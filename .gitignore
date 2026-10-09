@@ -1,0 +1,5 @@
+# build output (this file is also copied to the public repo)
+site/
+__pycache__/
+.venv/
+.preview-venv/

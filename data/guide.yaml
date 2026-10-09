@@ -1,0 +1,347 @@
+# Guide content: introduction, wiring notes, tubing steps and BOM. Wire endpoints live in wiring.yaml.
+# makerworld: https://makerworld.com/ is a placeholder until each model is published.
+revision: '2026-10-09'
+# The introduction page, short (user, 2026-10-05): what it is, features, use, needs, printing, build.
+# A list item is text or [bold lead, text]; a section has list, steps (numbered) or text.
+# Lead and section text can be a string or a list of paragraphs.
+# warning: shown at the top of every page; plain language, with supply voltages stated explicitly.
+# Safety guidance: https://www.hse.gov.uk/work-equipment-machinery/maintenance.htm
+# Electrical competence: https://www.hse.gov.uk/electricity/withequip.htm
+# Liability limits (German standard terms): https://www.gesetze-im-internet.de/bgb/__309.html
+intro:
+  warning: 'Moving parts can cause serious injury. Keep hands clear while the press is powered or pressurised. Before
+    reaching in, making adjustments or clearing a jam, unplug the power supply, close the air shut-off and release all
+    remaining air pressure. E-STOP is not a safety-rated emergency stop. This project uses 24 V DC only, from an enclosed,
+    CE-marked external power adapter. Household electricity (230 V) can kill. Never connect 230 V directly to the project
+    or open or modify the adapter. Leave electrical wiring and repairs to a qualified electrician. This is a DIY reference
+    design whose safety has not been independently verified. Have your build checked by a suitably qualified person before
+    use and follow local safety requirements. Do not use it for priming.'
+  title: 'AutoLever: pneumatic drive for the Lee APP'
+  lead:
+  - 'Pre-release, October 2026: this guide is published before the first build. Nothing in it has been built and
+    tested yet, the printed parts are not on MakerWorld yet, and details will change. Read it as a draft.'
+  - 'Give your Lee APP an air-powered upgrade. AutoLever takes over the lever work for sizing and decapping.
+    Press START and a Festo cylinder keeps it cycling, stroke after stroke. Press STOP when you’re done.'
+  - 'Four relays and two sensors run the sequence. No code to flash or controller to program.
+    The plans are free; bring your press and build your own.'
+  sections:
+  - title: What it does
+    list:
+    - [Automatic cycling., Press START once for continuous out-and-back strokes. Press STOP to stop and vent the cylinder.]
+    - [JOG control., 'With automatic mode off, hold JOG to cycle. Release it to stop. STOP interrupts JOG too.']
+    - [Free at rest., 'The cylinder vents when the valve is off, so you can move the lever by hand.']
+    - [Cycle monitoring., 'A timeout ends automatic mode and interrupts JOG. The timer resets at home, so it cannot detect a stall there.']
+    - [Pressure trip., 'The pressure switch cuts power to the valves, sensors and relays at 6 bar.']
+    - [24 V throughout., An enclosed external power supply powers the controls.]
+  - title: At the controls
+    text:
+    - 'POWER on, START to run, STOP to stop. E-STOP cuts all control power; twist to release.
+      Clear the fault before pressing START to resume automatic cycling.'
+    - 'Release JOG after any stop or trip. If you keep it held, the press can restart when STOP is released or the trip clears.'
+    - Check the printed handle adapter for cracks before each session.
+  - title: What you’ll need
+    list:
+    - A Lee APP (Classic preferred; Deluxe also works).
+    - A compressed-air supply at 7–10 bar.
+    - 'The BOM parts, plus a printed handle adapter, control box and yellow E-STOP ring.'
+  - title: Print it
+    text:
+    - 'PETG or ASA. Handle adapter: 6 walls and 40% infill. Control box: 15–20% infill.
+      The base, lid and console plate fit on a 256 mm bed. Print the E-STOP ring in yellow.'
+  - title: Build it
+    steps:
+    - Print the parts and gather the components from the BOM.
+    - Mount the press, cylinder, valve and filter-regulator on a board. Clamp the handle adapter onto the press lever.
+    - Follow the Wiring and Tubing guides to connect everything.
+    - 'Set the sensors with air disconnected: POWER on, move the rod by hand. Test with air at 2 bar using JOG
+      before trying START.'
+wiring_notes:
+  '0': 'Clip the sockets on the rail with their 1/4 end towards the back wall, so the busy 13/14 end faces the console. D1–D4:
+    ring to 14, plain leg to 13; crimp each leg into a 0.5 mm² ferrule.'
+  A: 'Unplug the supply and disconnect the air. J1: wire 1 on the centre-pin lug (+); with three lugs, wire 4 on the one that
+    stays connected to the sleeve with the plug in (meter). F1 (T 1 A) comes first, then the POWER rocker Q1: IN and OUT are
+    the pins that connect when it is switched on, GND is the third (wire 3 on GND shorts the supply). Solder lugs: solder and
+    heat-shrink; flat tabs: insulated receptacles. Clip the Wagos into the rack on the back wall, wire entries up, levers
+    towards the relays: X-EN, X-M1, X-M2, X-D, then the 2-way joints for D5 and D6. Twin ferrule where FROM or TO says so; on
+    13 and 14 the diode leg, in its own ferrule, goes on the other side of the screw. Pass each field cable through its gland
+    before you strip it. Check: plug centre pin +24 V; POWER off, the Q1 lamp stays dark (lit: swap wires 2 and 3). Then each
+    relay: plug it in, POWER on, test lead from S3:1 to its terminal 14: it clicks and its LED lights. POWER off, relays out
+    again until the wiring is done.'
+  B: 'START and JOG use their NO contact (3–4, or 13–14), never 1–2; E-STOP and STOP use their NC contact (1–2, or
+    11–12 / 21–22). A meter beeps across a NO contact only while the button is pressed, across an NC contact until it is
+    pressed. E-STOP and the pressure switch feed X-EN directly, so E-STOP cuts all control power. The timer contact (T1 8–5),
+    STOP, and START with the K1 holding contact form the AUTO latch. Wire 15 gives the Q1 lamp its 0 V. QPM11: with no air,
+    a meter must beep across its two terminals (NC type). After power-on and after STOP, E-STOP, a jam or an air pressure
+    fault, K1 is off and the press moves only while you hold JOG; START resumes automatic mode. The K1 LED shows it.'
+  C: X-EN is the control +24 V, live while POWER is on, E-STOP is released and the air pressure is below the trip. Wires 16
+    and 17 feed K1:12 and T1:8. Sensor brown cores go here. Every slot in each Wago is electrically common;
+    use only one conductor per slot.
+  D: 'Wire 20 feeds JOG from START''s input, after STOP and the timer contact, so STOP and a jam stop JOG too. K1 (AUTO,
+    wire 22) and JOG feed the same point, so the press runs while K1 is on or while JOG is held. The extend
+    coil Y1 is fed through K3 12–4 and K2 9–1 (both NC, wired here; Y1 itself in step G). Use the printed terminal numbers,
+    not the apparent position in the drawing.'
+  E: At the front, K2 starts the return; K3 holds itself until K4 cuts it at home. The return runs only while K1 is on or
+    JOG is held.
+  F: 'PNP sensors: brown = EN, blue = 0 V, black = output. B1 drives K2 (front); B0 drives K4 (home). Brown cores were connected
+    in step C. Check the label: SMT-8M-A-PS-… (PS = PNP). The output (max 100 mA) drives the relay coil (37 mA) directly.
+    Position: B0 so K4 lights with the rod fully home, B1 so K2 lights 2–3 mm before the press bottoms.'
+  G: 'Y1 extends; Y2 retracts. Pin 1 is + (wires 33 and 35): mark that core at both ends of each valve cable. Inside each plug,
+    fit D7/D8 with the cores: ring on pin 1 (+), plain leg on pin 2; reversed, they short the supply. Leave them out only if
+    the plug''s datasheet shows built-in suppression (an LED alone is not enough). K2:1 and K3:8 also take wires 37 and 38
+    from step H: cut those now and crimp 33 with 37 and 35 with 38 into one twin ferrule each. The plugs fit either coil:
+    with air on, press the red manual button next to each coil; the coil that drives the rod out gets plug Y1. K3 interlocks
+    the coils: they can never be on together.'
+  H: 'D5/D6 combine the two valve commands: D5''s plain leg joins wire 37 in one 2-way Wago (221-412), D6''s joins wire 38
+    in another (never 37 with 38: that ties Y1 to Y2); sleeve the bare legs with heat-shrink. Their ring legs meet at X-D,
+    then T1:7. T1 runs only while a valve coil is on and the rod is away from home: K4 bridges 1–3 at home and holds it at
+    zero. Set its wheels with no coil on (it reads them at power-up): left T1 (relay off) about twice one out-and-back, 30 s
+    until you have timed it; right T2 (relay on) 1 s, never 0. Test without air: rod a few cm off home, press START: after T1
+    the timer clicks and K1 drops. A jam stops JOG too; let go before you try again.'
+tubes:
+- id: air1
+  title: Supply → filter-regulator
+  from: Air supply (hose coupler)
+  to: FRL · IN
+  text: 'Mount the FRL upright on its bracket at the board edge, bowls hanging vertically and drains pointing down off the
+    board, away from the control box. Follow the arrow on the FRL body. Supply: 7–10 bar; start with the regulator at 2 bar.
+    If the unit has a lubricator, leave it empty: the cylinder and the valve are greased for life, and once you oil them you
+    have to keep oiling.'
+  check: Hose retained; FRL flow arrow points towards the valve.
+- id: shutoff
+  title: Filter-regulator → shut-off
+  from: FRL · OUT
+  to: Shut-off · IN
+  text: 'Fit the 3/2 shut-off with exhaust right after the FRL, its arrow pointing away from the FRL. Closed, it cuts the supply
+    and vents everything after it: tee, pressure switch, valve and cylinder. Close it whenever you reach into the press.'
+  check: Arrow points away from the FRL; exhaust port open, not plugged.
+- id: air2
+  title: Shut-off → pressure-switch tee
+  from: Shut-off · OUT
+  to: Tee · inlet
+  text: 'Connect the shut-off outlet to the 6 mm tee. The QPM11 sits on the tee''s branch and measures the regulated supply
+    pressure. Set it to open at 6 bar: regulator at 6 bar (only for this setting), POWER on, rod pushed home by hand
+    so the K4 LED lights, turn its screw until K4 goes out; then back to 5.5 bar or less.'
+  check: Pressure switch after the shut-off; tee branch sealed.
+- id: air3
+  title: Tee → valve supply
+  from: Tee · outlet
+  to: Valve · P
+  text: 'Connect the tee to P, the supply port. Read the letters on the valve body: never connect the supply to R or S (the
+    exhausts).'
+  check: Tube reaches P; no tight bend or kink.
+- id: air4
+  title: Valve A → cylinder cap end
+  from: Valve · A
+  to: Cylinder · cap-end flow control
+  text: 'Connect A to the end without the rod. Fit a meter-out flow control: free flow into the cylinder, restricted flow
+    out. This cap-end adjuster controls retraction speed. Start with both flow controls 1 turn open.'
+  check: A reaches the cap end; flow-control direction confirmed.
+- id: air5
+  title: Valve B → cylinder rod end
+  from: Valve · B
+  to: Cylinder · rod-end flow control
+  text: Connect B to the port beside the rod. Again use meter-out orientation. This rod-end adjuster controls extension speed.
+    Leave room for cylinder movement.
+  check: B reaches the rod end; tube cannot rub or pull tight.
+- id: air6
+  title: Fit both exhaust silencers
+  from: Valve · R + S
+  to: Atmosphere · two silencers
+  text: 'Fit one silencer to each exhaust and point both away from the control box and the operator. Do not cap or join these
+    ports to supply. First air-on, POWER off: nothing may move and the lever must stay free by hand. If the rod creeps out,
+    the valve is not exhaust-centre: close the shut-off.'
+  check: Both exhausts open through silencers; no obstruction.
+bom:
+- id: press
+  group: Mounting
+  qty: '1'
+  part: Lee APP
+  spec: Classic APP (preferred) or APP Deluxe
+- id: rail
+  group: Mounting
+  qty: 1 set
+  part: DIN rail + end stops
+  spec: TS35 × 7.5 · cut to 211 mm, 12.5 mm from a slot centre · 2 end stops
+- id: glands
+  group: Mounting
+  qty: '5'
+  part: Cable glands M12 × 1.5
+  spec: 3 × clamping 3–6.5 mm (valve Y1, Y2 · QPM11) · 2 × clamping 2–5 mm (sensors B0, B1)
+- id: hardware
+  group: Mounting
+  qty: 1 set
+  part: Board and mounting hardware
+  spec: Plywood board ≥ 15 mm · 4 × 4×16 countersunk wood screws (box) · 3 × 4×16 pan-head wood screws (rail) · 4 × M3
+    heat-set inserts (4.2 mm hole, ≤ 6 mm long) + 4 × M3×8 (lid) · 6 × M3 heat-set inserts + 6 × M3×8 countersunk (console plate) · wood screws for the press, cylinder pivot, valve and FRL
+    bracket · cable ties
+- id: mechanism
+  group: Mounting
+  qty: 1 set
+  part: Cylinder pivot and lever coupling
+  spec: 'Rear pivot mount · M10×1.25 rod clevis · adapter hardware: 2 × M6×45 + 1 × M10 (length to suit the clevis), nuts
+    and washers'
+- id: compressor
+  group: Pneumatics
+  qty: '1'
+  part: Compressed-air source
+  spec: Compressor or shop air · 7–10 bar at the FRL inlet
+- id: cylinder
+  group: Pneumatics
+  qty: '1'
+  part: Festo DSNU-32-250-PPS-A
+  spec: Ø32 mm bore · 250 mm stroke · G1/8 ports · M10×1.25 rod
+- id: valve
+  group: Pneumatics
+  qty: '1'
+  part: 5/3 exhaust-centre valve
+  spec: AirTAC 4V230E-06 or another 5/3 exhaust-centre (E) valve, not C or P · 1/8 ports · two 24 V DC coils with DIN plugs
+- id: frl
+  group: Pneumatics
+  qty: '1'
+  part: Filter-regulator + gauge
+  spec: AirTAC AFC-2000 or AFR-2000 (no lubricator) · 1/4 ports · gauge and bracket included
+- id: pressure
+  group: Pneumatics
+  qty: '1'
+  part: QPM11 pressure switch + tee
+  spec: QPM11-NC, 1/8 male · opens above the set pressure · 6 mm push-in tee with 1/8 male branch + 1/8 female–female socket
+- id: flow
+  group: Pneumatics
+  qty: '2'
+  part: Meter-out flow controls
+  spec: G1/8 cylinder thread × 6 mm tube OD
+- id: valvefittings
+  group: Pneumatics
+  qty: '3'
+  part: Valve push-in fittings
+  spec: 6 mm tube × 1/8 · P, A and B
+- id: silencers
+  group: Pneumatics
+  qty: '2'
+  part: Exhaust silencers
+  spec: 1/8 · R and S
+- id: tube
+  group: Pneumatics
+  qty: 3 m est.
+  part: PU pneumatic tubing
+  spec: 6 mm OD × 4 mm ID · PU, rated ≥ 8 bar
+- id: supplyair
+  group: Pneumatics
+  qty: 1 set
+  part: Air supply connection
+  spec: Supply hose rated ≥ 10 bar, matching coupler, 1/4 FRL inlet adapter
+- id: frladapter
+  group: Pneumatics
+  qty: '1'
+  part: FRL outlet tube adapter
+  spec: 6 mm push-in × 1/4
+- id: isolation
+  group: Pneumatics
+  qty: '1'
+  part: Air shut-off with exhaust
+  spec: 3/2-way hand valve with exhaust, 6 mm tube connections · between the filter-regulator and the tee
+- id: psu
+  group: Electrical
+  qty: '1'
+  part: Mean Well GST25A24-P1J
+  spec: Closed desktop power supply, CE-marked · 24 V DC · 1.04 A · Class I, IEC C14 inlet · 5.5 × 2.1 mm plug, centre +
+- id: cord
+  group: Electrical
+  qty: '1'
+  part: IEC mains cord
+  spec: Earthed, C13 plug (fits the supply's C14 inlet)
+- id: jack
+  group: Electrical
+  qty: '1'
+  part: Panel DC jack J1
+  spec: 5.5 × 2.1 mm, 8 mm thread (DC-099 type) · ≥ 2 A · 8 mm panel hole
+- id: fuse
+  group: Electrical
+  qty: '1'
+  part: Panel fuse holder F1 + fuse
+  spec: 5 × 20 mm · 12 mm thread, at most 28 mm behind the panel · pre-wired leads · fuse T 1 A (slow-blow) + spare
+- id: relays
+  group: Electrical
+  qty: '4'
+  part: HH52P-L / MY2NJ relays
+  spec: 24 V DC coil with LED · DPDT · K1–K4
+- id: sockets
+  group: Electrical
+  qty: '4'
+  part: PYF08A relay sockets
+  spec: Compatible with fitted relays · DIN mounting
+- id: timer
+  group: Electrical
+  qty: 1 set
+  part: DH48S-S timer + socket
+  spec: SPDT, reset on 1–3 · 24 V AC/DC · 8-pin socket · T1
+- id: sensors
+  group: Electrical
+  qty: 2 sets
+  part: Festo SMT-8M-A-PS-24V-E-2,5-OE sensors + clamps
+  spec: PNP, N/O · 2.5 m open cable end · SMBR-8-32 clamps
+- id: diodes
+  group: Electrical
+  qty: '8'
+  part: 1N4007 diodes
+  spec: D1–D4 relay suppression · D5/D6 timer feed · D7/D8 in the valve plugs
+- id: stop
+  group: Controls
+  qty: '1'
+  part: 22 mm emergency stop E-STOP
+  spec: Red mushroom, latching, twist release · NC contact · S3 · sits on the printed yellow ring
+- id: buttons
+  group: Controls
+  qty: '3'
+  part: 22 mm momentary buttons
+  spec: STOP S2 black, NC contact 1–2 · START S0 green and JOG S1 white, NO contact 3–4 or 13–14 · 1NO+1NC sets fit all three
+- id: switch
+  group: Controls
+  qty: '1'
+  part: Illuminated rocker switch Q1
+  spec: Round Ø20 mm snap-in · ON-OFF with 24 V LED, 3 pins · ≥ 3 A · any LED colour but red · POWER
+- id: wago5
+  group: Wiring
+  qty: '3'
+  part: Wago 221-415 lever connectors, 5-way
+  spec: 'X-EN: control +24 V, live while POWER is on and E-STOP released · X-M1 and X-M2: 0 V (minus)'
+- id: wago3
+  group: Wiring
+  qty: '1'
+  part: Wago 221-413 lever connector, 3-way
+  spec: 'X-D: joins diodes D5 and D6 and feeds timer T1'
+- id: wago2
+  group: Wiring
+  qty: '2'
+  part: Wago 221-412 lever connectors, 2-way
+  spec: 'One per joint: D5 plain leg + wire 37, D6 plain leg + wire 38'
+- id: controlwire
+  group: Wiring
+  qty: 10 m est.
+  part: Hook-up wire, white + blue
+  spec: Stranded, H05V-K · 0.5 mm² (AWG 20) · white = + / switched, blue = 0 V
+- id: valvecable
+  group: Wiring
+  qty: 3 m est.
+  part: 2-core cable, black sheath
+  spec: 3 runs out of the box (valve plugs Y1, Y2 and QPM11) · 2 × 0.5 mm² (AWG 20) · sheath to suit the M12 glands
+- id: terminations
+  group: Wiring
+  qty: 1 set
+  part: Ferrules, receptacles and labels
+  spec: 50 ferrules 0.5 mm² · 12 twin ferrules 2 × 0.5 mm² · 5 insulated flat receptacles for the Q1 and F1 tabs · heat-shrink
+    · wire labels
+- id: adapter
+  group: 3D printed
+  qty: '1'
+  part: Lee APP handle adapter
+  spec: 3D printed, two halves · clamps on the lever struts, takes the cylinder rod clevis · PETG or ASA, 6 walls, 40 % infill · regulator at most 5.5 bar · not for other presses or loads
+  image: boxes/lee_app_handle_adapter.png
+  makerworld: https://makerworld.com/
+- id: controlbox
+  group: 3D printed
+  qty: '1'
+  part: Control box
+  spec: 3D printed in PETG or ASA, 15–20 % infill · relays, timer, buttons, a clip rack for the lever connectors and the 24 V entry in one box, no mains inside · buttons on a separate console plate, wired on the bench · cable entries at the back, or glands on the left · base, lid and plate fit a 256 mm bed · labels in a second colour · E-STOP ring in yellow
+  image: boxes/control_box.png
+  makerworld: https://makerworld.com/
