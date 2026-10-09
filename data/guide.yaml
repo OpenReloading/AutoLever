@@ -16,10 +16,11 @@ intro:
     or open or modify the adapter. Leave electrical wiring and repairs to a qualified electrician. This is a DIY reference
     design whose safety has not been independently verified. Have your build checked by a suitably qualified person before
     use and follow local safety requirements. Do not use it for priming.'
+  # prerelease: red banner above the page tabs on every page; delete the key after the first build.
+  prerelease: 'Pre-release, October 2026: published before the first build. Nothing has been built and tested yet,
+    the printed parts are not on MakerWorld yet, and details will change.'
   title: 'AutoLever: pneumatic drive for the Lee APP'
   lead:
-  - 'Pre-release, October 2026: this guide is published before the first build. Nothing in it has been built and
-    tested yet, the printed parts are not on MakerWorld yet, and details will change. Read it as a draft.'
   - 'Give your Lee APP an air-powered upgrade. AutoLever takes over the lever work for sizing and decapping.
     Press START and a Festo cylinder keeps it cycling, stroke after stroke. Press STOP when you’re done.'
   - 'Four relays and two sensors run the sequence. No code to flash or controller to program.

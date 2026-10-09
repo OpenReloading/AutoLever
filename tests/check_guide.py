@@ -31,6 +31,7 @@ with sync_playwright() as p:
     # The safety warning sits above the content on every page, without exact figures.
     expect(page.locator('.ag-nav + .ag-warning + #ag-content')).to_have_count(1)
     expect(page.locator('.ag-warning')).to_contain_text('E-STOP is not a safety-rated')
+    expect(page.locator('.ag-prerelease')).to_contain_text('Pre-release')
     expect(page.locator('.ag-warning')).to_contain_text('electricity')
     expect(page.locator('.ag-warning')).not_to_contain_text(re.compile(r'\d+ ?(N|bar)\b'))
     expect(page.locator('#assembly-guide h1')).to_have_text(data['intro']['title'])

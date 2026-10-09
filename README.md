@@ -1,32 +1,20 @@
-# AutoLever pneumatic press drive
+# AutoLever
 
-An air cylinder works the lever of a Lee APP press, controlled by four 24 V relays and a jam timer. Press START and it presses out and back by itself until STOP, a jam or an overpressure trip; then the cylinder vents. With automatic mode off, JOG runs it only while held; E-STOP cuts the control power.
+Pneumatic drive for the Lee APP reloading press. A Festo cylinder works the lever, four 24 V relays and a timer run the cycle. No microcontroller, nothing to flash.
 
-Everything in the printed box runs on 24 V DC from a closed, CE-marked desktop power supply; no mains voltage inside. This is an unchecked reference design: build and use it at your own risk. **Pre-release (October 2026):** the guide is published before the first build; nothing has been built and tested yet, the printed parts are not on MakerWorld yet, and details will change.
+Build guide with parts list, wiring and tubing: https://openreloading.github.io/AutoLever/
 
-The build guide (introduction, BOM, step-by-step wiring and tubing) is published with GitHub Pages from this repository.
+**Pre-release, October 2026.** Nothing has been built yet, the printed parts are not on MakerWorld yet, details will change.
 
-## Editing
+Use at your own risk. The box runs on 24 V DC from an external desktop power supply, no mains inside.
 
-| What | Where |
-|---|---|
-| Every wire, terminal and board position | `data/wiring.yaml` |
-| Introduction, wiring step notes, tubing steps, BOM | `data/guide.yaml` |
-| Guide pages and board | `docs/`, `docs/assets/guide.js`, `docs/assets/guide-board.js` |
+## Repo
 
-```sh
-python -m venv .venv && .venv/bin/pip install -r requirements.txt
-.venv/bin/mkdocs serve        # preview at http://127.0.0.1:8000
-```
+- `data/wiring.yaml`: every wire and terminal
+- `data/guide.yaml`: text, tubing steps, parts list
+- `docs/`: the MkDocs site. `pip install -r requirements.txt`, then `mkdocs serve`.
+- `tests/check_guide.py`: Playwright check against a running `mkdocs serve`
 
-The build fails if a wire names a terminal that does not exist or puts more than two wires under one screw. `tests/check_guide.py` (needs `playwright` and Chromium) checks every wire, tube, the BOM and the mobile layout against a running `mkdocs serve`.
+A push to `main` builds and deploys the site with GitHub Actions.
 
-## Publishing
-
-Pushing to `main` runs `.github/workflows/pages.yml`, which builds the site and deploys it to GitHub Pages. In the repository settings, set **Pages → Source** to **GitHub Actions** once.
-
-The printed parts will be published on MakerWorld; until then the `makerworld:` links in `data/guide.yaml` are placeholders.
-
-## Licence
-
-MIT, see `LICENSE`. `docs/assets/vendor/` contains unmodified copies of JointJS (MPL 2.0) and libavoid-js (LGPL 2.1 or later) with their licences.
+MIT licence. `docs/assets/vendor/` holds unmodified JointJS (MPL 2.0) and libavoid-js (LGPL 2.1+).

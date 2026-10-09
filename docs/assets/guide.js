@@ -43,7 +43,7 @@
     root.classList.toggle('ag-diagram-page',isDiagram);
     root.classList.toggle('ag-expanded',state.expanded);
     root.innerHTML=`<header class="ag-top"><div class="ag-top-inner"><a class="ag-brand" href="${pageURL('intro')}"><img class="ag-mark" src="${new URL('autolever.svg',ASSETS)}" alt="" width="36" height="36"><span class="ag-wordmark">Auto<span>Lever</span></span><span class="ag-brand-label">BUILD GUIDE</span></a></div></header>
-    <main class="ag-main"><nav class="ag-nav" aria-label="Guide pages">${pages.map(([id,title])=>`<a href="${pageURL(id)}" ${id===page?'aria-current="page"':''}>${title}</a>`).join('')}</nav><p class="ag-warning" role="note"><b>⚠ Safety</b> ${esc(D.intro.warning)}</p><div id="ag-content">${page==='intro'?renderIntro():page==='bom'?renderBOM():renderAssembly()}</div>
+    <main class="ag-main">${D.intro.prerelease?`<p class="ag-prerelease" role="alert"><b>⚠ Pre-release</b> ${esc(D.intro.prerelease)}</p>`:''}<nav class="ag-nav" aria-label="Guide pages">${pages.map(([id,title])=>`<a href="${pageURL(id)}" ${id===page?'aria-current="page"':''}>${title}</a>`).join('')}</nav><p class="ag-warning" role="note"><b>⚠ Safety</b> ${esc(D.intro.warning)}</p><div id="ag-content">${page==='intro'?renderIntro():page==='bom'?renderBOM():renderAssembly()}</div>
     <footer class="ag-footer"><span>${isDiagram?(persistent?'Progress saved in this browser':'Storage unavailable · progress lasts for this visit'):'AutoLever · pneumatic press drive'}${D.revision?' · revision '+esc(D.revision):''}</span>${button('Print','print')}</footer></main>`;
     bind();
     if(page==='wiring') {
@@ -80,7 +80,7 @@
       });
     };
     const observer=new ResizeObserver(fit);
-    root.querySelectorAll('.ag-top, .ag-nav, .ag-warning, .ag-page-heading, .ag-steps, .ag-work-heading, .ag-board-toolbar, .ag-board-legend, .ag-connection-detail, .ag-wire-navigation').forEach(el=>observer.observe(el));
+    root.querySelectorAll('.ag-top, .ag-prerelease, .ag-nav, .ag-warning, .ag-page-heading, .ag-steps, .ag-work-heading, .ag-board-toolbar, .ag-board-legend, .ag-connection-detail, .ag-wire-navigation').forEach(el=>observer.observe(el));
     window.addEventListener('resize',fit);fit();
     return ()=>{observer.disconnect();window.removeEventListener('resize',fit);cancelAnimationFrame(frame);};
   }
