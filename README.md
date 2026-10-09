@@ -1,3 +1,5 @@
+<p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/assets/autolever-logo-dark.svg"><img src="docs/assets/autolever-logo.svg" width="320" alt="AutoLever"></picture></p>
+
 # AutoLever
 
 Pneumatic drive for the Lee APP reloading press. A Festo cylinder works the lever, four 24 V relays and a timer run the cycle. No microcontroller, nothing to flash.

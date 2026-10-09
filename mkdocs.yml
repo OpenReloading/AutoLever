@@ -8,7 +8,7 @@ theme:
   name: material
   font: false   # system fonts: no requests to Google Fonts
   logo: assets/autolever.svg
-  favicon: assets/autolever.svg
+  favicon: assets/favicon.svg
   features:
     - navigation.tabs
   palette:
