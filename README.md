@@ -6,6 +6,8 @@ Pneumatic drive for the Lee APP reloading press. A Festo cylinder works the leve
 
 Build guide with parts list, wiring and tubing: https://openreloading.github.io/AutoLever/
 
+Built by reloaders for reloaders, with AI as a tool.
+
 **Pre-release, October 2026.** Nothing has been built yet, the printed parts are not on MakerWorld yet, details will change.
 
 Use at your own risk. The box runs on 24 V DC from an external desktop power supply, no mains inside.

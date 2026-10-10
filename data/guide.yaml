@@ -25,6 +25,7 @@ intro:
     Press START and a Festo cylinder keeps it cycling, stroke after stroke. Press STOP when you’re done.'
   - 'Four relays and two sensors run the sequence. No code to flash or controller to program.
     The plans are free; bring your press and build your own.'
+  - 'Built by reloaders for reloaders, with AI as a tool.'
   sections:
   - title: What it does
     list:
