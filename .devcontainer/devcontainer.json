@@ -1,0 +1,9 @@
+{
+  "name": "AutoLever",
+  "build": { "dockerfile": "Dockerfile" },
+  "runArgs": ["--userns=keep-id"],
+  "remoteUser": "vscode",
+  "updateRemoteUserUID": false,
+  "forwardPorts": [8000],
+  "postCreateCommand": "python -m venv .venv && .venv/bin/pip install -r requirements.txt"
+}

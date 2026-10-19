@@ -40,6 +40,11 @@ markdown_extensions:
   - attr_list
   - md_in_html
 
+# agent instruction files in docs/ are not pages
+exclude_docs: |
+  AGENTS.md
+  CLAUDE.md
+
 nav:
   - Introduction: index.md
   - BOM: bom.md
