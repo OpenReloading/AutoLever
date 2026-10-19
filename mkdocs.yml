@@ -44,6 +44,7 @@ markdown_extensions:
 exclude_docs: |
   AGENTS.md
   CLAUDE.md
+  agents/
 
 nav:
   - Introduction: index.md
