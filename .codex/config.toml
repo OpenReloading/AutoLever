@@ -1,0 +1,4 @@
+[mcp_servers.playwright]
+command = "sh"
+args = ["-c", "exec devcontainer exec --docker-path podman --workspace-folder \"$(git rev-parse --show-toplevel)\" playwright-mcp --headless --browser chromium"]
+startup_timeout_sec = 60
