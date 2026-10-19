@@ -14,3 +14,13 @@
 - Content in `data/*.yaml`; `main.py` asserts wiring rules, `on_error_fail: true` fails the build.
 - No third-party requests: `font: false`, `docs/assets/vendor/` unmodified; the browser check fails on external requests.
 - Safety warning without exact force or pressure figures.
+
+## Agent skills
+
+### Issue tracker
+
+Issues live in GitHub Issues (`gh` CLI). See `docs/agents/issue-tracker.md`.
+
+### Domain docs
+
+Single-context: `GLOSSARY.md` and `docs/adr/` at the repo root. See `docs/agents/domain.md`.
