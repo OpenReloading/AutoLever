@@ -6,13 +6,15 @@
 - Install: `python -m venv .venv && .venv/bin/pip install -r requirements.txt`
 - Build (as CI): `.venv/bin/mkdocs build --strict`
 - Serve: `.venv/bin/mkdocs serve -a 0.0.0.0:8000`
-- Browser check, with the site served: `.venv/bin/python tests/check_guide.py http://127.0.0.1:8000/AutoLever` (`site_url` serves under `/AutoLever/`)
+- Generate the guide data after editing `data/*.yaml`: `.venv/bin/python main.py` (writes `data/buildguide.json`, committed; CI fails when it is stale)
+- Browser check, against the built site (`mkdocs serve` livereload counts as an external request): `.venv/bin/mkdocs build --strict -d /tmp/www/AutoLever && python -m http.server -d /tmp/www 8000`, then `.venv/bin/python tests/check_guide.py http://127.0.0.1:8000/AutoLever`
 - Playwright MCP (`.mcp.json`, `.codex/config.toml`) runs inside the container and reaches the served site at `http://127.0.0.1:8000/AutoLever/`.
 
 ## Conventions
 
-- Content in `data/*.yaml`; `main.py` asserts wiring rules, `on_error_fail: true` fails the build.
-- No third-party requests: `font: false`, `docs/assets/vendor/` unmodified; the browser check fails on external requests.
+- Content in `data/*.yaml`. `main.py` keeps the project rules (wire labels, cable kinds, two wires per screw) and converts to the BuildGuide data format; the `buildguide` MkDocs plugin checks the result and fails the build on a problem.
+- Pages carry front matter `buildguide: <page id>`; the plugin renders the guide.
+- No third-party requests: `font: false`, no `repo_url` (Material fetches repo stats from the GitHub API); the browser check fails on external requests.
 - Safety warning without exact force or pressure figures.
 
 ## Agent skills

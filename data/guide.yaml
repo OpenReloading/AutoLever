@@ -16,9 +16,9 @@ intro:
     or open or modify the adapter. Leave electrical wiring and repairs to a qualified electrician. This is a DIY reference
     design whose safety has not been independently verified. Have your build checked by a suitably qualified person before
     use and follow local safety requirements. Do not use it for priming.'
-  # prerelease: red banner above the page tabs on every page; delete the key after the first build.
-  prerelease: 'Pre-release, October 2026: published before the first build. Nothing has been built and tested yet,
-    the printed parts are not on MakerWorld yet, and details will change.'
+  # warning_short: the warning on the wiring and tubing pages, the full text opens from it
+  warning_short: 'Moving parts can cause serious injury. Before reaching in, unplug the power supply and release the air
+    pressure. E-STOP is not a safety-rated emergency stop.'
   title: 'AutoLever: pneumatic drive for the Lee APP'
   lead:
   - 'Give your Lee APP an air-powered upgrade. AutoLever takes over the lever work for sizing and decapping.

@@ -1,6 +1,5 @@
 site_name: AutoLever pneumatic press drive
 site_url: https://openreloading.github.io/AutoLever/
-repo_url: https://github.com/OpenReloading/AutoLever
 site_description: An air cylinder works the lever of a Lee APP press, controlled by four 24 V relays and a jam timer. Parts, wiring and tubing.
 copyright: MIT licence
 
@@ -23,22 +22,10 @@ theme:
       accent: deep orange
       toggle: {icon: material/weather-sunny, name: Light mode}
 
-# rebuild on data and macro changes too, not only docs/
-watch:
-  - data
-  - main.py
-
+# data/buildguide.json comes from main.py (python main.py)
 plugins:
-  - macros:
-      module_name: main
-      on_error_fail: true
-
-extra_css:
-  - assets/guide.css
-
-markdown_extensions:
-  - attr_list
-  - md_in_html
+  - buildguide:
+      data: data/buildguide.json
 
 # agent instruction files in docs/ are not pages
 exclude_docs: |
