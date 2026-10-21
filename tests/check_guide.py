@@ -1,5 +1,5 @@
 """Browser checks for the dedicated guide pages. Requires Playwright + Chromium.
-Run with MkDocs serving: python tests/check_guide.py [http://127.0.0.1:8000]
+Run against the built site served under /AutoLever/ (AGENTS.md): python tests/check_guide.py http://127.0.0.1:8000/AutoLever
 """
 import csv
 import io
@@ -27,6 +27,7 @@ with sync_playwright() as p:
         expect(page.locator('.ag-board-canvas')).to_have_attribute('data-ready','true')
     go()
     data=json.loads(page.locator('#guide-data').text_content())
+    wiring,tubing,bom=data['boards']['wiring']['steps'],data['boards']['tubing']['steps'],data['bom']['items']
     expect(page.locator('.ag-nav a')).to_have_text(['Introduction','BOM','Wiring','Tubing'])
     # The safety warning sits above the content on every page, without exact figures.
     expect(page.locator('.ag-nav + .ag-warning + #ag-content')).to_have_count(1)
@@ -50,18 +51,18 @@ with sync_playwright() as p:
     page.go_back(wait_until='domcontentloaded')
     expect(page.locator('#assembly-guide h1')).to_have_text('Wiring')
     # Every board connection matches the validated source, with no extra diode wires.
-    for step in data['steps']:
-        for wire in step['wires']:
+    for step in wiring:
+        for wire in step['connections']:
             go(f"wiring/#{step['id']}/{wire['no']}");ready()
             expect(page.locator('.ag-connection-detail')).to_contain_text(wire['la'])
             expect(page.locator('.ag-connection-detail')).to_contain_text(wire['lb'])
-            expect(page.locator('[data-connection]')).to_have_count(len(step['wires']))
-            expect(page.locator('[data-connection="'+wire['no']+'"]')).to_have_attribute('aria-label',wire['no']+': '+wire['la']+' to '+wire['lb']+('; ring at '+wire['la'] if wire['col']=='DIODE' else ''))
+            expect(page.locator('[data-connection]')).to_have_count(len(step['connections']))
+            expect(page.locator('[data-connection="'+wire['no']+'"]')).to_have_attribute('aria-label',wire['no']+': '+wire['la']+' to '+wire['lb']+('; ring at '+wire['la'] if wire['color']=='DIODE' else ''))
     go('wiring/#A/1');ready()
     page.locator('#ag-wire-scope').select_option('single');ready()
     expect(page.locator('[data-connection]')).to_have_count(1)
     page.locator('#ag-wire-scope').select_option('all');ready()
-    expect(page.locator('[data-connection]')).to_have_count(sum(len(s['wires']) for s in data['steps']))
+    expect(page.locator('[data-connection]')).to_have_count(sum(len(s['connections']) for s in wiring))
     page.locator('#ag-wire-scope').select_option('step');ready()
     page.locator('.ag-verify input').check()
     expect(page.locator('.ag-wire-row.selected input')).to_be_checked()
@@ -76,28 +77,29 @@ with sync_playwright() as p:
     expect(page.locator('.ag-verify input')).not_to_be_checked()
     go('wiring/#A/1')
     page.locator('[data-action=prev-wire]').click()
-    expect(page.locator('.ag-wire-row.selected .ag-wire-number')).to_have_text(data['steps'][0]['wires'][-1]['no'])
-    go('wiring/#H/'+data['steps'][-1]['wires'][-1]['no'])
+    expect(page.locator('.ag-wire-row.selected .ag-wire-number')).to_have_text(wiring[0]['connections'][-1]['no'])
+    go('wiring/#H/'+wiring[-1]['connections'][-1]['no'])
     page.locator('[data-action=next-wire]').click()
     expect(page).to_have_url(BASE+'/tubing/#1')
     # Tubing has the same workspace, zoom, scope, selection and fullscreen controls.
-    for i,tube in enumerate(data['tubes']):
-        go(f'tubing/#{i+1}');ready()
-        expect(page.locator('.ag-connection-detail')).to_contain_text(tube['from'])
-        expect(page.locator('.ag-connection-detail')).to_contain_text(tube['to'])
-        expect(page.locator('[data-air-route]')).to_have_count(len(data['tubes']))   # tubing shows every connection by default
+    for step in tubing:
+        tube=step['connections'][0]
+        go(f"tubing/#{step['id']}");ready()
+        expect(page.locator('.ag-connection-detail')).to_contain_text(tube['la'])
+        expect(page.locator('.ag-connection-detail')).to_contain_text(tube['lb'])
+        expect(page.locator('[data-connection]')).to_have_count(len(tubing))   # tubing shows every connection by default
         page.locator('.ag-verify input').check()
     page.reload(wait_until='domcontentloaded')
-    tubes=len(data['tubes'])
+    tubes=len(tubing)
     expect(page.locator('.ag-progress')).to_have_text(f'{tubes} / {tubes} checked')
-    expect(page.locator('[data-action=next-tube]')).to_be_disabled()
+    expect(page.locator('[data-action=next-wire]')).to_be_disabled()
     page.locator('#ag-wire-scope').select_option('all');ready()
-    expect(page.locator('[data-air-route]')).to_have_count(tubes)
-    page.locator('[data-air-route="2"]').focus()
+    expect(page.locator('[data-connection]')).to_have_count(tubes)
+    page.locator('[data-connection="3"]').focus()
     page.keyboard.press('Enter')
     expect(page).to_have_url(BASE+'/tubing/#3')
     dimensions=[]
-    for slug,selector,step in [('wiring','.joint-paper','[data-step="2"]'),('tubing','.ag-air-paper','[data-tube="2"]')]:
+    for slug,selector,step in [('wiring','.joint-paper','[data-step="2"]'),('tubing','.joint-paper','[data-step="2"]')]:
         go(slug+'/');ready()
         expect(page.locator('.ag-steps')).to_be_visible()
         dimensions.append(page.locator('.ag-board-canvas').bounding_box())
@@ -114,7 +116,9 @@ with sync_playwright() as p:
         expect(page.locator('#assembly-guide')).to_have_class(re.compile('ag-expanded'))
         page.wait_for_timeout(300)
         assert page.locator(selector).bounding_box()['width']>=width-1,slug+': fullscreen shows a smaller diagram'
-        page.locator('.ag-steps').locator(step).click();ready()
+        # the step renders on hashchange: until then ready() still sees the old canvas (BuildGuide#9)
+        page.locator('.ag-steps').locator(step).click()
+        expect(page.locator('.ag-steps').locator(step)).to_have_attribute('aria-current','step');ready()
         assert page.evaluate('document.fullscreenElement.id')=='assembly-guide'
         nav=page.locator('.ag-wire-navigation').bounding_box()
         assert nav['y']+nav['height']<=page.evaluate('innerHeight')+1
@@ -123,23 +127,23 @@ with sync_playwright() as p:
     assert dimensions[0]['width']==dimensions[1]['width']
     go('bom/')
     expect(page.locator('thead th')).to_have_text(['Qty','Component','Specification'])
-    expect(page.locator('tbody tr:not(.ag-group)')).to_have_count(len(data['bom']))
+    expect(page.locator('tbody tr:not(.ag-group)')).to_have_count(len(bom))
     expect(page.locator('#assembly-guide').locator('[data-filter], .ag-bom-stats')).to_have_count(0)
     # Each BOM line has a tick, stored in this browser; it survives a reload and a search.
-    expect(page.locator('tbody input[type=checkbox]')).to_have_count(len(data['bom']))
+    expect(page.locator('tbody input[type=checkbox]')).to_have_count(len(bom))
     page.locator('tbody input[type=checkbox]').first.check()
     page.reload(wait_until='domcontentloaded')
     expect(page.locator('tbody input[type=checkbox]').first).to_be_checked()
-    expect(page.locator('.ag-progress')).to_have_text(f"1 / {len(data['bom'])} checked")
+    expect(page.locator('.ag-progress')).to_have_text(f"1 / {len(bom)} checked")
     page.locator('#ag-search').fill('Wago')
     page.locator('tbody input[type=checkbox]').first.check()
-    expect(page.locator('.ag-progress')).to_have_text(f"2 / {len(data['bom'])} checked")
+    expect(page.locator('.ag-progress')).to_have_text(f"2 / {len(bom)} checked")
     page.locator('#ag-search').fill('')
     # a click anywhere in a row ticks it
     page.locator('tbody tr:not(.ag-group)').nth(2).locator('td').nth(2).click()
-    expect(page.locator('.ag-progress')).to_have_text(f"3 / {len(data['bom'])} checked")
+    expect(page.locator('.ag-progress')).to_have_text(f"3 / {len(bom)} checked")
     expect(page.locator('tbody tr:not(.ag-group)').nth(2).locator('input[type=checkbox]')).to_be_checked()
-    assert all('status' not in row for row in data['bom'])
+    assert all('status' not in row for row in bom)
     page.locator('#ag-search').fill('Wago')
     expect(page.locator('tbody tr:not(.ag-group)')).to_have_count(3)
     with page.expect_download() as download:
@@ -153,11 +157,11 @@ with sync_playwright() as p:
     page.locator('#ag-search').fill('does-not-exist')
     expect(page.locator('.ag-empty')).to_be_visible()
     page.locator('#ag-search').fill('')
-    expect(page.locator('tbody tr:not(.ag-group)')).to_have_count(len(data['bom']))
+    expect(page.locator('tbody tr:not(.ag-group)')).to_have_count(len(bom))
     # Printed parts are grouped, marked as 3D printed and link to MakerWorld.
     page.locator('#ag-search').fill('3D printed')
     expect(page.locator('tr.ag-group')).to_have_text(['3D printed'])
-    expect(page.locator('tbody a', has_text='MakerWorld')).to_have_count(sum('makerworld' in row for row in data['bom']))
+    expect(page.locator('tbody a', has_text='MakerWorld')).to_have_count(sum('link' in row for row in bom))
     page.locator('#ag-search').fill('')
     # No links to removed pages or manufacturer lists.
     for path in ['', 'bom/', 'wiring/', 'tubing/']:
@@ -179,7 +183,8 @@ with sync_playwright() as p:
             go(slug+'/');ready()
             steps=page.locator('.ag-steps button')
             for index in range(steps.count()):
-                steps.nth(index).click();ready()
+                steps.nth(index).click()
+                expect(steps.nth(index)).to_have_attribute('aria-current','step');ready()
                 # short landscape screens: the safety warning scrolls away, the board keeps its minimum height
                 page.evaluate("scrollTo(0,innerHeight<500?document.querySelector('.ag-warning').getBoundingClientRect().bottom+scrollY:0)")
                 page.wait_for_function('''() => {
@@ -205,5 +210,5 @@ with sync_playwright() as p:
     fallback=nojs.new_page();fallback.goto(BASE+'/',wait_until='domcontentloaded')
     assert 'This guide needs JavaScript.' in fallback.content()
     browser.close()
-    wires=[w for s in data['steps'] for w in s['wires']]
-    print(f"PASS: four pages; {len(wires)} connections ({sum(w['col']=='DIODE' for w in wires)} diodes), {len(data['tubes'])} tubing steps, grouped BOM with 3D printed parts, safety warning on every page; matching layouts, zoom, fullscreen, scrolling, persistence, CSV and mobile; no JS errors, missing assets or third-party requests.")
+    wires=[w for s in wiring for w in s['connections']]
+    print(f"PASS: four pages; {len(wires)} connections ({sum(w['color']=='DIODE' for w in wires)} diodes), {len(tubing)} tubing steps, grouped BOM with 3D printed parts, safety warning on every page; matching layouts, zoom, fullscreen, scrolling, persistence, CSV and mobile; no JS errors, missing assets or third-party requests.")

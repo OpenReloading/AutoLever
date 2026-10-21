@@ -1,5 +1,5 @@
 mkdocs==1.6.1
 mkdocs-material==9.7.7
-mkdocs-macros-plugin==1.5.0
+mkdocs-buildguide @ git+https://github.com/OpenReloading/BuildGuide@4c29112139adf5e58828486c114ad79077e1699b#subdirectory=packages/mkdocs
 pyyaml==6.0.3
 playwright==1.64.0

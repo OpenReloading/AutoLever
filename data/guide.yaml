@@ -17,7 +17,7 @@ intro:
     design whose safety has not been independently verified. Have your build checked by a suitably qualified person before
     use and follow local safety requirements. Do not use it for priming.'
   # prerelease: red banner above the page tabs on every page; delete the key after the first build.
-  prerelease: 'Pre-release, October 2026: published before the first build. Nothing has been built and tested yet,
+  prerelease: 'October 2026: published before the first build. Nothing has been built and tested yet,
     the printed parts are not on MakerWorld yet, and details will change.'
   title: 'AutoLever: pneumatic drive for the Lee APP'
   lead:

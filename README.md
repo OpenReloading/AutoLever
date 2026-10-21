@@ -16,9 +16,10 @@ Use at your own risk. The box runs on 24 V DC from an external desktop power sup
 
 - `data/wiring.yaml`: every wire and terminal
 - `data/guide.yaml`: text, tubing steps, parts list
-- `docs/`: the MkDocs site. `pip install -r requirements.txt`, then `mkdocs serve`.
-- `tests/check_guide.py`: Playwright check against a running `mkdocs serve`
+- `main.py`: writes `data/buildguide.json` ([BuildGuide](https://github.com/OpenReloading/BuildGuide) data format) from both. Run `python main.py` after editing `data/` and commit the result.
+- `docs/`: the MkDocs site, drawn by the BuildGuide MkDocs plugin. `pip install -r requirements.txt`, then `mkdocs serve`.
+- `tests/check_guide.py`: Playwright check against the built site served under `/AutoLever/`
 
-A push to `main` builds and deploys the site with GitHub Actions.
+Pull requests run the build, the `data/buildguide.json` freshness check and the browser check. A push to `main` builds and deploys the site with GitHub Actions.
 
-MIT licence. `docs/assets/vendor/` holds unmodified JointJS (MPL 2.0) and libavoid-js (LGPL 2.1+).
+MIT licence. The BuildGuide plugin bundles JointJS (MPL 2.0) and libavoid-js (LGPL 2.1+).
