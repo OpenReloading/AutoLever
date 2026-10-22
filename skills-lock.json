@@ -13,6 +13,13 @@
       "skillPath": "skills/gha-security-review/SKILL.md",
       "computedHash": "7569699e788bf657f49f8d2fe217ffb6aa7d267d2de60d5c597013a178f57aa2"
     },
+    "playwright-best-practices": {
+      "source": "currents-dev/playwright-best-practices-skill",
+      "ref": "283d5cbc5d11aac1abda058b16ad22c317d54dc0",
+      "sourceType": "github",
+      "skillPath": "playwright-best-practices/SKILL.md",
+      "computedHash": "7eb144f734450fee649dc1d209114775ddda07cbf45be84fe969d3d4f3971dce"
+    },
     "webapp-testing": {
       "source": "anthropics/skills",
       "sourceType": "github",

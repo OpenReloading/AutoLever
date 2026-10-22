@@ -1,8 +1,6 @@
 ---
 name: designing-technical-uis
 description: "Designs and reviews technical UIs for people who know the domain: workbenches, calculators, analysis and comparison views, dashboards, data tables, charts, settings and admin tools, and their docs. Covers text (labels, helper text, tooltips, errors, empty states), numbers and units, inputs and selection, tables, comparisons and charts. Use when building or changing such a screen or its text, or reviewing one. Visual style is frontend-design's job."
-paths:
-  - "docs/**"
 ---
 
 # Designing technical UIs
