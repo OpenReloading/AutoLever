@@ -27,6 +27,16 @@ plugins:
   - buildguide:
       data: data/buildguide.json
 
+markdown_extensions:
+  - admonition
+  # the safety text is written once in snippets/ and included on the pages
+  # sources: https://www.hse.gov.uk/work-equipment-machinery/maintenance.htm (safety guidance),
+  # https://www.hse.gov.uk/electricity/withequip.htm (electrical competence),
+  # https://www.gesetze-im-internet.de/bgb/__309.html (liability limits, German standard terms)
+  - pymdownx.snippets:
+      base_path: snippets
+      check_paths: true
+
 # agent instruction files in docs/ are not pages
 exclude_docs: |
   AGENTS.md

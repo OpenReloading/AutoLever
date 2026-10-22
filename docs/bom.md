@@ -1,5 +1,11 @@
 ---
-title: BOM
-hide: [navigation, toc, footer]
-buildguide: bom
+hide: [navigation, toc]
 ---
+
+# BOM
+
+!!! danger "Safety"
+
+    --8<-- "safety.md"
+
+<div data-buildguide="bom"></div>

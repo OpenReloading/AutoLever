@@ -1,123 +1,5 @@
 {
  "storage": "autolever-guide",
- "revision": "2026-10-09",
- "brand": {
-  "mark": "autolever.svg",
-  "wordmark": [
-   "Auto",
-   "Lever"
-  ],
-  "label": "BUILD GUIDE",
-  "footer": "AutoLever · pneumatic press drive"
- },
- "warning": {
-  "text": "Moving parts can cause serious injury. Keep hands clear while the press is powered or pressurised. Before reaching in, making adjustments or clearing a jam, unplug the power supply, close the air shut-off and release all remaining air pressure. E-STOP is not a safety-rated emergency stop. This project uses 24 V DC only, from an enclosed, CE-marked external power adapter. Household electricity (230 V) can kill. Never connect 230 V directly to the project or open or modify the adapter. Leave electrical wiring and repairs to a qualified electrician. This is a DIY reference design whose safety has not been independently verified. Have your build checked by a suitably qualified person before use and follow local safety requirements. Do not use it for priming.",
-  "short": "Moving parts can cause serious injury. Before reaching in, unplug the power supply and release the air pressure. E-STOP is not a safety-rated emergency stop."
- },
- "pages": [
-  {
-   "id": "intro",
-   "title": "Introduction",
-   "view": "intro"
-  },
-  {
-   "id": "bom",
-   "title": "BOM",
-   "view": "bom"
-  },
-  {
-   "id": "wiring",
-   "title": "Wiring",
-   "view": "board",
-   "board": "wiring"
-  },
-  {
-   "id": "tubing",
-   "title": "Tubing",
-   "view": "board",
-   "board": "tubing"
-  }
- ],
- "intro": {
-  "title": "AutoLever: pneumatic drive for the Lee APP",
-  "lead": [
-   "Give your Lee APP an air-powered upgrade. AutoLever takes over the lever work for sizing and decapping. Press START and a Festo cylinder keeps it cycling, stroke after stroke. Press STOP when you’re done.",
-   "Four relays and two sensors run the sequence. No code to flash or controller to program. The plans are free; bring your press and build your own.",
-   "Built by reloaders for reloaders, with AI as a tool."
-  ],
-  "sections": [
-   {
-    "title": "What it does",
-    "list": [
-     [
-      "Automatic cycling.",
-      "Press START once for continuous out-and-back strokes. Press STOP to stop and vent the cylinder."
-     ],
-     [
-      "JOG control.",
-      "With automatic mode off, hold JOG to cycle. Release it to stop. STOP interrupts JOG too."
-     ],
-     [
-      "Free at rest.",
-      "The cylinder vents when the valve is off, so you can move the lever by hand."
-     ],
-     [
-      "Cycle monitoring.",
-      "A timeout ends automatic mode and interrupts JOG. The timer resets at home, so it cannot detect a stall there."
-     ],
-     [
-      "Pressure trip.",
-      "The pressure switch cuts power to the valves, sensors and relays at 6 bar."
-     ],
-     [
-      "24 V throughout.",
-      "An enclosed external power supply powers the controls."
-     ]
-    ]
-   },
-   {
-    "title": "At the controls",
-    "text": [
-     "POWER on, START to run, STOP to stop. E-STOP cuts all control power; twist to release. Clear the fault before pressing START to resume automatic cycling.",
-     "Release JOG after any stop or trip. If you keep it held, the press can restart when STOP is released or the trip clears.",
-     "Check the printed handle adapter for cracks before each session."
-    ]
-   },
-   {
-    "title": "What you’ll need",
-    "list": [
-     "A Lee APP (Classic preferred; Deluxe also works).",
-     "A compressed-air supply at 7–10 bar.",
-     "The BOM parts, plus a printed handle adapter, control box and yellow E-STOP ring."
-    ]
-   },
-   {
-    "title": "Print it",
-    "text": [
-     "PETG or ASA. Handle adapter: 6 walls and 40% infill. Control box: 15–20% infill. The base, lid and console plate fit on a 256 mm bed. Print the E-STOP ring in yellow."
-    ]
-   },
-   {
-    "title": "Build it",
-    "steps": [
-     "Print the parts and gather the components from the BOM.",
-     "Mount the press, cylinder, valve and filter-regulator on a board. Clamp the handle adapter onto the press lever.",
-     "Follow the Wiring and Tubing guides to connect everything.",
-     "Set the sensors with air disconnected: POWER on, move the rod by hand. Test with air at 2 bar using JOG before trying START."
-    ]
-   }
-  ],
-  "media": [
-   {
-    "kind": "video",
-    "caption": "Video placeholder"
-   },
-   {
-    "kind": "image",
-    "caption": "Image placeholder"
-   }
-  ]
- },
  "bom": {
   "note": "Feel free to substitute as required for local availability and cost. Cable and tube lengths are estimates.",
   "export": "autolever-bom.csv",
@@ -390,6 +272,7 @@
  },
  "boards": {
   "wiring": {
+   "title": "Wiring",
    "label": "Wiring board",
    "size": [
     1360,
@@ -397,7 +280,6 @@
    ],
    "prefix": "wire",
    "single": true,
-   "next": "tubing",
    "legend": [
     {
      "key": "diode",
@@ -1072,6 +954,7 @@
     {
      "id": "0",
      "title": "Relay diodes",
+     "note": "Clip the sockets on the rail with their 1/4 end towards the back wall, so the busy 13/14 end faces the console. D1–D4: ring to 14, plain leg to 13; crimp each leg into a 0.5 mm² ferrule.",
      "connections": [
       {
        "no": "D1",
@@ -1110,6 +993,7 @@
     {
      "id": "A",
      "title": "Power",
+     "note": "Unplug the supply and disconnect the air. J1: wire 1 on the centre-pin lug (+); with three lugs, wire 4 on the one that stays connected to the sleeve with the plug in (meter). F1 (T 1 A) comes first, then the POWER rocker Q1: IN and OUT are the pins that connect when it is switched on, GND is the third (wire 3 on GND shorts the supply). Solder lugs: solder and heat-shrink; flat tabs: insulated receptacles. Clip the Wagos into the rack on the back wall, wire entries up, levers towards the relays: X-EN, X-M1, X-M2, X-D, then the 2-way joints for D5 and D6. Twin ferrule where FROM or TO says so; on 13 and 14 the diode leg, in its own ferrule, goes on the other side of the screw. Pass each field cable through its gland before you strip it. Check: plug centre pin +24 V; POWER off, the Q1 lamp stays dark (lit: swap wires 2 and 3). Then each relay: plug it in, POWER on, test lead from S3:1 to its terminal 14: it clicks and its LED lights. POWER off, relays out again until the wiring is done.",
      "connections": [
       {
        "no": "1",
@@ -1206,6 +1090,7 @@
     {
      "id": "B",
      "title": "E-STOP, STOP and START",
+     "note": "START and JOG use their NO contact (3–4, or 13–14), never 1–2; E-STOP and STOP use their NC contact (1–2, or 11–12 / 21–22). A meter beeps across a NO contact only while the button is pressed, across an NC contact until it is pressed. E-STOP and the pressure switch feed X-EN directly, so E-STOP cuts all control power. The timer contact (T1 8–5), STOP, and START with the K1 holding contact form the AUTO latch. Wire 15 gives the Q1 lamp its 0 V. QPM11: with no air, a meter must beep across its two terminals (NC type). After power-on and after STOP, E-STOP, a jam or an air pressure fault, K1 is off and the press moves only while you hold JOG; START resumes automatic mode. The K1 LED shows it.",
      "connections": [
       {
        "no": "8",
@@ -1292,6 +1177,7 @@
     {
      "id": "C",
      "title": "Switched +24 V (EN)",
+     "note": "X-EN is the control +24 V, live while POWER is on, E-STOP is released and the air pressure is below the trip. Wires 16 and 17 feed K1:12 and T1:8. Sensor brown cores go here. Every slot in each Wago is electrically common; use only one conductor per slot.",
      "connections": [
       {
        "no": "16",
@@ -1338,6 +1224,7 @@
     {
      "id": "D",
      "title": "AUTO and JOG: rod out",
+     "note": "Wire 20 feeds JOG from START's input, after STOP and the timer contact, so STOP and a jam stop JOG too. K1 (AUTO, wire 22) and JOG feed the same point, so the press runs while K1 is on or while JOG is held. The extend coil Y1 is fed through K3 12–4 and K2 9–1 (both NC, wired here; Y1 itself in step G). Use the printed terminal numbers, not the apparent position in the drawing.",
      "connections": [
       {
        "no": "20",
@@ -1404,6 +1291,7 @@
     {
      "id": "E",
      "title": "Return: rod back",
+     "note": "At the front, K2 starts the return; K3 holds itself until K4 cuts it at home. The return runs only while K1 is on or JOG is held.",
      "connections": [
       {
        "no": "26",
@@ -1440,6 +1328,7 @@
     {
      "id": "F",
      "title": "End sensors",
+     "note": "PNP sensors: brown = EN, blue = 0 V, black = output. B1 drives K2 (front); B0 drives K4 (home). Brown cores were connected in step C. Check the label: SMT-8M-A-PS-… (PS = PNP). The output (max 100 mA) drives the relay coil (37 mA) directly. Position: B0 so K4 lights with the rod fully home, B1 so K2 lights 2–3 mm before the press bottoms.",
      "connections": [
       {
        "no": "29",
@@ -1486,6 +1375,7 @@
     {
      "id": "G",
      "title": "Valve coils",
+     "note": "Y1 extends; Y2 retracts. Pin 1 is + (wires 33 and 35): mark that core at both ends of each valve cable. Inside each plug, fit D7/D8 with the cores: ring on pin 1 (+), plain leg on pin 2; reversed, they short the supply. Leave them out only if the plug's datasheet shows built-in suppression (an LED alone is not enough). K2:1 and K3:8 also take wires 37 and 38 from step H: cut those now and crimp 33 with 37 and 35 with 38 into one twin ferrule each. The plugs fit either coil: with air on, press the red manual button next to each coil; the coil that drives the rod out gets plug Y1. K3 interlocks the coils: they can never be on together.",
      "connections": [
       {
        "no": "33",
@@ -1548,6 +1438,7 @@
     {
      "id": "H",
      "title": "Jam timer",
+     "note": "D5/D6 combine the two valve commands: D5's plain leg joins wire 37 in one 2-way Wago (221-412), D6's joins wire 38 in another (never 37 with 38: that ties Y1 to Y2); sleeve the bare legs with heat-shrink. Their ring legs meet at X-D, then T1:7. T1 runs only while a valve coil is on and the rod is away from home: K4 bridges 1–3 at home and holds it at zero. Set its wheels with no coil on (it reads them at power-up): left T1 (relay off) about twice one out-and-back, 30 s until you have timed it; right T2 (relay on) 1 s, never 0. Test without air: rod a few cm off home, press START: after T1 the timer clicks and K1 drops. A jam stops JOG too; let go before you try again.",
      "connections": [
       {
        "no": "37",
@@ -1634,6 +1525,7 @@
    ]
   },
   "tubing": {
+   "title": "Tubing",
    "label": "Pneumatic tubing diagram",
    "size": [
     1100,
