@@ -10,6 +10,8 @@ Built by reloaders for reloaders, with AI as a tool.
 
 **Pre-release, October 2026.** Nothing has been built yet, the printed parts are not on MakerWorld yet, details will change.
 
+Questions and ideas: [Discord](https://discord.gg/KkYJ5fdukR).
+
 Use at your own risk. The box runs on 24 V DC from an external desktop power supply, no mains inside.
 
 ## Repo
