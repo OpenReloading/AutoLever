@@ -25,9 +25,10 @@ KINDS = {
     "sensor": {"fill": "#e8f5ec", "stroke": "#15803d", "pins": {"BN": "#92400e", "BU": "#2563eb", "BK": "#111827"}},
     "button": {"round": True, "stroke": "#9ca3af"},
 }
-# tubing: the old schematic as a routed board, one connection per tube in guide.yaml order
-TUBE_ENDS = [("AIR:out", "FRL:in"), ("FRL:out", "SHUT:in"), ("SHUT:out", "TEE:in"), ("TEE:out", "VALVE:P"),
-             ("VALVE:A", "CYL:cap"), ("VALVE:B", "CYL:rod"), ("VALVE:R+S", "SIL:in")]
+# tubing: the old schematic as a routed board, one connection per tube of guide.yaml (ends by tube id)
+TUBE_ENDS = {"air1": ("AIR:out", "FRL:in"), "shutoff": ("FRL:out", "SHUT:in"), "air2": ("SHUT:out", "TEE:in"),
+             "air3": ("TEE:out", "VALVE:P"), "air4": ("VALVE:A", "CYL:cap"), "air5": ("VALVE:B", "CYL:rod"),
+             "air6": ("VALVE:R+S", "SIL:in")}
 TUBING_PARTS = {
     "AIR": {"name": "AIR", "sub": "7–10 bar", "at": [20, 250], "size": [90, 56], "ports": {"right": ["out"]}},
     "FRL": {"name": "FRL", "sub": "Filter-regulator", "at": [200, 236], "size": [110, 84], "ports": {"left": ["in"], "right": ["out"]}},
@@ -142,7 +143,7 @@ def build():
                 "colors": {"AIR": {"line": "#7694b2", "outline": "#3f5f7f"}},
                 "props": TUBING_PROPS, "parts": TUBING_PARTS,
                 "steps": [{"id": str(i), "title": t["title"], "connections": [{"no": str(i), "a": a, "b": b, "color": "AIR", "la": t["from"], "lb": t["to"]}]}
-                          for i, (t, (a, b)) in enumerate(zip(g["tubes"], TUBE_ENDS, strict=True), 1)],
+                          for i, t in enumerate(g["tubes"], 1) for a, b in [TUBE_ENDS[t["id"]]]],
             },
         },
     }
