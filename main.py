@@ -113,6 +113,9 @@ def build():
     shared = screws(w)
     over = {k: v for k, v in shared.items() if len(v) > 2}
     assert not over, f"more than two wires under one screw: {over}"
+    notes = g["wiring_notes"]
+    ids = {str(s["id"]) for s in w["steps"]}
+    assert set(notes) == ids, f"wiring_notes and wiring steps differ: notes only {sorted(set(notes) - ids)}, steps only {sorted(ids - set(notes))}"
     return {
         "storage": "autolever-guide",
         "bom": {"note": "Feel free to substitute as required for local availability and cost. Cable and tube lengths are estimates.",
@@ -125,7 +128,7 @@ def build():
                 "colors": {k: {"line": line, "outline": outline, "swatch": swatch, **({"diode": True} if k == "DIODE" else {})}
                            for k, (line, outline, swatch) in WIRE.items()},
                 "kinds": KINDS, "areas": w["areas"], "props": w["props"], "parts": w["parts"],
-                "steps": [{"id": str(s["id"]), "title": s["title"], "connections": [connection(w, shared, *wire) for wire in s["wires"]]}
+                "steps": [{"id": str(s["id"]), "title": s["title"], "note": notes[str(s["id"])], "connections": [connection(w, shared, *wire) for wire in s["wires"]]}
                           for s in w["steps"]],
             },
             "tubing": {

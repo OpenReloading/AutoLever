@@ -68,6 +68,11 @@ with sync_playwright() as p:
             expect(page.locator('.ag-connection-detail')).to_contain_text(wire['lb'])
             expect(page.locator('[data-connection]')).to_have_count(len(step['connections']))
             expect(page.locator('[data-connection="'+wire['no']+'"]')).to_have_attribute('aria-label',wire['no']+': '+wire['la']+' to '+wire['lb']+('; ring at '+wire['la'] if wire['color']=='DIODE' else ''))
+    # Each wiring step shows its own note, and the note changes with the step.
+    assert all(s['note'] for s in wiring)
+    for step in wiring:
+        go(f"wiring/#wiring={step['id']}/{step['connections'][0]['no']}");ready()
+        expect(page.locator('.ag-step-note')).to_have_text(step['note'])
     go('wiring/#wiring=A/1');ready()
     page.locator('[data-role=scope]').select_option('single');ready()
     expect(page.locator('[data-connection]')).to_have_count(1)
