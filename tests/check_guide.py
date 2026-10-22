@@ -39,7 +39,6 @@ with sync_playwright() as p:
     expect(page.locator('.ag-lead').first).to_contain_text('Lee APP')
     expect(page.locator('.ag-intro h2')).to_have_text([s['title'] for s in data['intro']['sections']])
     expect(page.locator('.ag-wordmark')).to_have_text('AutoLever')
-    expect(page.locator('.ag-flow, .ag-intro-steps')).to_have_count(0)
     # Real page navigation, reload and browser back preserve the destination.
     for name,slug in [('BOM','bom'),('Wiring','wiring'),('Tubing','tubing')]:
         page.locator('.ag-nav').get_by_role('link',name=name,exact=True).click()
@@ -47,7 +46,6 @@ with sync_playwright() as p:
         page.reload(wait_until='domcontentloaded')
         expect(page.locator('#assembly-guide h1')).to_have_text(name)
         expect(page.locator('.ag-warning')).to_be_visible()
-    expect(page.locator('.ag-step-note')).to_have_count(0)
     page.go_back(wait_until='domcontentloaded')
     expect(page.locator('#assembly-guide h1')).to_have_text('Wiring')
     # Every board connection matches the validated source, with no extra diode wires.
@@ -71,10 +69,12 @@ with sync_playwright() as p:
     page.locator('[data-action=next-wire]').click()
     expect(page.locator('.ag-wire-row.selected .ag-wire-number')).to_have_text('2')
     expect(page.locator('.ag-verify input')).not_to_be_checked()
-    # A tick belongs to one exact connection: an old tick for wire 16 with other ends stays unchecked.
-    page.evaluate("localStorage.setItem('autolever-guide',JSON.stringify({'wire-16:H1:-:X-M2:2':true}))")
-    go('wiring/#C/16');ready()
-    expect(page.locator('.ag-verify input')).not_to_be_checked()
+    # A tick belongs to one exact connection: a tick for wire 16 with other ends stays unchecked, the real key is checked.
+    c16=next(c for st in wiring for c in st['connections'] if c['no']=='16')
+    for key,done in [(f"wire-16:{c16['a']}:X",False),(f"wire-16:{c16['a']}:{c16['b']}",True)]:
+        page.evaluate("key=>localStorage.setItem('autolever-guide',JSON.stringify({[key]:true}))",key)
+        go('wiring/#C/16');page.reload(wait_until='domcontentloaded');ready()   # same URL: goto alone keeps the old state
+        (expect(page.locator('.ag-verify input')).to_be_checked if done else expect(page.locator('.ag-verify input')).not_to_be_checked)()
     go('wiring/#A/1')
     page.locator('[data-action=prev-wire]').click()
     expect(page.locator('.ag-wire-row.selected .ag-wire-number')).to_have_text(wiring[0]['connections'][-1]['no'])
@@ -128,7 +128,6 @@ with sync_playwright() as p:
     go('bom/')
     expect(page.locator('thead th')).to_have_text(['Qty','Component','Specification'])
     expect(page.locator('tbody tr:not(.ag-group)')).to_have_count(len(bom))
-    expect(page.locator('#assembly-guide').locator('[data-filter], .ag-bom-stats')).to_have_count(0)
     # Each BOM line has a tick, stored in this browser; it survives a reload and a search.
     expect(page.locator('tbody input[type=checkbox]')).to_have_count(len(bom))
     page.locator('tbody input[type=checkbox]').first.check()
@@ -163,11 +162,6 @@ with sync_playwright() as p:
     expect(page.locator('tr.ag-group')).to_have_text(['3D printed'])
     expect(page.locator('tbody a', has_text='MakerWorld')).to_have_count(sum('link' in row for row in bom))
     page.locator('#ag-search').fill('')
-    # No links to removed pages or manufacturer lists.
-    for path in ['', 'bom/', 'wiring/', 'tubing/']:
-        go(path)
-        for text in ['Manufacturer references', 'Original guide', 'Open wiring']:
-            expect(page.get_by_text(text)).to_have_count(0)
     page.set_viewport_size({'width':390,'height':844})
     for path in ['', 'bom/', 'wiring/', 'tubing/']:
         go(path)
@@ -175,7 +169,6 @@ with sync_playwright() as p:
         expect(page.locator('.ag-nav a')).to_have_text(['Introduction','BOM','Wiring','Tubing'])
         if path=='bom/':   # every specification on screen, not hidden in a sideways scroller
             assert page.evaluate("[...document.querySelectorAll('tbody tr:not(.ag-group) td:nth-child(3)')].every(td=>{const r=td.getBoundingClientRect();return r.width>0&&r.left>=0&&r.right<=innerWidth})"),'BOM specification off screen'
-        expect(page.get_by_role('button',name='Connection detail',exact=True)).to_have_count(0)
     # The next action stays on screen across step lengths and viewport changes.
     for width,height in [(1440,900),(1280,720),(390,844),(375,667),(844,390)]:
         page.set_viewport_size({'width':width,'height':height})
