@@ -113,23 +113,14 @@ def build():
     shared = screws(w)
     over = {k: v for k, v in shared.items() if len(v) > 2}
     assert not over, f"more than two wires under one screw: {over}"
-    intro = {k: g["intro"][k] for k in ("title", "lead", "sections")}
-    intro["media"] = [{"kind": "video", "caption": "Video placeholder"}, {"kind": "image", "caption": "Image placeholder"}]
     return {
         "storage": "autolever-guide",
-        "revision": g["revision"],
-        "brand": {"mark": "autolever.svg", "wordmark": ["Auto", "Lever"], "label": "BUILD GUIDE", "footer": "AutoLever · pneumatic press drive"},
-        "warning": {"text": g["intro"]["warning"], "short": g["intro"]["warning_short"]},
-        "pages": [{"id": "intro", "title": "Introduction", "view": "intro"}, {"id": "bom", "title": "BOM", "view": "bom"},
-                  {"id": "wiring", "title": "Wiring", "view": "board", "board": "wiring"},
-                  {"id": "tubing", "title": "Tubing", "view": "board", "board": "tubing"}],
-        "intro": intro,
         "bom": {"note": "Feel free to substitute as required for local availability and cost. Cable and tube lengths are estimates.",
                 "export": "autolever-bom.csv", "linkLabel": "MakerWorld",
                 "items": [{("link" if k == "makerworld" else k): v for k, v in item.items()} for item in g["bom"]]},
         "boards": {
             "wiring": {
-                "label": "Wiring board", "size": [1360, 860], "prefix": "wire", "single": True, "next": "tubing",
+                "title": "Wiring", "label": "Wiring board", "size": [1360, 860], "prefix": "wire", "single": True,
                 "legend": [{"key": "diode", "text": "Silver ring = cathode"}, "Green = selected connection"],
                 "colors": {k: {"line": line, "outline": outline, "swatch": swatch, **({"diode": True} if k == "DIODE" else {})}
                            for k, (line, outline, swatch) in WIRE.items()},
@@ -138,7 +129,7 @@ def build():
                           for s in w["steps"]],
             },
             "tubing": {
-                "label": "Pneumatic tubing diagram", "size": [1100, 530], "prefix": "tube", "scope": "all", "listAll": True, "listColor": False,
+                "title": "Tubing", "label": "Pneumatic tubing diagram", "size": [1100, 530], "prefix": "tube", "scope": "all", "listAll": True, "listColor": False,
                 "legend": ["6 × 4 mm tube · schematic", "Green = selected connection"],
                 "colors": {"AIR": {"line": "#7694b2", "outline": "#3f5f7f"}},
                 "props": TUBING_PROPS, "parts": TUBING_PARTS,

@@ -1,5 +1,5 @@
 mkdocs==1.6.1
 mkdocs-material==9.7.7
-mkdocs-buildguide @ git+https://github.com/OpenReloading/BuildGuide@7cf1cf60a2888cada21206b97061f7f0c4bc42f1#subdirectory=packages/mkdocs
+mkdocs-buildguide @ git+https://github.com/OpenReloading/BuildGuide@a19fc856b435ed9a4dc9253f4aed3b24e9707431#subdirectory=packages/mkdocs
 pyyaml==6.0.3
 playwright==1.64.0

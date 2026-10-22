@@ -15,9 +15,9 @@ Use at your own risk. The box runs on 24 V DC from an external desktop power sup
 ## Repo
 
 - `data/wiring.yaml`: every wire and terminal
-- `data/guide.yaml`: text, tubing steps, parts list
+- `data/guide.yaml`: tubing steps, parts list
 - `main.py`: writes `data/buildguide.json` ([BuildGuide](https://github.com/OpenReloading/BuildGuide) data format) from both. Run `python main.py` after editing `data/` and commit the result.
-- `docs/`: the MkDocs site, drawn by the BuildGuide MkDocs plugin. `pip install -r requirements.txt`, then `mkdocs serve`.
+- `docs/`: the MkDocs site in Markdown; the BuildGuide MkDocs plugin draws the BOM, wiring and tubing components in it. The safety text is in `snippets/`. `pip install -r requirements.txt`, then `mkdocs serve`.
 - `tests/check_guide.py`: Playwright check against the built site served under `/AutoLever/`
 
 Pull requests run the build, the `data/buildguide.json` freshness check and the browser check. A push to `main` builds and deploys the site with GitHub Actions.
