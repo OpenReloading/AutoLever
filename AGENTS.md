@@ -16,6 +16,7 @@
 - Page text is Markdown in `docs/`; the BOM, wiring and tubing components are placed with `<div data-buildguide="bom"></div>` and `<div data-buildguide="board" data-board="wiring"></div>`. The safety text lives once in `snippets/` (full on the introduction and BOM pages, short on wiring and tubing), see `docs/AGENTS.md`.
 - No third-party requests: `font: false`, no `repo_url` (Material fetches repo stats from the GitHub API); the browser check fails on external requests.
 - Safety warning without exact force or pressure figures.
+- Branches: pull requests target `develop` (squash merge). `main` holds releases and changes only by a promotion pull request `develop` to `main`, merged with a merge commit. The site deploys from `main`.
 
 ## Agent skills
 
