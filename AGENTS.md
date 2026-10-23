@@ -14,7 +14,7 @@
 
 - Component content (parts list, tubing steps, wiring) in `data/*.yaml`. `main.py` keeps the project rules (wire labels, cable kinds, two wires per screw) and converts to the BuildGuide data format; the `buildguide` MkDocs plugin checks the result and fails the build on a problem.
 - Page text is Markdown in `docs/`; the BOM, wiring and tubing components are placed with `<div data-buildguide="bom"></div>` and `<div data-buildguide="board" data-board="wiring"></div>`. The safety text lives once in `snippets/` (full on the introduction and BOM pages, short on wiring and tubing), see `docs/AGENTS.md`.
-- No third-party requests: `font: false`, no `repo_url` (Material fetches repo stats from the GitHub API); the browser check fails on external requests.
+- No third-party requests: `font: false`, `repo_url` is set, but without Material's `data-md-component="source"`: `hooks/repo_facts.py` fetches the header facts (tag, stars, forks) from the GitHub API at build time and `overrides/partials/source.html` renders them, so the browser calls nothing; the browser check fails on external requests.
 - Safety warning without exact force or pressure figures.
 
 ## Agent skills
