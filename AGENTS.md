@@ -4,7 +4,7 @@
 
 - Agents run on the host; file edits and Git stay there. Start the container with `devcontainer up --docker-path podman --workspace-folder .` (creates `.venv` with `requirements.txt`); run project commands with the prefix `devcontainer exec --docker-path podman --workspace-folder .`.
 - Install: `python -m venv .venv && .venv/bin/pip install -r requirements.txt`
-- Lint (as CI): `.venv/bin/pip install -r requirements-dev.txt`, then `.venv/bin/ruff check .` and `.venv/bin/basedpyright` (tools pinned in `requirements-dev.txt`, rules in `pyproject.toml`)
+- Lint (as CI): `.venv/bin/pip install --only-binary :all: --require-hashes -r requirements-dev.txt`, then `.venv/bin/ruff check .` and `.venv/bin/basedpyright --pythonpath .venv/bin/python` (rules in `pyproject.toml`). `requirements-dev.txt` is compiled from `requirements-dev.in` on Python 3.13: `pip-compile --generate-hashes --output-file=requirements-dev.txt requirements-dev.in`
 - Build (as CI): `.venv/bin/mkdocs build --strict`
 - Serve: `.venv/bin/mkdocs serve -a 0.0.0.0:8000`
 - Generate the guide data after editing `data/*.yaml`: `.venv/bin/python main.py` (writes `data/buildguide.json`, committed; CI fails when it is stale)
