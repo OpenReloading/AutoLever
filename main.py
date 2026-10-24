@@ -47,6 +47,12 @@ def screws(w):
     ends = {}
     for step in w["steps"]:
         for no, a, b, col in step["wires"]:
+            for side, end in (("from", a), ("to", b)):   # also keeps label() from a bare KeyError
+                part, _, pin = end.partition(":")
+                if part not in w["parts"]:
+                    raise ValueError(f"wire {no}, {side} end {end}: unknown part {part}")
+                if pin not in sum(w["parts"][part]["ports"].values(), []):
+                    raise ValueError(f"wire {no}, {side} end {end}: part {part} has no terminal {pin}")
             if col == "DIODE":       # a diode leg shares the screw, it is not a wire
                 continue
             for end in (a, b):
@@ -68,6 +74,8 @@ def label(end):
         return f"{PLAIN[part]}, " + ("plain leg, in its own 2-way Wago with this wire" if pin == "A" else "ring leg")
     if part in ("Y1", "Y2"):
         return f"{PLAIN[part]} pin {pin}" + (" (+)" if pin == "1" else "")
+    if part == "F1":
+        return f"{PLAIN[part]} tab {pin}"
     if part == "J1":
         return f"{PLAIN[part]} {pin.replace('-', '−')}"
     if part in ("S0", "S1", "S2", "S3"):   # E-STOP and STOP use their NC contact, the others their NO contact
@@ -136,7 +144,7 @@ def build():
                 "legend": ["6 × 4 mm tube · schematic", "Green = selected connection"],
                 "colors": {"AIR": {"line": "#7694b2", "outline": "#3f5f7f"}},
                 "props": TUBING_PROPS, "parts": TUBING_PARTS,
-                "steps": [{"id": str(i), "title": t["title"], "connections": [{"no": str(i), "a": a, "b": b, "color": "AIR", "la": t["from"], "lb": t["to"]}]}
+                "steps": [{"id": str(i), "title": t["title"], "note": f'{t["text"]} Check: {t["check"]}', "connections": [{"no": str(i), "a": a, "b": b, "color": "AIR", "la": t["from"], "lb": t["to"]}]}
                           for i, t in enumerate(g["tubes"], 1) for a, b in [TUBE_ENDS[t["id"]]]],
             },
         },
