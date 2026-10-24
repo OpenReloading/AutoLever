@@ -1,6 +1,7 @@
 """Writes data/buildguide.json (BuildGuide data format) from data/wiring.yaml and data/guide.yaml.
 Run after editing data/: python main.py. The MkDocs plugin checks the result at build time; CI fails when the committed file is stale.
 """
+import itertools
 import json
 import pathlib
 
@@ -51,7 +52,7 @@ def screws(w):
                 part, _, pin = end.partition(":")
                 if part not in w["parts"]:
                     raise ValueError(f"wire {no}, {side} end {end}: unknown part {part}")
-                if pin not in sum(w["parts"][part]["ports"].values(), []):  # noqa: RUF017
+                if pin not in itertools.chain.from_iterable(w["parts"][part]["ports"].values()):
                     raise ValueError(f"wire {no}, {side} end {end}: part {part} has no terminal {pin}")
             if col == "DIODE":       # a diode leg shares the screw, it is not a wire
                 continue
