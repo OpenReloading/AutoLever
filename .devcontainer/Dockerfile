@@ -14,3 +14,5 @@ RUN curl -fsSLo /tmp/node.tar.xz https://nodejs.org/dist/v24.21.0/node-v24.21.0-
  && /tmp/pw/bin/playwright install --with-deps chromium \
  && rm -rf /tmp/pw /root/.npm /var/lib/apt/lists/* \
  && chmod -R a+rX /ms-playwright
+
+USER vscode
