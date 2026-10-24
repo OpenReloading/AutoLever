@@ -1697,6 +1697,7 @@
     {
      "id": "1",
      "title": "Supply → filter-regulator",
+     "note": "Mount the FRL upright on its bracket at the board edge, bowls hanging vertically and drains pointing down off the board, away from the control box. Follow the arrow on the FRL body. Supply: 7–10 bar; start with the regulator at 2 bar. If the unit has a lubricator, leave it empty: the cylinder and the valve are greased for life, and once you oil them you have to keep oiling. Check: Hose retained; FRL flow arrow points towards the valve.",
      "connections": [
       {
        "no": "1",
@@ -1711,6 +1712,7 @@
     {
      "id": "2",
      "title": "Filter-regulator → shut-off",
+     "note": "Fit the 3/2 shut-off with exhaust right after the FRL, its arrow pointing away from the FRL. Closed, it cuts the supply and vents everything after it: tee, pressure switch, valve and cylinder. Close it whenever you reach into the press. Check: Arrow points away from the FRL; exhaust port open, not plugged.",
      "connections": [
       {
        "no": "2",
@@ -1725,6 +1727,7 @@
     {
      "id": "3",
      "title": "Shut-off → pressure-switch tee",
+     "note": "Connect the shut-off outlet to the 6 mm tee. The QPM11 sits on the tee's branch and measures the regulated supply pressure. Set it to open at 6 bar: regulator at 6 bar (only for this setting), POWER on, rod pushed home by hand so the K4 LED lights, turn its screw until K4 goes out; then back to 5.5 bar or less. Check: Pressure switch after the shut-off; tee branch sealed.",
      "connections": [
       {
        "no": "3",
@@ -1739,6 +1742,7 @@
     {
      "id": "4",
      "title": "Tee → valve supply",
+     "note": "Connect the tee to P, the supply port. Read the letters on the valve body: never connect the supply to R or S (the exhausts). Check: Tube reaches P; no tight bend or kink.",
      "connections": [
       {
        "no": "4",
@@ -1753,6 +1757,7 @@
     {
      "id": "5",
      "title": "Valve A → cylinder cap end",
+     "note": "Connect A to the end without the rod. Fit a meter-out flow control: free flow into the cylinder, restricted flow out. This cap-end adjuster controls retraction speed. Start with both flow controls 1 turn open. Check: A reaches the cap end; flow-control direction confirmed.",
      "connections": [
       {
        "no": "5",
@@ -1767,6 +1772,7 @@
     {
      "id": "6",
      "title": "Valve B → cylinder rod end",
+     "note": "Connect B to the port beside the rod. Again use meter-out orientation. This rod-end adjuster controls extension speed. Leave room for cylinder movement. Check: B reaches the rod end; tube cannot rub or pull tight.",
      "connections": [
       {
        "no": "6",
@@ -1781,6 +1787,7 @@
     {
      "id": "7",
      "title": "Fit both exhaust silencers",
+     "note": "Fit one silencer to each exhaust and point both away from the control box and the operator. Do not cap or join these ports to supply. First air-on, POWER off: nothing may move and the lever must stay free by hand. If the rod creeps out, the valve is not exhaust-centre: close the shut-off. Check: Both exhausts open through silencers; no obstruction.",
      "connections": [
       {
        "no": "7",
