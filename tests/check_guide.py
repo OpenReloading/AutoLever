@@ -90,6 +90,11 @@ with sync_playwright() as p:
     for step in wiring:
         go(f"wiring/#wiring={step['id']}/{step['connections'][0]['no']}");ready()
         expect(page.locator('.ag-step-note')).to_have_text(step['note'])
+    # Each tubing step shows its tube text and check.
+    assert all(s['note'] for s in tubing)
+    for step in tubing:
+        go(f"tubing/#tubing={step['id']}");ready()
+        expect(page.locator('.ag-step-note')).to_have_text(step['note'])
     go('wiring/#wiring=A/1');ready()
     page.locator('[data-role=scope]').select_option('single');ready()
     expect(page.locator('[data-connection]')).to_have_count(1)

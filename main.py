@@ -144,7 +144,7 @@ def build():
                 "legend": ["6 × 4 mm tube · schematic", "Green = selected connection"],
                 "colors": {"AIR": {"line": "#7694b2", "outline": "#3f5f7f"}},
                 "props": TUBING_PROPS, "parts": TUBING_PARTS,
-                "steps": [{"id": str(i), "title": t["title"], "connections": [{"no": str(i), "a": a, "b": b, "color": "AIR", "la": t["from"], "lb": t["to"]}]}
+                "steps": [{"id": str(i), "title": t["title"], "note": f'{t["text"]} Check: {t["check"]}', "connections": [{"no": str(i), "a": a, "b": b, "color": "AIR", "la": t["from"], "lb": t["to"]}]}
                           for i, t in enumerate(g["tubes"], 1) for a, b in [TUBE_ENDS[t["id"]]]],
             },
         },
