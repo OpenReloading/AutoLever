@@ -37,8 +37,8 @@ wiring_notes:
     with air on, press the red manual button next to each coil; the coil that drives the rod out gets plug Y1. K3 interlocks
     the coils: they can never be on together.'
   H: 'D5/D6 combine the two valve commands: D5''s plain leg joins wire 37 in one 2-way Wago (221-412), D6''s joins wire 38
-    in another (never 37 with 38: that ties Y1 to Y2); sleeve the bare legs with heat-shrink. Their ring legs meet at X-D,
-    then T1:7. T1 runs only while a valve coil is on and the rod is away from home: K4 bridges 1–3 at home and holds it at
+    in another (never 37 with 38: that ties Y1 to Y2); sleeve the bare legs with heat-shrink. Their ring legs meet at X-D (bend
+    each leg straight into its slot, no wire), then T1:7. T1 runs only while a valve coil is on and the rod is away from home: K4 bridges 1–3 at home and holds it at
     zero. Set its wheels with no coil on (it reads them at power-up): left T1 (relay off) about twice one out-and-back, 30 s
     until you have timed it; right T2 (relay on) 1 s, never 0. Test without air: rod a few cm off home, press START: after T1
     the timer clicks and K1 drops. A jam stops JOG too; let go before you try again.'
@@ -204,7 +204,7 @@ bom:
   group: Electrical
   qty: '1'
   part: Panel fuse holder F1 + fuse
-  spec: 5 × 20 mm · 12 mm thread, at most 28 mm behind the panel · pre-wired leads · fuse T 1 A (slow-blow) + spare
+  spec: 5 × 20 mm · 12 mm thread, at most 28 mm behind the panel · fuse T 1 A (slow-blow) + spare
 - id: relays
   group: Electrical
   qty: '4'

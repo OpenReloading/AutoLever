@@ -1,4 +1,4 @@
-# Every wire of the pneumatic press control, rev. 2026-10-05 (24 V DC only, no mains in the box; automatic: START runs,
+# Every wire of the pneumatic press control (24 V DC only, no mains in the box; automatic: START runs,
 # STOP ends, JOG is hold-to-run, E-STOP cuts the power). Single source of truth:
 # the wiring page (interactive board + wire lists) and the build checks read this file.
 #
@@ -12,12 +12,12 @@
 # cable types. Every wire gets one in main.py: sensor (B0/B1 own cable), valve (to Y1/Y2),
 # field (to QPM11, out through its gland), leg (diode leg), core (everything inside the box)
 cables:
-  core:   {name: "Stranded wire, white or blue", size: "0.5 mm²", awg: "AWG 20", cores: "1 per wire, inside the box: white = + / switched, blue = 0 V"}
-  field:  {name: "2-core cable, black sheath", size: "0.5 mm²", awg: "AWG 20", cores: "2: one per QPM11 terminal, out through gland P"}
-  valve:  {name: "2-core cable, black sheath", size: "0.5 mm²", awg: "AWG 20", cores: "2 per plug: pin 1 = + (mark that core), pin 2 = 0 V"}
-  sensor: {name: "The sensor's own cable", size: "as supplied", awg: "", cores: "3: brown +, blue 0 V, black signal"}
-  diode:  {name: "Diode 1N4007, no wire", size: "", awg: "", cores: "ring leg on the first terminal, other leg on the second"}
-  leg:    {name: "Diode leg", size: "", awg: "", cores: "no wire: bend the leg straight into the Wago"}
+  core:   {name: "Stranded wire, white or blue", size: "0.5 mm²", awg: "AWG 20"}
+  field:  {name: "2-core cable, black sheath", size: "0.5 mm²", awg: "AWG 20"}
+  valve:  {name: "2-core cable, black sheath", size: "0.5 mm²", awg: "AWG 20"}
+  sensor: {name: "The sensor's own cable", size: "as supplied", awg: ""}
+  diode:  {name: "Diode 1N4007, no wire", size: "", awg: ""}
+  leg:    {name: "Diode leg", size: "", awg: ""}
 
 # areas: a dashed frame with its title; frame: false = title only, marking a zone inside the box.
 # One box, gland wall at the top (back or left wall, as printed: the board doesn't name it). glands = [x, label]:
