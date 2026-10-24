@@ -22,6 +22,6 @@ jobs:
         with:
           python-version: '3.13'
       # basedpyright needs the project's dependencies to resolve imports
-      - run: pip install -r requirements-dev.txt
+      - run: pip install --only-binary :all: -r requirements-dev.txt
       - run: ruff check .
       - run: basedpyright
