@@ -8,7 +8,24 @@ import re
 import sys
 import tempfile
 from pathlib import Path
+import yaml
 from playwright.sync_api import sync_playwright, expect
+
+sys.path.insert(0, str(Path(__file__).parent.parent))
+import main
+
+# A wire with an unknown part or terminal fails with its number and end, not a bare KeyError.
+wiring_yaml=yaml.safe_load(Path(main.ROOT,'data/wiring.yaml').read_text(encoding='utf-8'))
+for end,message in [('K9:1','wire 6, to end K9:1: unknown part K9'),('K1:99','wire 6, to end K1:99: part K1 has no terminal 99')]:
+    broken=yaml.safe_load(yaml.safe_dump(wiring_yaml))
+    wire=next(w for s in broken['steps'] for w in s['wires'] if w[0]=='6')
+    wire[2]=end
+    try:
+        main.screws(broken)
+    except ValueError as e:
+        assert str(e)==message,str(e)
+    else:
+        raise AssertionError('no error for '+end)
 
 BASE=(sys.argv[1] if len(sys.argv)>1 else 'http://127.0.0.1:8000').rstrip('/')
 with sync_playwright() as p:
