@@ -1,7 +1,7 @@
 """Browser checks for the Markdown pages and their BuildGuide components. Requires Playwright + Chromium.
 Run against the built site served under /AutoLever/ (AGENTS.md): python tests/check_guide.py http://127.0.0.1:8000/AutoLever
 """
-import csv
+import csv  # noqa: I001
 import io
 import json
 import re
@@ -23,7 +23,7 @@ for end,message in [('K9:1','wire 6, to end K9:1: unknown part K9'),('K1:99','wi
     try:
         main.screws(broken)
     except ValueError as e:
-        assert str(e)==message,str(e)
+        assert str(e)==message,str(e)  # noqa: PT017
     else:
         raise AssertionError('no error for '+end)
 
@@ -32,7 +32,7 @@ with sync_playwright() as p:
     browser=p.chromium.launch(headless=True,args=['--no-sandbox'])
     context=browser.new_context(viewport={'width':1440,'height':1000},accept_downloads=True)
     context.route('**/*',lambda r:r.continue_() if r.request.url.startswith(BASE) else r.abort())
-    page=context.new_page();errors=[];missing=[];external=[]
+    page=context.new_page();errors=[];missing=[];external=[]  # noqa: E702
     page.on('pageerror',lambda e:errors.append(str(e)))
     page.on('response',lambda r:missing.append(r.url) if r.status>=400 else None)
     # no third-party requests (fonts, CDNs): the route below would only hide them
@@ -80,7 +80,7 @@ with sync_playwright() as p:
     # Every board connection matches the validated source, with no extra diode wires.
     for step in wiring:
         for wire in step['connections']:
-            go(f"wiring/#wiring={step['id']}/{wire['no']}");ready()
+            go(f"wiring/#wiring={step['id']}/{wire['no']}");ready()  # noqa: E702
             expect(page.locator('.ag-connection-detail')).to_contain_text(wire['la'])
             expect(page.locator('.ag-connection-detail')).to_contain_text(wire['lb'])
             expect(page.locator('[data-connection]')).to_have_count(len(step['connections']))
@@ -88,19 +88,19 @@ with sync_playwright() as p:
     # Each wiring step shows its own note, and the note changes with the step.
     assert all(s['note'] for s in wiring)
     for step in wiring:
-        go(f"wiring/#wiring={step['id']}/{step['connections'][0]['no']}");ready()
+        go(f"wiring/#wiring={step['id']}/{step['connections'][0]['no']}");ready()  # noqa: E702
         expect(page.locator('.ag-step-note')).to_have_text(step['note'])
     # Each tubing step shows its tube text and check.
     assert all(s['note'] for s in tubing)
     for step in tubing:
-        go(f"tubing/#tubing={step['id']}");ready()
+        go(f"tubing/#tubing={step['id']}");ready()  # noqa: E702
         expect(page.locator('.ag-step-note')).to_have_text(step['note'])
-    go('wiring/#wiring=A/1');ready()
-    page.locator('[data-role=scope]').select_option('single');ready()
+    go('wiring/#wiring=A/1');ready()  # noqa: E702
+    page.locator('[data-role=scope]').select_option('single');ready()  # noqa: E702
     expect(page.locator('[data-connection]')).to_have_count(1)
-    page.locator('[data-role=scope]').select_option('all');ready()
+    page.locator('[data-role=scope]').select_option('all');ready()  # noqa: E702
     expect(page.locator('[data-connection]')).to_have_count(sum(len(s['connections']) for s in wiring))
-    page.locator('[data-role=scope]').select_option('step');ready()
+    page.locator('[data-role=scope]').select_option('step');ready()  # noqa: E702
     page.locator('.ag-verify input').check()
     expect(page.locator('.ag-wire-row.selected input')).to_be_checked()
     page.reload(wait_until='domcontentloaded')
@@ -112,7 +112,7 @@ with sync_playwright() as p:
     c16=next(c for st in wiring for c in st['connections'] if c['no']=='16')
     for key,done in [(f"wire-16:{c16['a']}:X",False),(f"wire-16:{c16['a']}:{c16['b']}",True)]:
         page.evaluate("key=>localStorage.setItem('autolever-guide',JSON.stringify({[key]:true}))",key)
-        go('wiring/#wiring=C/16');page.reload(wait_until='domcontentloaded');ready()   # same URL: goto alone keeps the old state
+        go('wiring/#wiring=C/16');page.reload(wait_until='domcontentloaded');ready()   # same URL: goto alone keeps the old state  # noqa: E702
         (expect(page.locator('.ag-verify input')).to_be_checked if done else expect(page.locator('.ag-verify input')).not_to_be_checked)()
     go('wiring/#wiring=A/1')
     page.locator('[data-action=prev-wire]').click()
@@ -122,7 +122,7 @@ with sync_playwright() as p:
     # Tubing has the same workspace, zoom, scope, selection and fullscreen controls.
     for step in tubing:
         tube=step['connections'][0]
-        go(f"tubing/#tubing={step['id']}");ready()
+        go(f"tubing/#tubing={step['id']}");ready()  # noqa: E702
         expect(page.locator('.ag-connection-detail')).to_contain_text(tube['la'])
         expect(page.locator('.ag-connection-detail')).to_contain_text(tube['lb'])
         expect(page.locator('[data-connection]')).to_have_count(len(tubing))   # tubing shows every connection by default
@@ -131,14 +131,14 @@ with sync_playwright() as p:
     tubes=len(tubing)
     expect(page.locator('.ag-progress')).to_have_text(f'{tubes} / {tubes} checked')
     expect(page.locator('[data-action=next-wire]')).to_be_disabled()
-    page.locator('[data-role=scope]').select_option('all');ready()
+    page.locator('[data-role=scope]').select_option('all');ready()  # noqa: E702
     expect(page.locator('[data-connection]')).to_have_count(tubes)
     page.locator('[data-connection="3"]').focus()
     page.keyboard.press('Enter')
     expect(page).to_have_url(BASE+'/tubing/#tubing=3')
     dimensions=[]
     for slug,selector,step in [('wiring','.joint-paper','[data-step="2"]'),('tubing','.joint-paper','[data-step="2"]')]:
-        go(slug+'/');ready()
+        go(slug+'/');ready()  # noqa: E702
         expect(page.locator('.ag-steps')).to_be_visible()
         dimensions.append(page.locator('.ag-board-canvas').bounding_box())
         width=page.locator(selector).bounding_box()['width']
@@ -146,8 +146,8 @@ with sync_playwright() as p:
         assert page.locator(selector).bounding_box()['width']>width
         page.locator('[data-action=zoom-fit]').click()
         # Wheel scrolling is not trapped by the diagram.
-        page.evaluate('scrollTo(0,0)');page.locator('.ag-board-canvas').hover()
-        before=page.evaluate('scrollY');page.mouse.wheel(0,350)
+        page.evaluate('scrollTo(0,0)');page.locator('.ag-board-canvas').hover()  # noqa: E702
+        before=page.evaluate('scrollY');page.mouse.wheel(0,350)  # noqa: E702
         page.wait_for_function('(before)=>scrollY>before',arg=before)
         page.evaluate('scrollTo(0,0)')
         page.locator('[data-action=fullscreen]').click()
@@ -156,7 +156,7 @@ with sync_playwright() as p:
         assert page.locator(selector).bounding_box()['width']>=width-1,slug+': fullscreen shows a smaller diagram'
         # the step renders on hashchange: until then ready() still sees the old canvas (BuildGuide#9)
         page.locator('.ag-steps').locator(step).click()
-        expect(page.locator('.ag-steps').locator(step)).to_have_attribute('aria-current','step');ready()
+        expect(page.locator('.ag-steps').locator(step)).to_have_attribute('aria-current','step');ready()  # noqa: E702
         assert page.evaluate("document.fullscreenElement.classList.contains('ag-guide')")
         nav=page.locator('.ag-wire-navigation').bounding_box()
         assert nav['y']+nav['height']<=page.evaluate('innerHeight')+1
@@ -186,7 +186,7 @@ with sync_playwright() as p:
     with page.expect_download() as download:
         page.locator('[data-action=export]').click()
     with tempfile.TemporaryDirectory() as temp:
-        target=Path(temp)/'bom.csv';download.value.save_as(target)
+        target=Path(temp)/'bom.csv';download.value.save_as(target)  # noqa: E702
         rows=list(csv.DictReader(io.StringIO(target.read_text(encoding='utf-8-sig'))))
         assert list(rows[0])==['Group','Component','Specification','Quantity','MakerWorld']
         assert [r['Quantity'] for r in rows]==['3','1','2']
@@ -210,11 +210,11 @@ with sync_playwright() as p:
     for width,height in [(1440,900),(1280,720),(390,844),(375,667),(844,390)]:
         page.set_viewport_size({'width':width,'height':height})
         for slug in ['wiring','tubing']:
-            go(slug+'/');ready()
+            go(slug+'/');ready()  # noqa: E702
             steps=page.locator('.ag-steps button')
             for index in range(steps.count()):
                 steps.nth(index).click()
-                expect(steps.nth(index)).to_have_attribute('aria-current','step');ready()
+                expect(steps.nth(index)).to_have_attribute('aria-current','step');ready()  # noqa: E702
                 # the component takes the window height from its own top: scroll it to the top of the window
                 page.evaluate("document.querySelector('.ag-guide').scrollIntoView()")
                 page.wait_for_function('''() => {
@@ -224,7 +224,7 @@ with sync_playwright() as p:
             page.locator('.ag-wire-navigation .ag-primary').scroll_into_view_if_needed()
     # The board stays readable on laptop screens.
     page.set_viewport_size({'width':1024,'height':768})
-    go('wiring/#wiring=A/1');ready()
+    go('wiring/#wiring=A/1');ready()  # noqa: E702
     assert page.locator('.ag-board-canvas').evaluate('e=>e.clientHeight')>=300,'board too small at 1024x768'
     assert not errors,errors
     assert not missing,missing
@@ -232,12 +232,12 @@ with sync_playwright() as p:
     blocked=browser.new_context()
     blocked.route('**/*',lambda r:r.continue_() if r.request.url.startswith(BASE) else r.abort())
     blocked.add_init_script("Object.defineProperty(window,'localStorage',{get(){throw Error('blocked')}})")
-    fallback=blocked.new_page();fallback.goto(BASE+'/wiring/',wait_until='domcontentloaded')
+    fallback=blocked.new_page();fallback.goto(BASE+'/wiring/',wait_until='domcontentloaded')  # noqa: E702
     expect(fallback.locator('.ag-status')).to_contain_text('Storage unavailable')
     fallback.locator('.ag-verify input').check()
     expect(fallback.locator('.ag-verify input')).to_be_checked()
     nojs=browser.new_context(java_script_enabled=False)
-    fallback=nojs.new_page();fallback.goto(BASE+'/wiring/',wait_until='domcontentloaded')
+    fallback=nojs.new_page();fallback.goto(BASE+'/wiring/',wait_until='domcontentloaded')  # noqa: E702
     assert 'This guide needs JavaScript.' in fallback.content()
     browser.close()
     wires=[w for s in wiring for w in s['connections']]
