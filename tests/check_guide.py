@@ -212,6 +212,19 @@ with sync_playwright() as p:
     for path in ['', 'bom/', 'wiring/', 'tubing/']:
         go(path)
         assert page.evaluate('document.body.scrollWidth<=innerWidth'),path
+        # Phones: every control is at least 24 px; the canvas is as tall as its drawing, with Fullscreen above it in the first screen.
+        assert page.evaluate("[...document.querySelectorAll('.ag-guide button, .ag-guide select, .ag-guide input')].every(e=>{const r=e.getBoundingClientRect();return !r.width||(r.width>=23.9&&r.height>=23.9)})"),path+': control under 24 px'
+        if path in ('wiring/','tubing/'):
+            ready()
+            canvas,drawing,fullscreen=page.evaluate("['.ag-board-canvas','.ag-board-canvas > div','[data-action=fullscreen]'].map(s=>{const r=document.querySelector(s).getBoundingClientRect();return {y:r.y,height:r.height}})")
+            assert abs(canvas['height']-drawing['height'])<=2,f"{path}: canvas {canvas['height']} px, drawing {drawing['height']} px"
+            assert fullscreen['y']+fullscreen['height']<=844,path+': Fullscreen below the first screen'
+            assert fullscreen['y']+fullscreen['height']<=canvas['y'],path+': Fullscreen overlaps or follows the drawing'
+            # in fullscreen the zoom controls stay inside the screen
+            page.locator('[data-action=fullscreen]').click()
+            assert page.evaluate("document.querySelector('[data-action=zoom-in]').getBoundingClientRect().right<=innerWidth"),path+': zoom controls outside the fullscreen view'
+            page.locator('[data-action=fullscreen]').click()
+            expect(page.locator('.ag-guide')).not_to_have_class(re.compile('ag-expanded'))
         if path=='bom/':   # every specification on screen, not hidden in a sideways scroller
             assert page.evaluate("[...document.querySelectorAll('tbody tr:not(.ag-group) td:nth-child(3)')].every(td=>{const r=td.getBoundingClientRect();return r.width>0&&r.left>=0&&r.right<=innerWidth})"),'BOM specification off screen'
     # The next action stays on screen across step lengths and viewport changes.
