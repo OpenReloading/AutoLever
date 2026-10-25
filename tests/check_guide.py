@@ -85,6 +85,8 @@ with sync_playwright() as p:
         phone.goto(BASE+'/'+path,wait_until='domcontentloaded')
         title=phone.locator('.md-header__title .md-ellipsis').first
         assert title.evaluate('e=>e.scrollWidth<=e.clientWidth'),path
+        assert title.inner_text().strip()=='AutoLever',path
+        assert phone.title().endswith('AutoLever'),path
         footer=phone.locator('.md-footer')
         expect(footer.locator('.md-copyright a').first).to_have_attribute('href','https://github.com/OpenReloading/AutoLever')
         expect(footer.locator('.md-copyright a')).to_have_text(['Repository','Discord','MIT licence','Material for MkDocs'])
