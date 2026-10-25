@@ -35,8 +35,8 @@ pythonpath = [".", "hooks"]
 # hooks/ has no __init__.py, so it is listed to count its files even when no test imports them
 source_dirs = [".", "hooks"]
 branch = true
-# tests are not measured; the browser check runs against the built site in its own CI step
-omit = ["tests/*", ".venv/*"]
+# tests are not measured; the browser check runs against the built site in its own CI step; tools/ holds one-off generators
+omit = ["tests/*", "tools/*", ".venv/*"]
 
 [tool.coverage.report]
 fail_under = 95

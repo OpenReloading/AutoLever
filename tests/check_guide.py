@@ -5,9 +5,11 @@ import csv  # noqa: I001
 import io
 import json
 import re
+import struct
 import sys
 import tempfile
 from pathlib import Path
+from typing import Literal
 from urllib.parse import urlparse
 import yaml
 from playwright.sync_api import sync_playwright, expect
@@ -27,6 +29,17 @@ for end,message in [('K9:1','wire 6, to end K9:1: unknown part K9'),('K1:99','wi
         assert str(e)==message,str(e)  # noqa: PT017
     else:
         raise AssertionError('no error for '+end)
+
+# Contrast ratio of an element's text (or its placeholder) over its composited background.
+CONTRAST=r"""([sel,pseudo])=>{
+const num=c=>(c.match(/[\d.]+/g)||[0,0,0,0]).map(Number);
+const over=(f,b)=>[0,1,2].map(i=>f[i]*(f.length>3?f[3]:1)+b[i]*(1-(f.length>3?f[3]:1)));
+const lum=c=>{const l=c.map(v=>{v/=255;return v<=0.03928?v/12.92:((v+0.055)/1.055)**2.4});return 0.2126*l[0]+0.7152*l[1]+0.0722*l[2]};
+const e=document.querySelector(sel);
+const chain=[];for(let n=e;n;n=n.parentElement)chain.unshift(n);
+let bg=[255,255,255];for(const n of chain)bg=over(num(getComputedStyle(n).backgroundColor),bg);
+const a=lum(over(num(getComputedStyle(e,pseudo).color),bg)),b=lum(bg);
+return (Math.max(a,b)+0.05)/(Math.min(a,b)+0.05)}"""
 
 BASE=(sys.argv[1] if len(sys.argv)>1 else 'http://127.0.0.1:8000').rstrip('/')
 with sync_playwright() as p:
@@ -51,6 +64,20 @@ with sync_playwright() as p:
         assert ('class="md-banner"' in html)==preview,path
         assert ('Development preview, not the released site.' in html)==preview,path
     assert (context.request.get(BASE+'/sitemap.xml').status==404)==preview
+    # Link preview meta on every page, with the card URL built from site_url (the /develop/ preview points to its own copy); the card is a 1200 x 630 PNG that says nothing beyond the site title and description.
+    config=yaml.safe_load(Path(main.ROOT,'mkdocs.yml').read_text(encoding='utf-8'))
+    card='https://openreloading.github.io'+urlparse(BASE).path+'/assets/social-card.png'
+    for path in ['','bom/','wiring/','tubing/','404.html']:
+        tags=dict(re.findall(r'<meta (?:property|name)="((?:og|twitter):[\w:]+)" content="([^"]*)"',context.request.get(BASE+'/'+path).text()))
+        assert tags['og:image']==tags['twitter:image']==card,path
+        assert tags['og:description']==tags['twitter:description']==config['site_description'],path
+        assert tags['og:title']==tags['twitter:title'],path
+        assert tags['og:title'].endswith(config['site_name']),path
+        assert (tags['og:image:width'],tags['og:image:height'],tags['twitter:card'])==('1200','630','summary_large_image'),path
+    image=context.request.get(BASE+'/assets/social-card.png')
+    assert image.status==200
+    assert image.body()[:8]==b'\x89PNG\r\n\x1a\n'
+    assert struct.unpack('>II',image.body()[16:24])==(1200,630)
     go('wiring/')
     data=json.loads(page.locator('#guide-data').text_content())
     wiring,tubing,bom=data['boards']['wiring']['steps'],data['boards']['tubing']['steps'],data['bom']['items']
@@ -291,6 +318,34 @@ with sync_playwright() as p:
         expect(page.locator('main h1')).to_have_css('color','rgb(36, 52, 46)')
         expect(page.locator('main h1 + .admonition.danger')).to_be_visible()
     page.emulate_media(media='null',color_scheme='null')
+    # Self-hosted search under the base path: opens, finds a word of the introduction, links stay under the prefix; on a phone and on a desktop, light and dark, the controls are 24 px or more with text contrast of 4.5:1 or more.
+    views:list[tuple[int,Literal['light','dark']]]=[(390,'light'),(390,'dark'),(1440,'light'),(1440,'dark')]
+    for width,scheme in views:
+        page.set_viewport_size({'width':width,'height':844})
+        page.emulate_media(color_scheme=scheme)
+        go()
+        toggle=page.locator('label.md-header__button[for=__search]')
+        if width<500:
+            expect(toggle).to_be_visible()
+            assert toggle.evaluate('e=>e.offsetWidth>=24&&e.offsetHeight>=24'),(width,scheme)
+            assert page.evaluate(CONTRAST,['label.md-header__button[for=__search]',None])>=4.5,(width,scheme,'toggle')
+            toggle.click()
+        field=page.locator('.md-search__input')
+        field.click()
+        assert page.evaluate(CONTRAST,['.md-search__input','::placeholder'])>=4.5,(width,scheme,'placeholder')
+        field.press_sequentially('relay')  # the search listens to key events, fill() sends none
+        link=page.locator('.md-search-result__link').first
+        expect(link).to_be_visible()
+        assert link.evaluate('a=>a.pathname').startswith(urlparse(BASE).path+'/'),(width,scheme)
+        reset=page.locator('.md-search__options > button')
+        page.wait_for_function('e=>e.getBoundingClientRect().width>=24&&getComputedStyle(e).opacity==1',arg=reset.element_handle())  # the icon grows during its transition
+        for selector in ['.md-search__input','.md-search__options > button','.md-search-result__meta','.md-search-result__link','.md-search-result mark']:
+            ratio=page.evaluate(CONTRAST,[selector,None])
+            assert ratio>=4.5,(width,scheme,selector,ratio)
+        link.click()
+        expect(page.locator('main h1')).to_be_visible()
+    page.set_viewport_size({'width':1440,'height':1000})
+    page.emulate_media(color_scheme='null')
     assert not errors,errors
     assert not missing,missing
     assert not external,sorted(set(external))
@@ -306,4 +361,4 @@ with sync_playwright() as p:
     assert 'This guide needs JavaScript.' in fallback.content()
     browser.close()
     wires=[w for s in wiring for w in s['connections']]
-    print(f"PASS: four Markdown pages with BuildGuide components; {len(wires)} connections ({sum(w['color']=='DIODE' for w in wires)} diodes), {len(tubing)} tubing steps, grouped BOM with 3D printed parts, safety admonition on every page (full on introduction and BOM, short with link on wiring and tubing); matching layouts, zoom, fullscreen, scrolling, persistence, CSV and mobile; no JS errors, missing assets or third-party requests.")
+    print(f"PASS: four Markdown pages with BuildGuide components; {len(wires)} connections ({sum(w['color']=='DIODE' for w in wires)} diodes), {len(tubing)} tubing steps, grouped BOM with 3D printed parts, safety admonition on every page (full on introduction and BOM, short with link on wiring and tubing); matching layouts, zoom, fullscreen, scrolling, persistence, CSV and mobile; link preview meta and card on every page; self-hosted search at 390 and 1440 px in light and dark; no JS errors, missing assets or third-party requests.")

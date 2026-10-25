@@ -310,6 +310,11 @@ button:focus-visible {
   opacity: 1;
 }
 
+/* Search: the result count line is --muted on --line in Material, 4.2:1 in the light scheme; the ink token gives more than 4.5:1 in both */
+.md-search-result__meta {
+  color: var(--ink);
+}
+
 /* Print: the site chrome is hidden by Material and the BuildGuide controls by the component. Material's 25 mm page margin leaves 605 px on A4, but BuildGuide scales the boards to 700 px before printing, so they were cut off at the right edge; 10 mm leaves 718 px on A4 and more on Letter. */
 @page {
   margin: 10mm;
