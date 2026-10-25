@@ -66,7 +66,8 @@ with sync_playwright() as p:
     assert (context.request.get(BASE+'/sitemap.xml').status==404)==preview
     # Link preview meta on every page, with the card URL built from site_url (the /develop/ preview points to its own copy); the card is a 1200 x 630 PNG that says nothing beyond the site title and description.
     config=yaml.safe_load(Path(main.ROOT,'mkdocs.yml').read_text(encoding='utf-8'))
-    card='https://openreloading.github.io'+urlparse(BASE).path+'/assets/social-card.png'
+    origin=urlparse(config['site_url'])
+    card=f'{origin.scheme}://{origin.netloc}'+urlparse(BASE).path+'/assets/social-card.png'
     for path in ['','bom/','wiring/','tubing/','404.html']:
         tags=dict(re.findall(r'<meta (?:property|name)="((?:og|twitter):[\w:]+)" content="([^"]*)"',context.request.get(BASE+'/'+path).text()))
         assert tags['og:image']==tags['twitter:image']==card,path
@@ -323,7 +324,7 @@ with sync_playwright() as p:
     for width,scheme in views:
         page.set_viewport_size({'width':width,'height':844})
         page.emulate_media(color_scheme=scheme)
-        go()
+        go('bom/' if width==390 else '')  # a nested page checks the relative base of the search files
         toggle=page.locator('label.md-header__button[for=__search]')
         if width<500:
             expect(toggle).to_be_visible()
