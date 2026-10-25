@@ -81,20 +81,32 @@ button:focus-visible {
   border-bottom: 1px solid var(--line);
 }
 
-/* The safety admonition takes the danger tokens, not Material's red */
-.md-typeset .admonition.danger,
-.md-typeset details.danger {
-  border-color: var(--danger);
-}
-
-.md-typeset .danger > .admonition-title,
-.md-typeset .danger > summary {
+/* The safety admonition: a left bar in the danger tokens, no title slab or icon, text at 16 px so it stays short on a phone */
+.md-typeset .admonition.danger {
+  border: 0;
+  border-left: 0.2rem solid var(--danger);
+  border-radius: 0 0.2rem 0.2rem 0;
+  box-shadow: none;
   background-color: var(--danger-tint);
+  font-size: 0.8rem;
+  padding: 0 0.8rem 0.1rem;
 }
 
-.md-typeset .danger > .admonition-title::before,
-.md-typeset .danger > summary::before {
-  background-color: var(--danger);
+.md-typeset .danger > .admonition-title {
+  margin: 0;
+  padding: 0.5rem 0 0;
+  background: none;
+  color: var(--danger);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.md-typeset .danger > .admonition-title::before {
+  display: none;
+}
+
+.md-typeset .danger > p {
+  margin: 0.2em 0 0.7em;
 }
 
 /* BuildGuide components sit on the page: no slab of their own (the expanded view and the sticky bar keep --ag-page as an opaque fill) */
