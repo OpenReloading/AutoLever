@@ -62,8 +62,9 @@ def test_default_print_plate_is_two_bodies(tmp_path):
     assert bodies(tmp_path / "out.stl") == 2
 
 
-def test_print_plate_with_arm_beyond_a_long_clamp_is_two_bodies(tmp_path):
+@pytest.mark.parametrize("arm_x", [1.5, -0.5])
+def test_print_plate_with_arm_beyond_a_long_clamp_is_two_bodies(tmp_path, arm_x):
     # L = 50 / tan(30 deg) = 86.6 mm, more than 2 * (eye_r + 10) = 46 mm
-    result = render(tmp_path / "out.stl", arm_x=1.5, gap_wide=60)
+    result = render(tmp_path / "out.stl", arm_x=arm_x, gap_wide=60)
     assert result.returncode == 0, result.stderr
     assert bodies(tmp_path / "out.stl") == 2
