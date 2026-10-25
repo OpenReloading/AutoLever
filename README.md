@@ -22,6 +22,6 @@ Use at your own risk. The box runs on 24 V DC from an external desktop power sup
 - `docs/`: the MkDocs site in Markdown; the BuildGuide MkDocs plugin draws the BOM, wiring and tubing components in it. The safety text is in `snippets/`. `pip install -r requirements.txt`, then `mkdocs serve`.
 - `tests/check_guide.py`: Playwright check against the built site served under `/AutoLever/`
 
-Pull requests run the build, the `data/buildguide.json` freshness check and the browser check. A push to `main` builds and deploys the site with GitHub Actions.
+Pull requests run the build, the `data/buildguide.json` freshness check and the browser check. A push to `main` or `develop` builds and deploys the site with GitHub Actions: `main` is the released site, `develop` a preview under `/develop/` (marked `noindex`, with a banner).
 
 MIT licence. The BuildGuide plugin bundles JointJS (MPL 2.0) and libavoid-js (LGPL 2.1+).

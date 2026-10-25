@@ -1,7 +1,7 @@
 name: Deploy to GitHub Pages
 on:
   push:
-    branches: [main]
+    branches: [main, develop]
   workflow_dispatch:
 permissions: {}
 concurrency:
@@ -15,14 +15,36 @@ jobs:
     permissions:
       contents: read
     steps:
+      # main is the released site at the root, develop the preview under /develop/ (see AGENTS.md)
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          ref: main
+          persist-credentials: false
+      - id: checkout_preview
+        continue-on-error: true
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: develop
+          path: preview
           persist-credentials: false
       - run: python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
       # the header's repository facts come from the GitHub API at build time
       - run: .venv/bin/mkdocs build --strict
         env:
           GITHUB_TOKEN: ${{ github.token }}
+      # each ref installs its own requirements; a failed preview must not stop the released site
+      - id: preview
+        if: steps.checkout_preview.outcome == 'success'
+        continue-on-error: true
+        working-directory: preview
+        run: |
+          python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
+          .venv/bin/mkdocs build --strict -f mkdocs.develop.yml -d "$RUNNER_TEMP/preview"
+          mv "$RUNNER_TEMP/preview" ../site/develop
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+      - if: steps.checkout_preview.outcome == 'failure' || steps.preview.outcome == 'failure'
+        run: echo "::warning::The develop preview failed to check out or build; the released site is deployed without it."
       - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:
           path: site
