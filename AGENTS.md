@@ -10,7 +10,7 @@
 - Unit tests with coverage (CI; pytest is in `requirements-dev.txt`, install it as in the lint line): `.venv/bin/pytest --cov`; prints the summary and fails below `fail_under` in `[tool.coverage.report]` of `pyproject.toml`. Raise the floor when coverage rises, keep it a little below the measured value. Not measured: `tests/` and the browser check `tests/check_guide.py` (needs the built site, below).
 - Generate the guide data after editing `data/*.yaml`: `.venv/bin/python main.py` (writes `data/buildguide.json`, committed; CI fails when it is stale)
 - Browser check, against the built site (`mkdocs serve` livereload counts as an external request): `.venv/bin/mkdocs build --strict -d /tmp/www/AutoLever && python -m http.server -d /tmp/www 8000`, then `.venv/bin/python tests/check_guide.py http://127.0.0.1:8000/AutoLever`
-- Preview build (as CI): `.venv/bin/mkdocs build --strict -d /tmp/www/AutoLever && .venv/bin/mkdocs build --strict -f mkdocs.develop.yml -d /tmp/www/AutoLever/develop`, then the browser check with `http://127.0.0.1:8000/AutoLever/develop`; it also checks `noindex`, banner and sitemap (present on the preview only).
+- Preview build (as CI): `.venv/bin/mkdocs build --strict -d /tmp/www/AutoLever && .venv/bin/mkdocs build --strict -f mkdocs.develop.yml -d /tmp/www/AutoLever/develop`, then the browser check with `http://127.0.0.1:8000/AutoLever/develop`; it also checks that `noindex` and the banner are on every page of the preview and the sitemap is not, and the reverse on the root.
 - Playwright MCP (`.mcp.json`, `.codex/config.toml`) runs inside the container and reaches the served site at `http://127.0.0.1:8000/AutoLever/`.
 
 ## Conventions
