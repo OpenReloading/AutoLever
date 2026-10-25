@@ -1,0 +1,5 @@
+{#- Preview build only (extra.preview, mkdocs.develop.yml): noindex meta and a banner. Both blocks must render nothing
+    when the flag is off: Material draws its banner whenever the announce block is not empty. -#}
+{% extends "base.html" %}
+{%- block extrahead -%}{%- if config.extra.preview -%}<meta name="robots" content="noindex">{%- endif -%}{%- endblock -%}
+{%- block announce -%}{%- if config.extra.preview -%}Development preview, not the released site.{%- endif -%}{%- endblock -%}

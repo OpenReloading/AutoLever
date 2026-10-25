@@ -26,10 +26,13 @@ jobs:
       # data/buildguide.json is committed: it must match data/*.yaml
       - run: .venv/bin/python main.py && git diff --exit-code data/buildguide.json
       - run: .venv/bin/mkdocs build --strict -d /tmp/www/AutoLever
+      # the preview of the Pages workflow (mkdocs.develop.yml), next to the root as on the deployed site
+      - run: .venv/bin/mkdocs build --strict -f mkdocs.develop.yml -d /tmp/www/AutoLever/develop
       - run: .venv/bin/playwright install --with-deps chromium
       - run: |
           python3 -m http.server -d /tmp/www 8000 &
           .venv/bin/python tests/check_guide.py http://127.0.0.1:8000/AutoLever
+          .venv/bin/python tests/check_guide.py http://127.0.0.1:8000/AutoLever/develop
   # ruff and basedpyright from the hash-locked requirements-dev.txt. Rules are in pyproject.toml, the basedpyright
   # baseline in .basedpyright/baseline.json, the ruff baseline as noqa comments.
   lint-python:
