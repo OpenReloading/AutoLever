@@ -8,6 +8,7 @@
   --muted: #5e6c5f;
   --accent: #21634c;
   --accent-hover: #174735;
+  --on-accent: #ffffff;
   --header-bg: #21634c;
   --header-ink: #ffffff;
   --line: #dce3dc;
@@ -25,6 +26,7 @@
   --muted: #a9b6ac;
   --accent: #72d6aa;
   --accent-hover: #9be6c4;
+  --on-accent: #10231b;
   --header-bg: #1b2622;
   --header-ink: #e4ebe6;
   --line: #3b4740;
@@ -160,4 +162,63 @@ button:focus-visible {
 .md-tabs__link:hover,
 .md-tabs__link:focus {
   opacity: 1;
+}
+
+/* Home page: lead paragraph, call to action and the three cards, the list after the button (docs/index.md) */
+.md-content__inner > .admonition + p {
+  max-width: 47ch;   /* 56ch at the 16 px of the admonition above */
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.md-typeset .md-button--primary {
+  min-height: 2.2rem;
+  padding: 0.5em 1.4em;
+  background-color: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 0.2rem;
+  color: var(--on-accent);
+  font-weight: 600;
+}
+
+.md-typeset .md-button--primary:is(:hover, :focus-visible) {
+  background-color: var(--accent-hover);
+  border-color: var(--accent-hover);
+  color: var(--on-accent);
+}
+
+.md-typeset .md-button--primary:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.md-content__inner > p:has(> .md-button--primary) + ul {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: 0.6rem;
+  max-width: 48rem;
+  margin: 1rem 0;
+  padding: 0;
+  list-style: none;
+}
+
+.md-content__inner > p:has(> .md-button--primary) + ul > li {
+  margin: 0;
+  padding: 0.6rem 0.8rem;
+  background-color: var(--surface);
+  border: 1px solid var(--control-line);
+  border-radius: 0.2rem;
+}
+
+.md-content__inner > p:has(> .md-button--primary) + ul strong {
+  display: block;
+  color: var(--ink);
+}
+
+/* Forced colours replace the fills: keep a visible edge on the button and the cards */
+@media (forced-colors: active) {
+  .md-typeset .md-button--primary,
+  .md-content__inner > p:has(> .md-button--primary) + ul > li {
+    border-color: ButtonText;
+  }
 }
