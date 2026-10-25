@@ -1,0 +1,121 @@
+/* One green token set, shared with the Feeder docs, plus the safety tokens. Light is the default scheme, dark is Material's slate. */
+:root,
+[data-md-color-scheme="default"] {
+  --page: #ffffff;
+  --surface: #f6f7f4;
+  --surface-alt: #eef2e8;
+  --ink: #24342e;
+  --muted: #5e6c5f;
+  --accent: #21634c;
+  --accent-hover: #174735;
+  --header-bg: #21634c;
+  --header-ink: #ffffff;
+  --line: #dce3dc;
+  --control-line: #74857a;
+  --warn: #c2410c;
+  --danger: #b3261e;
+  --danger-tint: #fdecea;
+}
+
+[data-md-color-scheme="slate"] {
+  --page: #171c19;
+  --surface: #202722;
+  --surface-alt: #2b352e;
+  --ink: #e4ebe6;
+  --muted: #a9b6ac;
+  --accent: #72d6aa;
+  --accent-hover: #9be6c4;
+  --header-bg: #1b2622;
+  --header-ink: #e4ebe6;
+  --line: #3b4740;
+  --control-line: #6f8076;
+  --warn: #f59e0b;
+  --danger: #ff8a80;
+  --danger-tint: #3a1f1f;
+}
+
+/* Material variables from the tokens */
+[data-md-color-scheme] {
+  --md-default-bg-color: var(--page);
+  --md-default-fg-color: var(--ink);
+  --md-default-fg-color--light: var(--muted);
+  --md-default-fg-color--lighter: var(--control-line);
+  --md-default-fg-color--lightest: var(--line);
+  --md-primary-fg-color: var(--header-bg);
+  --md-primary-fg-color--light: var(--header-bg);
+  --md-primary-fg-color--dark: var(--header-bg);
+  --md-primary-bg-color: var(--header-ink);
+  --md-primary-bg-color--light: var(--header-ink);
+  --md-accent-fg-color: var(--accent-hover);
+  --md-accent-fg-color--transparent: transparent;
+  --md-accent-bg-color: var(--header-ink);
+  --md-typeset-color: var(--ink);
+  --md-typeset-a-color: var(--accent);
+  --md-typeset-table-color: var(--line);
+  --md-typeset-table-color--light: var(--surface);
+  --md-code-bg-color: var(--surface-alt);
+  --md-code-fg-color: var(--ink);
+  --md-footer-bg-color: var(--header-bg);
+  --md-footer-bg-color--dark: var(--header-bg);
+  --md-footer-fg-color: var(--header-ink);
+  --md-footer-fg-color--light: var(--header-ink);
+  --md-footer-fg-color--lighter: var(--header-ink);
+  --md-admonition-bg-color: var(--page);
+}
+
+.md-typeset a:focus-visible,
+.md-nav__link:focus-visible,
+.md-header a:focus-visible,
+.md-footer a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.md-header a:focus-visible,
+.md-footer a:focus-visible {
+  outline-color: var(--header-ink);
+}
+
+[data-md-color-scheme="slate"] .md-header {
+  border-bottom: 1px solid var(--line);
+}
+
+/* The safety admonition takes the danger tokens, not Material's red */
+.md-typeset .admonition.danger,
+.md-typeset details.danger {
+  border-color: var(--danger);
+}
+
+.md-typeset .danger > .admonition-title,
+.md-typeset .danger > summary {
+  background-color: var(--danger-tint);
+}
+
+.md-typeset .danger > .admonition-title::before,
+.md-typeset .danger > summary::before {
+  background-color: var(--danger);
+}
+
+/* BuildGuide components sit on the page: no slab of their own (the expanded view and the sticky bar keep --ag-page as an opaque fill) */
+[data-md-color-scheme] .ag-guide {
+  background: transparent;
+  --ag-page: var(--page);
+  --ag-ink: var(--ink);
+  --ag-muted: var(--muted);
+  --ag-accent: var(--accent);
+  --ag-line: var(--line);
+  --ag-control-line: var(--control-line);
+  --ag-surface-head: var(--surface-alt);
+}
+
+/* Material dims inactive tabs to 0.7, 4.4:1 on the light header; 0.85 keeps them apart from the active tab and above 4.5:1 */
+.md-tabs__link {
+  opacity: 0.85;
+}
+
+.md-tabs__link--active,
+.md-tabs__link:hover,
+.md-tabs__link:focus {
+  opacity: 1;
+}
