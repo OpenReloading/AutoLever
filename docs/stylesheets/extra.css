@@ -132,7 +132,7 @@ button:focus-visible {
   font-size: 1.25em;
 }
 
-/* BuildGuide sets 9 to 11 px on labels, table heads and legends (issue #69 in OpenReloading/BuildGuide); 12 px is the floor here. The SVG drawing text scales with the board and is out of reach of CSS. */
+/* BuildGuide sets 9 to 11 px on labels, table heads and legends (issue #69 in OpenReloading/BuildGuide); 12 px is the floor here. The SVG drawing text scales with the board and is out of reach of CSS (OpenReloading/BuildGuide#97). */
 [data-md-color-scheme] .ag-guide :is(.ag-steps small, .ag-board-toolbar label, .ag-board-legend, .ag-connection-detail small, .ag-wire-navigation, .ag-wire-row button, .ag-row-color, .ag-bom-table th, .ag-part-cell small, .ag-source-link, .ag-result-count, .ag-status, .ag-primary) {
   font-size: 12px;
 }
@@ -220,5 +220,79 @@ button:focus-visible {
   .md-typeset .md-button--primary,
   .md-content__inner > p:has(> .md-button--primary) + ul > li {
     border-color: ButtonText;
+  }
+}
+
+/* Boards: the canvas is as tall as the drawing at its width, so no empty bands remain above and below it (ratios are the board sizes in data/buildguide.json, checked by tests/test_main.py; BuildGuide#97 asks for them on the element). Fullscreen keeps BuildGuide's flex height. */
+.ag-guide[data-board="wiring"] {
+  --board-ratio: 1360 / 860;
+}
+
+.ag-guide[data-board="tubing"] {
+  --board-ratio: 1100 / 530;
+}
+
+[data-md-color-scheme] .ag-guide:not(.ag-expanded) .ag-board-canvas {
+  height: auto;
+  aspect-ratio: var(--board-ratio);
+}
+
+/* Touch targets of at least 24 px: the tick boxes in the connection list, the detail and the BOM (BuildGuide sets 17 px, see OpenReloading/BuildGuide#69) */
+[data-md-color-scheme] .ag-guide input[type="checkbox"] {
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+}
+
+/* Fullscreen is the primary action of a board: filled in the accent colour, and on phones (component narrower than 900 px) first, above the drawing, on its own row */
+[data-md-color-scheme] .ag-guide .ag-board-controls .ag-fullscreen-button {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
+  font-weight: 600;
+}
+
+[data-md-color-scheme] .ag-guide .ag-board-controls .ag-fullscreen-button:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
+@container (max-width: 899px) {
+  .ag-guide:not(.ag-expanded) .ag-work {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .ag-guide:not(.ag-expanded) .ag-work > * {
+    order: 3;
+  }
+
+  .ag-guide:not(.ag-expanded) .ag-work-heading {
+    order: 0;
+  }
+
+  .ag-guide:not(.ag-expanded) .ag-board-toolbar {
+    order: 1;
+    margin: 8px 0;
+  }
+
+  .ag-guide:not(.ag-expanded) .ag-full-board {
+    order: 2;
+  }
+
+  .ag-guide:not(.ag-expanded) .ag-board-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .ag-guide:not(.ag-expanded) .ag-board-controls {
+    order: -1;
+    flex-wrap: wrap;
+  }
+
+  .ag-guide .ag-board-controls .ag-fullscreen-button {
+    order: -1;
+    flex: 1 0 100%;
+    min-height: 44px;
   }
 }

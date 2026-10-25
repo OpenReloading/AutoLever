@@ -121,3 +121,10 @@ def test_wiring_notes_must_match_the_wiring_steps(data):
     with pytest.raises(AssertionError, match="wiring_notes and wiring steps differ"):
         main.build()
 
+
+
+@pytest.mark.parametrize("board", ["wiring", "tubing"])
+def test_board_canvas_ratio_in_the_stylesheet_is_the_board_size(board):
+    width, height = json.loads((main.ROOT / "data/buildguide.json").read_text(encoding="utf-8"))["boards"][board]["size"]
+    css = (main.ROOT / "docs/stylesheets/extra.css").read_text(encoding="utf-8")
+    assert f'[data-board="{board}"] {{\n  --board-ratio: {width} / {height};' in css
