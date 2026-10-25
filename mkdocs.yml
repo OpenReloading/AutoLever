@@ -39,6 +39,7 @@ hooks:
 
 # data/buildguide.json comes from main.py (python main.py)
 plugins:
+  - search   # Material's own search: index and worker are built into the site, no third-party request
   - buildguide:
       data: data/buildguide.json
 
