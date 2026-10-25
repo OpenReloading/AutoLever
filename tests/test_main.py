@@ -128,3 +128,9 @@ def test_board_canvas_ratio_in_the_stylesheet_is_the_board_size(board):
     width, height = json.loads((main.ROOT / "data/buildguide.json").read_text(encoding="utf-8"))["boards"][board]["size"]
     css = (main.ROOT / "docs/stylesheets/extra.css").read_text(encoding="utf-8")
     assert f'[data-board="{board}"] {{\n  --board-ratio: {width} / {height};' in css
+
+
+def test_a_set_makerworld_address_is_the_link_and_an_unset_one_shows_none():
+    g = {"bom": [{"id": "a", "part": "A", "makerworld": "https://makerworld.com/models/1"}, {"id": "b", "part": "B", "makerworld": None}, {"id": "c", "part": "C"}]}
+    assert main.bom_items(g) == [{"id": "a", "part": "A", "link": "https://makerworld.com/models/1"}, {"id": "b", "part": "B"}, {"id": "c", "part": "C"}]
+    assert main.unset_makerworld(g) == ["b"]

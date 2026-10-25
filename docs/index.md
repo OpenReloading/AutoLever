@@ -9,6 +9,10 @@ hide: [navigation]
 
     --8<-- "safety.md"
 
+!!! warning "Pre-release, October 2026"
+
+    Nothing has been built yet, the printed parts are not on MakerWorld yet, details will change.
+
 Give your Lee APP an air-powered upgrade. AutoLever takes over the lever work for sizing and decapping. Press START and a Festo cylinder keeps it cycling, stroke after stroke. Press STOP when you’re done.
 
 [Start with the BOM](bom.md){ .md-button .md-button--primary }
