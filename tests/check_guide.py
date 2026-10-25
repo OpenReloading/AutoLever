@@ -42,6 +42,14 @@ with sync_playwright() as p:
         expect(page.locator('.ag-guide' if path else 'main h1')).to_be_visible()
     def ready():
         expect(page.locator('.ag-board-canvas')).to_have_attribute('data-ready','true')
+    # The preview under /develop/ is marked noindex with a banner on every page and has no sitemap; the released site has none of these.
+    preview=BASE.endswith('/develop')
+    for path in ['','bom/','wiring/','tubing/','404.html']:
+        html=context.request.get(BASE+'/'+path).text()
+        assert ('<meta name="robots" content="noindex">' in html)==preview,path
+        assert ('class="md-banner"' in html)==preview,path
+        assert ('Development preview, not the released site.' in html)==preview,path
+    assert (context.request.get(BASE+'/sitemap.xml').status==404)==preview
     go('wiring/')
     data=json.loads(page.locator('#guide-data').text_content())
     wiring,tubing,bom=data['boards']['wiring']['steps'],data['boards']['tubing']['steps'],data['bom']['items']
