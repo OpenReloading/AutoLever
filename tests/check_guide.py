@@ -281,6 +281,9 @@ with sync_playwright() as p:
     page.emulate_media(media='print',color_scheme='dark')
     for slug in ['bom','wiring','tubing']:
         go(slug+'/')
+        if slug!='bom':
+            ready()
+        expect(page.locator('.joint-paper')).to_have_count(0 if slug=='bom' else 1)  # an empty list would pass the bounds check below
         page.evaluate("dispatchEvent(new Event('beforeprint'))")
         assert page.evaluate("[...document.querySelectorAll('.joint-paper')].every(e=>e.getBoundingClientRect().right<=innerWidth)"),'board cut off in print: '+slug
         for hidden in ['.ag-progress','.ag-status','.ag-result-count','.ag-connection-detail','.ag-board-toolbar']:
