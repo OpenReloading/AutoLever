@@ -109,6 +109,36 @@ button:focus-visible {
   margin: 0.2em 0 0.7em;
 }
 
+/* Reading measure: about 70 characters per line for paragraphs, lists and the safety admonition; the BuildGuide components keep the full width */
+.md-content__inner > :is(p, ul, ol, .admonition) {
+  max-width: 56ch;
+}
+
+/* Heading scale: the h2 matches the 20 px h2 of the components, both at weight 600 */
+.md-typeset h1,
+.md-typeset h2 {
+  color: var(--ink);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.md-typeset h1 {
+  font-size: 1.75em;
+}
+
+.md-typeset h2 {
+  font-size: 1.25em;
+}
+
+/* BuildGuide sets 9 to 11 px on labels, table heads and legends (issue #69 in OpenReloading/BuildGuide); 12 px is the floor here. The SVG drawing text scales with the board and is out of reach of CSS. */
+[data-md-color-scheme] .ag-guide :is(.ag-steps small, .ag-board-toolbar label, .ag-board-legend, .ag-connection-detail small, .ag-wire-navigation, .ag-wire-row button, .ag-row-color, .ag-bom-table th, .ag-part-cell small, .ag-source-link, .ag-result-count, .ag-status, .ag-primary) {
+  font-size: 12px;
+}
+
+.md-source__fact {
+  font-size: 12px;
+}
+
 /* BuildGuide components sit on the page: no slab of their own (the expanded view and the sticky bar keep --ag-page as an opaque fill) */
 [data-md-color-scheme] .ag-guide {
   background: transparent;
