@@ -31,7 +31,7 @@
     "group": "Mounting",
     "qty": "1 set",
     "part": "Board and mounting hardware",
-    "spec": "Plywood board ≥ 15 mm · 4 × 4×16 countersunk wood screws (box) · 3 × 4×16 pan-head wood screws (rail) · 4 × M3 heat-set inserts (4.2 mm hole, ≤ 6 mm long) + 4 × M3×8 (lid) · 6 × M3 heat-set inserts + 6 × M3×8 countersunk (console plate) · wood screws for the press, cylinder pivot, valve and FRL bracket · cable ties"
+    "spec": "Plywood board ≥ 15 mm · 13 × M3 heat-set inserts (4.2 mm hole, ≤ 6 mm long) · 3 × M3×6 pan-head screws with washers (rail) · 4 × M3×8 (lid) · 6 × M3×8 countersunk (console plate) · 4 × 4×16 countersunk wood screws for the box, only if you print the base with the wood-screw holes · wood screws for the press, cylinder pivot, valve and FRL bracket · cable ties"
    },
    {
     "id": "mechanism",
@@ -952,7 +952,7 @@
     {
      "id": "0",
      "title": "Relay diodes",
-     "note": "Clip the sockets on the rail with their 1/4 end towards the back wall, so the busy 13/14 end faces the console. D1–D4: ring to 14, plain leg to 13; crimp each leg into a 0.5 mm² ferrule.",
+     "note": "Press an M3 heat-set insert into each of the three rail pads in the base (soldering iron, straight down, flush with the pad), then screw the rail on from above with an M3×6 pan-head screw and a washer, through the slots 37.5, 137.5 and 187.5 mm from the K1 end of the rail. Clip the sockets on the rail with their 1/4 end towards the back wall, so the busy 13/14 end faces the console. D1–D4: ring to 14, plain leg to 13; crimp each leg into a 0.5 mm² ferrule.",
      "connections": [
       {
        "no": "D1",
