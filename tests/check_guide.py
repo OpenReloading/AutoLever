@@ -8,6 +8,7 @@ import re
 import sys
 import tempfile
 from pathlib import Path
+from urllib.parse import urlparse
 import yaml
 from playwright.sync_api import sync_playwright, expect
 
@@ -76,6 +77,34 @@ with sync_playwright() as p:
         else:
             expect(warning).not_to_contain_text('Household electricity')
             expect(warning.locator('a')).to_have_attribute('href','../')
+    # The header title is not cut off on a phone; every page ends with the repository, Discord and licence links and previous and next links.
+    phone=browser.new_page(viewport={'width':390,'height':844})
+    pages=['','bom/','wiring/','tubing/']
+    names=['Introduction','BOM','Wiring','Tubing']
+    for i,path in enumerate(pages):
+        phone.goto(BASE+'/'+path,wait_until='domcontentloaded')
+        title=phone.locator('.md-header__title .md-ellipsis').first
+        assert title.evaluate('e=>e.scrollWidth<=e.clientWidth'),path
+        assert title.inner_text().strip()=='AutoLever',path
+        assert phone.title().endswith('AutoLever'),path
+        footer=phone.locator('.md-footer')
+        expect(footer.locator('.md-copyright a').first).to_have_attribute('href','https://github.com/OpenReloading/AutoLever')
+        expect(footer.locator('.md-copyright a')).to_have_text(['Repository','Discord','MIT licence','Material for MkDocs'])
+        expect(footer.get_by_role('link',name='Discord')).to_have_attribute('href',re.compile(r'^https://discord\.gg/\w+$'))
+        expect(footer.get_by_role('link',name='MIT licence')).to_have_attribute('href','https://github.com/OpenReloading/AutoLever/blob/main/LICENSE')
+        for side,j in [('prev',i-1),('next',i+1)]:
+            link=footer.locator(f'.md-footer__link--{side} .md-footer__title')
+            if 0<=j<len(names):
+                expect(link).to_contain_text(names[j])
+            else:
+                expect(link).to_have_count(0)
+    # The 404 has one sentence with links to the Introduction and the BOM, under the base path.
+    phone.goto(BASE+'/404.html',wait_until='domcontentloaded')
+    expect(phone.locator('main h1')).to_have_text('Page not found')
+    expect(phone.locator('main .md-content__inner > p')).to_have_count(1)
+    expect(phone.locator('main .md-content__inner > p a')).to_have_text(['Introduction','BOM'])
+    assert phone.locator('main .md-content__inner > p a').evaluate_all('l=>l.map(a=>new URL(a.href).pathname)')==[urlparse(BASE).path+'/',urlparse(BASE).path+'/bom/']
+    phone.close()
     # Real page navigation, reload and browser back preserve the destination.
     for name,slug in [('BOM','bom'),('Wiring','wiring'),('Tubing','tubing')]:
         page.locator('.md-tabs').get_by_role('link',name=name,exact=True).click()

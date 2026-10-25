@@ -1,9 +1,13 @@
-site_name: AutoLever pneumatic press drive
+site_name: AutoLever   # short: the longer name is cut off in the header at 390 px
 site_url: https://openreloading.github.io/AutoLever/
 site_description: An air cylinder works the lever of a Lee APP press, controlled by four 24 V relays and a jam timer. Parts, wiring and tubing.
 repo_url: https://github.com/OpenReloading/AutoLever
 repo_name: OpenReloading/AutoLever
-copyright: MIT licence
+# footer links (README: repository, Discord); the licence file is in the repository; MakerWorld follows with #23
+copyright: >-
+  <a href="https://github.com/OpenReloading/AutoLever">Repository</a>
+  <a href="https://discord.gg/KkYJ5fdukR">Discord</a>
+  <a href="https://github.com/OpenReloading/AutoLever/blob/main/LICENSE">MIT licence</a>
 
 theme:
   name: material
@@ -12,6 +16,7 @@ theme:
   logo: assets/autolever-white.svg   # white on the green and dark headers
   favicon: assets/favicon.svg
   features:
+    - navigation.footer   # previous and next page links, no third-party request
     - navigation.tabs
   palette:
     - media: "(prefers-color-scheme: light)"
