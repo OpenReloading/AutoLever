@@ -12,6 +12,7 @@
 - Social card: `.venv/bin/python tools/social_card.py` (needs Chromium, so in the container) rewrites `docs/assets/social-card.png`; run it and commit the PNG after changing the logo, the light tokens in `docs/stylesheets/extra.css` or `site_description`. Nothing in CI catches a stale card.
 - Browser check, against the built site (`mkdocs serve` livereload counts as an external request): `.venv/bin/mkdocs build --strict -d /tmp/www/AutoLever && python -m http.server -d /tmp/www 8000`, then `.venv/bin/python tests/check_guide.py http://127.0.0.1:8000/AutoLever`
 - Preview build (as CI): `.venv/bin/mkdocs build --strict -d /tmp/www/AutoLever && .venv/bin/mkdocs build --strict -f mkdocs.develop.yml -d /tmp/www/AutoLever/develop`, then the browser check with `http://127.0.0.1:8000/AutoLever/develop`; it also checks that `noindex` and the banner are on every page of the preview and the sitemap is not, and the reverse on the root.
+- Printable parts (OpenSCAD, not in the dev container): `mkdir -p cad/stl && openscad -o cad/stl/control_box-base.stl -D 'part="base"' cad/control_box.scad`; `part` takes the values listed at the top of the file, and `-D 'wood_screw_holes=true'` adds the optional wood-screw holes to the base. The adapter is `cad/lee_app_handle_adapter.scad`. `cad/stl/` is git-ignored.
 - Playwright MCP (`.mcp.json`, `.codex/config.toml`) runs inside the container and reaches the served site at `http://127.0.0.1:8000/AutoLever/`.
 
 ## Conventions
