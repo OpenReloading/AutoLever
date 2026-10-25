@@ -11,7 +11,11 @@ hide: [navigation]
 
 Give your Lee APP an air-powered upgrade. AutoLever takes over the lever work for sizing and decapping. Press START and a Festo cylinder keeps it cycling, stroke after stroke. Press STOP when you’re done.
 
-Four relays and two sensors run the sequence. No code to flash or controller to program. The plans are free; bring your press and build your own.
+[Start with the BOM](bom.md){ .md-button .md-button--primary }
+
+- **Four relays, two sensors.** They run the sequence.
+- **No code.** Nothing to flash and no controller to program.
+- **Free plans.** Bring your press and build your own.
 
 Built by reloaders for reloaders, with AI as a tool.
 

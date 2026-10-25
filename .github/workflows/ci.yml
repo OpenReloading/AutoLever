@@ -20,6 +20,9 @@ jobs:
         with:
           persist-credentials: false
       - run: python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
+      # pytest and pytest-cov from the hash-locked requirements-dev.txt; the floor is fail_under in pyproject.toml
+      - run: '.venv/bin/pip install --only-binary :all: --require-hashes -r requirements-dev.txt'
+      - run: .venv/bin/pytest --cov
       # data/buildguide.json is committed: it must match data/*.yaml
       - run: .venv/bin/python main.py && git diff --exit-code data/buildguide.json
       - run: .venv/bin/mkdocs build --strict -d /tmp/www/AutoLever

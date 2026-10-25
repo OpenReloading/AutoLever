@@ -8,6 +8,7 @@
   --muted: #5e6c5f;
   --accent: #21634c;
   --accent-hover: #174735;
+  --on-accent: #ffffff;
   --header-bg: #21634c;
   --header-ink: #ffffff;
   --line: #dce3dc;
@@ -25,6 +26,7 @@
   --muted: #a9b6ac;
   --accent: #72d6aa;
   --accent-hover: #9be6c4;
+  --on-accent: #10231b;
   --header-bg: #1b2622;
   --header-ink: #e4ebe6;
   --line: #3b4740;
@@ -81,20 +83,62 @@ button:focus-visible {
   border-bottom: 1px solid var(--line);
 }
 
-/* The safety admonition takes the danger tokens, not Material's red */
-.md-typeset .admonition.danger,
-.md-typeset details.danger {
-  border-color: var(--danger);
-}
-
-.md-typeset .danger > .admonition-title,
-.md-typeset .danger > summary {
+/* The safety admonition: a left bar in the danger tokens, no title slab or icon, text at 16 px so it stays short on a phone */
+.md-typeset .admonition.danger {
+  border: 0;
+  border-left: 0.2rem solid var(--danger);
+  border-radius: 0 0.2rem 0.2rem 0;
+  box-shadow: none;
   background-color: var(--danger-tint);
+  font-size: 0.8rem;
+  padding: 0 0.8rem 0.1rem;
 }
 
-.md-typeset .danger > .admonition-title::before,
-.md-typeset .danger > summary::before {
-  background-color: var(--danger);
+.md-typeset .danger > .admonition-title {
+  margin: 0;
+  padding: 0.5rem 0 0;
+  background: none;
+  color: var(--danger);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.md-typeset .danger > .admonition-title::before {
+  display: none;
+}
+
+.md-typeset .danger > p {
+  margin: 0.2em 0 0.7em;
+}
+
+/* Reading measure: about 70 characters per line for paragraphs, lists and the safety admonition; the BuildGuide components keep the full width */
+.md-content__inner > :is(p, ul, ol, .admonition) {
+  max-width: 56ch;
+}
+
+/* Heading scale: the h2 matches the 20 px h2 of the components, both at weight 600 */
+.md-typeset h1,
+.md-typeset h2 {
+  color: var(--ink);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.md-typeset h1 {
+  font-size: 1.75em;
+}
+
+.md-typeset h2 {
+  font-size: 1.25em;
+}
+
+/* BuildGuide sets 9 to 11 px on labels, table heads and legends (issue #69 in OpenReloading/BuildGuide); 12 px is the floor here. The SVG drawing text scales with the board and is out of reach of CSS. */
+[data-md-color-scheme] .ag-guide :is(.ag-steps small, .ag-board-toolbar label, .ag-board-legend, .ag-connection-detail small, .ag-wire-navigation, .ag-wire-row button, .ag-row-color, .ag-bom-table th, .ag-part-cell small, .ag-source-link, .ag-result-count, .ag-status, .ag-primary) {
+  font-size: 12px;
+}
+
+.md-source__fact {
+  font-size: 12px;
 }
 
 /* BuildGuide components sit on the page: no slab of their own (the expanded view and the sticky bar keep --ag-page as an opaque fill) */
@@ -118,4 +162,63 @@ button:focus-visible {
 .md-tabs__link:hover,
 .md-tabs__link:focus {
   opacity: 1;
+}
+
+/* Home page: lead paragraph, call to action and the three cards, the list after the button (docs/index.md) */
+.md-content__inner > .admonition + p {
+  max-width: 47ch;   /* 56ch at the 16 px of the admonition above */
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.md-typeset .md-button--primary {
+  min-height: 2.2rem;
+  padding: 0.5em 1.4em;
+  background-color: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 0.2rem;
+  color: var(--on-accent);
+  font-weight: 600;
+}
+
+.md-typeset .md-button--primary:is(:hover, :focus-visible) {
+  background-color: var(--accent-hover);
+  border-color: var(--accent-hover);
+  color: var(--on-accent);
+}
+
+.md-typeset .md-button--primary:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.md-content__inner > p:has(> .md-button--primary) + ul {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: 0.6rem;
+  max-width: 48rem;
+  margin: 1rem 0;
+  padding: 0;
+  list-style: none;
+}
+
+.md-content__inner > p:has(> .md-button--primary) + ul > li {
+  margin: 0;
+  padding: 0.6rem 0.8rem;
+  background-color: var(--surface);
+  border: 1px solid var(--control-line);
+  border-radius: 0.2rem;
+}
+
+.md-content__inner > p:has(> .md-button--primary) + ul strong {
+  display: block;
+  color: var(--ink);
+}
+
+/* Forced colours replace the fills: keep a visible edge on the button and the cards */
+@media (forced-colors: active) {
+  .md-typeset .md-button--primary,
+  .md-content__inner > p:has(> .md-button--primary) + ul > li {
+    border-color: ButtonText;
+  }
 }

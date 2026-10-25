@@ -39,6 +39,7 @@ plugins:
 
 markdown_extensions:
   - admonition
+  - attr_list   # CSS classes on the home page call to action and cards
   # the safety text is written once in snippets/ and included on the pages
   # sources: https://www.hse.gov.uk/work-equipment-machinery/maintenance.htm (safety guidance),
   # https://www.hse.gov.uk/electricity/withequip.htm (electrical competence),
