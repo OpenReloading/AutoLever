@@ -296,3 +296,80 @@ button:focus-visible {
     min-height: 44px;
   }
 }
+
+/* Footer links: underlined so they do not rely on colour, spaced and padded for touch; the "Previous" and "Next" labels keep full opacity for contrast */
+.md-copyright a {
+  display: inline-block;
+  margin-right: 1rem;
+  padding: 0.3rem 0;
+  color: var(--md-footer-fg-color);
+  text-decoration: underline;
+}
+
+.md-footer__direction {
+  opacity: 1;
+}
+
+/* Search: the result count line is --muted on --line in Material, 4.2:1 in the light scheme; the ink token gives more than 4.5:1 in both */
+.md-search-result__meta {
+  color: var(--ink);
+}
+
+/* Print: the site chrome is hidden by Material and the BuildGuide controls by the component. Material's 25 mm page margin leaves 605 px on A4, but BuildGuide scales the boards to 700 px before printing, so they were cut off at the right edge; 10 mm leaves 718 px on A4 and more on Letter. */
+@page {
+  margin: 10mm;
+}
+
+@media print {
+  /* Always the light tokens on paper, also when the dark scheme is active on screen */
+  [data-md-color-scheme="slate"] {
+    --page: #ffffff;
+    --surface: #f6f7f4;
+    --surface-alt: #eef2e8;
+    --ink: #24342e;
+    --muted: #5e6c5f;
+    --accent: #21634c;
+    --line: #dce3dc;
+    --control-line: #74857a;
+    --danger: #b3261e;
+    --danger-tint: #fdecea;
+  }
+
+  /* The danger tint and the board drawing keep their colours when the browser would drop backgrounds */
+  .md-typeset .admonition.danger,
+  .ag-guide .ag-board-canvas {
+    print-color-adjust: exact;
+  }
+
+  .md-content__inner > :is(p, ul, ol, .admonition) {
+    max-width: none;
+  }
+
+  .md-typeset :is(h1, h2, h3),
+  .ag-guide .ag-list-heading {
+    break-after: avoid;
+  }
+
+  .md-typeset .admonition,
+  .ag-guide :is(.ag-full-board, .ag-wire-row) {
+    break-inside: avoid;
+  }
+
+  /* Controls: the home page button, the progress and result counters, the status line and the selected-connection panel with its checkbox. The tick boxes of the BOM and the connection lists stay as a paper checklist. */
+  .md-typeset .md-button,
+  [data-md-color-scheme] .ag-guide :is(.ag-progress, .ag-result-count, .ag-status, .ag-connection-detail) {
+    display: none;
+  }
+
+  /* Links are underlined and external ones print their address, so they work on paper */
+  .md-typeset a {
+    color: inherit;
+    text-decoration: underline;
+  }
+
+  .md-typeset a[href^="http"]::after,
+  .ag-guide a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    overflow-wrap: anywhere;
+  }
+}

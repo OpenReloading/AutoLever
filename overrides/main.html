@@ -1,5 +1,27 @@
 {#- Preview build only (extra.preview, mkdocs.develop.yml): noindex meta and a banner. Both blocks must render nothing
-    when the flag is off: Material draws its banner whenever the announce block is not empty. -#}
+    when the flag is off: Material draws its banner whenever the announce block is not empty.
+    Link preview meta on every build: the card is an asset of the site, so its absolute URL comes from site_url and the
+    /develop/ preview points to its own copy. -#}
 {% extends "base.html" %}
-{%- block extrahead -%}{%- if config.extra.preview -%}<meta name="robots" content="noindex">{%- endif -%}{%- endblock -%}
+{%- block extrahead -%}
+{%- set card = (config.site_url ~ "assets/social-card.png") | e -%}
+{%- if page and page.title and not page.is_homepage -%}{%- set title = (page.title | striptags ~ " - " ~ config.site_name) | e -%}{%- else -%}{%- set title = config.site_name | e -%}{%- endif -%}
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="{{ config.site_name | e }}">
+<meta property="og:title" content="{{ title }}">
+<meta property="og:description" content="{{ config.site_description | e }}">
+{%- if page and page.canonical_url %}
+<meta property="og:url" content="{{ page.canonical_url | e }}">
+{%- endif %}
+<meta property="og:image" content="{{ card }}">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="{{ config.site_name | e }}: {{ config.site_description | e }}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ title }}">
+<meta name="twitter:description" content="{{ config.site_description | e }}">
+<meta name="twitter:image" content="{{ card }}">
+{%- if config.extra.preview -%}<meta name="robots" content="noindex">{%- endif -%}
+{%- endblock -%}
 {%- block announce -%}{%- if config.extra.preview -%}Development preview, not the released site.{%- endif -%}{%- endblock -%}
