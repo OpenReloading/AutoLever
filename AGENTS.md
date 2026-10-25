@@ -7,6 +7,7 @@
 - Lint (as CI): `.venv/bin/pip install --only-binary :all: --require-hashes -r requirements-dev.txt`, then `.venv/bin/ruff check .` and `.venv/bin/basedpyright --pythonpath .venv/bin/python` (rules in `pyproject.toml`). `requirements-dev.txt` is compiled from `requirements-dev.in` on Python 3.13: `pip-compile --generate-hashes --output-file=requirements-dev.txt requirements-dev.in`
 - Build (as CI): `.venv/bin/mkdocs build --strict`
 - Serve: `.venv/bin/mkdocs serve -a 0.0.0.0:8000`
+- Unit tests with coverage (CI; pytest is in `requirements-dev.txt`, install it as in the lint line): `.venv/bin/pytest --cov`; prints the summary and fails below `fail_under` in `[tool.coverage.report]` of `pyproject.toml`. Raise the floor when coverage rises, keep it a little below the measured value. Not measured: `tests/` and the browser check `tests/check_guide.py` (needs the built site, below).
 - Generate the guide data after editing `data/*.yaml`: `.venv/bin/python main.py` (writes `data/buildguide.json`, committed; CI fails when it is stale)
 - Browser check, against the built site (`mkdocs serve` livereload counts as an external request): `.venv/bin/mkdocs build --strict -d /tmp/www/AutoLever && python -m http.server -d /tmp/www 8000`, then `.venv/bin/python tests/check_guide.py http://127.0.0.1:8000/AutoLever`
 - Playwright MCP (`.mcp.json`, `.codex/config.toml`) runs inside the container and reaches the served site at `http://127.0.0.1:8000/AutoLever/`.
