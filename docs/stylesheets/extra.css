@@ -290,7 +290,7 @@ button:focus-visible {
     flex-wrap: wrap;
   }
 
-  .ag-guide .ag-board-controls .ag-fullscreen-button {
+  .ag-guide:not(.ag-expanded) .ag-board-controls .ag-fullscreen-button {
     order: -1;
     flex: 1 0 100%;
     min-height: 44px;
