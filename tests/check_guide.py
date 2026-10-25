@@ -276,6 +276,18 @@ with sync_playwright() as p:
     page.set_viewport_size({'width':1024,'height':768})
     go('wiring/#wiring=A/1');ready()  # noqa: E702
     assert page.locator('.ag-board-canvas').evaluate('e=>e.clientHeight')>=300,'board too small at 1024x768'
+    # Print on A4 (718 px between 10 mm margins), also from the dark scheme: the boards fit the width BuildGuide prints them at (700 px), the controls and counters are hidden and the text is dark on white paper.
+    page.set_viewport_size({'width':718,'height':1123})
+    page.emulate_media(media='print',color_scheme='dark')
+    for slug in ['bom','wiring','tubing']:
+        go(slug+'/')
+        page.evaluate("dispatchEvent(new Event('beforeprint'))")
+        assert page.evaluate("[...document.querySelectorAll('.joint-paper')].every(e=>e.getBoundingClientRect().right<=innerWidth)"),'board cut off in print: '+slug
+        for hidden in ['.ag-progress','.ag-status','.ag-result-count','.ag-connection-detail','.ag-board-toolbar']:
+            expect(page.locator(hidden)).to_be_hidden()
+        expect(page.locator('main h1')).to_have_css('color','rgb(36, 52, 46)')
+        expect(page.locator('main h1 + .admonition.danger')).to_be_visible()
+    page.emulate_media(media='null',color_scheme='null')
     assert not errors,errors
     assert not missing,missing
     assert not external,sorted(set(external))
