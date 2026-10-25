@@ -1,6 +1,7 @@
 """Writes data/buildguide.json (BuildGuide data format) from data/wiring.yaml and data/guide.yaml.
 Run after editing data/: python main.py. The MkDocs plugin checks the result at build time; CI fails when the committed file is stale.
 """
+import itertools
 import json
 import pathlib
 
@@ -30,14 +31,14 @@ TUBE_ENDS = {"air1": ("AIR:out", "FRL:in"), "shutoff": ("FRL:out", "SHUT:in"), "
              "air3": ("TEE:out", "VALVE:P"), "air4": ("VALVE:A", "CYL:cap"), "air5": ("VALVE:B", "CYL:rod"),
              "air6": ("VALVE:R+S", "SIL:in")}
 TUBING_PARTS = {
-    "AIR": {"name": "AIR", "sub": "7–10 bar", "at": [20, 250], "size": [90, 56], "ports": {"right": ["out"]}},
+    "AIR": {"name": "AIR", "sub": "7–10 bar", "at": [20, 250], "size": [90, 56], "ports": {"right": ["out"]}},  # noqa: RUF001
     "FRL": {"name": "FRL", "sub": "Filter-regulator", "at": [200, 236], "size": [110, 84], "ports": {"left": ["in"], "right": ["out"]}},
     "SHUT": {"name": "3/2", "sub": "shut-off, vents", "at": [400, 250], "size": [80, 56], "ports": {"left": ["in"], "right": ["out"]}},
     "TEE": {"name": "Tee", "sub": "6 mm", "at": [570, 254], "size": [60, 48], "ports": {"left": ["in"], "right": ["out"]}},
     "VALVE": {"name": "5/3 VALVE · exhaust centre", "at": [720, 230], "size": [200, 96],
               "ports": {"left": ["P"], "right": ["A", "B"], "bottom": ["R+S"]}},
     "CYL": {"name": "DSNU CYLINDER", "at": [880, 60], "size": [200, 56], "ports": {"bottom": ["cap", "rod"]}},
-    "SIL": {"sub": "2 × silencers · R + S → atmosphere", "at": [745, 460], "size": [150, 40], "ports": {"top": ["in"]}},
+    "SIL": {"sub": "2 × silencers · R + S → atmosphere", "at": [745, 460], "size": [150, 40], "ports": {"top": ["in"]}},  # noqa: RUF001
 }
 TUBING_PROPS = [{"name": "QPM11 on the branch", "at": [520, 150], "size": [160, 40]}]
 
@@ -51,7 +52,7 @@ def screws(w):
                 part, _, pin = end.partition(":")
                 if part not in w["parts"]:
                     raise ValueError(f"wire {no}, {side} end {end}: unknown part {part}")
-                if pin not in sum(w["parts"][part]["ports"].values(), []):
+                if pin not in itertools.chain.from_iterable(w["parts"][part]["ports"].values()):
                     raise ValueError(f"wire {no}, {side} end {end}: part {part} has no terminal {pin}")
             if col == "DIODE":       # a diode leg shares the screw, it is not a wire
                 continue
@@ -61,7 +62,7 @@ def screws(w):
     return ends
 
 
-def label(end):
+def label(end):  # noqa: PLR0911
     """'K1:9' → 'K1 terminal 9' in words a first-timer can find on the part."""
     part, pin = end.split(":", 1)
     if part[0] == "K" or part == "T1":
@@ -77,13 +78,13 @@ def label(end):
     if part == "F1":
         return f"{PLAIN[part]} tab {pin}"
     if part == "J1":
-        return f"{PLAIN[part]} {pin.replace('-', '−')}"
+        return f"{PLAIN[part]} {pin.replace('-', '−')}"  # noqa: RUF001
     if part in ("S0", "S1", "S2", "S3"):   # E-STOP and STOP use their NC contact, the others their NO contact
         return f"{PLAIN[part]} {pin} ({'NC' if part in ('S2', 'S3') else 'NO'})"
     return f"{PLAIN.get(part, part)} {pin}"
 
 
-def cable_of(w, a, b, col):
+def cable_of(w, a, b, col):  # noqa: ARG001
     """Which kind of cable a wire is: see `cables:` in data/wiring.yaml."""
     parts = {a.split(":")[0], b.split(":")[0]}
     if col == "DIODE":
@@ -101,7 +102,7 @@ def cable_text(c):
     return " · ".join(x for x in (c["size"], c["awg"]) if x)
 
 
-def connection(w, shared, no, a, b, col):
+def connection(w, shared, no, a, b, col):  # noqa: PLR0913
     def twin(end):
         """Two wires on one screw go into one twin ferrule: name the partner."""
         return "".join(f" · twin ferrule with {n}" for n in shared.get(end, []) if n != no)
@@ -141,7 +142,7 @@ def build():
             },
             "tubing": {
                 "title": "Tubing", "label": "Pneumatic tubing diagram", "size": [1100, 530], "prefix": "tube", "scope": "all", "listAll": True, "listColor": False,
-                "legend": ["6 × 4 mm tube · schematic", "Green = selected connection"],
+                "legend": ["6 × 4 mm tube · schematic", "Green = selected connection"],  # noqa: RUF001
                 "colors": {"AIR": {"line": "#7694b2", "outline": "#3f5f7f"}},
                 "props": TUBING_PROPS, "parts": TUBING_PARTS,
                 "steps": [{"id": str(i), "title": t["title"], "note": f'{t["text"]} Check: {t["check"]}', "connections": [{"no": str(i), "a": a, "b": b, "color": "AIR", "la": t["from"], "lb": t["to"]}]}
