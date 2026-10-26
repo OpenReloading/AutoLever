@@ -107,6 +107,9 @@ for (f = clamp_bolt_pos)
     assert(gap(f * L) >= clamp_d + 4, "V gap too narrow for the clamp bolt at this position");
 assert(y_gusset_end < ymin,
        "arm_r too small for the pivot washer: increase arm_r or use a smaller pivot bolt");
+// tan_pt() needs the eye to clear both arm-side clamp corners, else asin() gets an argument above 1
+assert(norm([arm_x * L, eye_y - ymin]) > eye_r && norm([arm_x * L - L, eye_y - ymin]) > eye_r,
+       "pivot eye overlaps a clamp corner: increase arm_r, move arm_x, or reduce eye_extra");
 echo(str("Clamp length: ", L, " mm, clamp bolts: ", clamp_bolt, " (hole ", clamp_d,
          "), pivot: ", pivot_bolt, " (hole ", pivot_d, ")"));
 echo(str("Suggested bolt lengths: clamp ", clamp_bolt, "x", ceil((ztop - zbot + 9) / 5) * 5,
@@ -239,5 +242,9 @@ if (part == "assembly") {
 } else {
     // print_plate: both halves side by side, parting plane down
     translate([0, 0, -(zs + clamp_gap/2)]) half_top();
-    translate([L + 2 * eye_r + 10, 0, zs - clamp_gap/2]) rotate([180, 0, 0]) half_bottom();
+    // the bottom half starts 10 mm past the X extent of the top half (clamp plus eye); the old
+    // spacing stays as the minimum so the default plate does not move
+    x_min = min(0, arm_x * L - eye_r);
+    x_max = max(L, arm_x * L + eye_r);
+    translate([max(L + 2 * eye_r, x_max - x_min) + 10, 0, zs - clamp_gap/2]) rotate([180, 0, 0]) half_bottom();
 }

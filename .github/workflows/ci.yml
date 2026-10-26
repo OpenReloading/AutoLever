@@ -22,6 +22,8 @@ jobs:
       - run: python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
       # pytest and pytest-cov from the hash-locked requirements-dev.txt; the floor is fail_under in pyproject.toml
       - run: '.venv/bin/pip install --only-binary :all: --require-hashes -r requirements-dev.txt'
+      # tests/test_cad.py renders cad/*.scad and skips itself without OpenSCAD
+      - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends openscad
       - run: .venv/bin/pytest --cov
       # data/buildguide.json is committed: it must match data/*.yaml
       - run: .venv/bin/python main.py && git diff --exit-code data/buildguide.json
