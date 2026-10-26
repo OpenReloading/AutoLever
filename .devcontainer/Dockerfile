@@ -15,4 +15,8 @@ RUN curl -fsSLo /tmp/node.tar.xz https://nodejs.org/dist/v24.21.0/node-v24.21.0-
  && rm -rf /tmp/pw /root/.npm /var/lib/apt/lists/* \
  && chmod -R a+rX /ms-playwright
 
+# OpenSCAD for the render checks of cad/ (tests/test_cad.py)
+RUN apt-get update && apt-get install -y --no-install-recommends openscad \
+ && rm -rf /var/lib/apt/lists/*
+
 USER vscode
