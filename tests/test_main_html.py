@@ -6,10 +6,10 @@ from jinja2 import DictLoader, Environment
 
 
 def render(title, description):
-    stub = "{% block extrahead %}{% endblock %}{% block announce %}{% endblock %}"
+    stub = "{% block extrahead %}{% endblock %}"
     source = Path(__file__).parent.parent.joinpath("overrides/main.html").read_text(encoding="utf-8")
     config = SimpleNamespace(
-        site_name='Auto"Lever', site_description=description, site_url="https://example.org/x/", extra=SimpleNamespace(preview=False)
+        site_name='Auto"Lever', site_description=description, site_url="https://example.org/x/"
     )
     page = SimpleNamespace(title=title, is_homepage=False, canonical_url='https://example.org/x/a"b/')
     return Environment(loader=DictLoader({"base.html": stub, "main.html": source})).get_template("main.html").render(config=config, page=page)
