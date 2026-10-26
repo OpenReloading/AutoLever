@@ -1,8 +1,10 @@
 # Guide content: wiring notes, tubing steps and BOM. Wire endpoints live in wiring.yaml. The introduction is docs/index.md, the safety text snippets/.
-# makerworld: https://makerworld.com/ is a placeholder until each model is published.
+# makerworld: the model address of a printed part. Leave it empty until the model is published: the BOM then shows no link, and main.py lists the unset ones.
 wiring_notes:
-  '0': 'Clip the sockets on the rail with their 1/4 end towards the back wall, so the busy 13/14 end faces the console. D1–D4:
-    ring to 14, plain leg to 13; crimp each leg into a 0.5 mm² ferrule.'
+  '0': 'Press an M3 heat-set insert into each of the three rail pads in the base (soldering iron, straight down, flush with
+    the pad), then screw the rail on from above with an M3×6 pan-head screw and a washer, through the slots 37.5, 137.5 and
+    187.5 mm from the K1 end of the rail. Clip the sockets on the rail with their 1/4 end towards the back wall, so the busy
+    13/14 end faces the console. D1–D4: ring to 14, plain leg to 13; crimp each leg into a 0.5 mm² ferrule.'
   A: 'Unplug the supply and disconnect the air. J1: wire 1 on the centre-pin lug (+); with three lugs, wire 4 on the one that
     stays connected to the sleeve with the plug in (meter). F1 (T 1 A) comes first, then the POWER rocker Q1: IN and OUT are
     the pins that connect when it is switched on, GND is the third (wire 3 on GND shorts the supply). Solder lugs: solder and
@@ -117,9 +119,10 @@ bom:
   group: Mounting
   qty: 1 set
   part: Board and mounting hardware
-  spec: Plywood board ≥ 15 mm · 4 × 4×16 countersunk wood screws (box) · 3 × 4×16 pan-head wood screws (rail) · 4 × M3
-    heat-set inserts (4.2 mm hole, ≤ 6 mm long) + 4 × M3×8 (lid) · 6 × M3 heat-set inserts + 6 × M3×8 countersunk (console plate) · wood screws for the press, cylinder pivot, valve and FRL
-    bracket · cable ties
+  spec: Plywood board ≥ 15 mm · 13 × M3 heat-set inserts (4.2 mm hole, ≤ 6 mm long) · 3 × M3×6 pan-head screws with
+    washers (rail) · 4 × M3×8 (lid) · 6 × M3×8 countersunk (console plate) · 4 × 4×16 countersunk
+    wood screws for the box, only if you print the base with the wood-screw holes · wood screws for the press, cylinder pivot,
+    valve and FRL bracket · cable ties
 - id: mechanism
   group: Mounting
   qty: 1 set
@@ -283,11 +286,11 @@ bom:
   part: Lee APP handle adapter
   spec: 3D printed, two halves · clamps on the lever struts, takes the cylinder rod clevis · PETG or ASA, 6 walls, 40 % infill · regulator at most 5.5 bar · not for other presses or loads
   image: boxes/lee_app_handle_adapter.png
-  makerworld: https://makerworld.com/
+  makerworld:
 - id: controlbox
   group: 3D printed
   qty: '1'
   part: Control box
   spec: 3D printed in PETG or ASA, 15–20 % infill · relays, timer, buttons, a clip rack for the lever connectors and the 24 V entry in one box, no mains inside · buttons on a separate console plate, wired on the bench · cable entries at the back, or glands on the left · base, lid and plate fit a 256 mm bed · labels in a second colour · E-STOP ring in yellow
   image: boxes/control_box.png
-  makerworld: https://makerworld.com/
+  makerworld:

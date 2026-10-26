@@ -116,6 +116,16 @@ def connection(w, shared, no, a, b, col):  # noqa: PLR0913
     return c
 
 
+def bom_items(g):
+    """BOM rows for the guide: the makerworld address becomes the link, an unset one shows no link (a dead link is worse than none)."""
+    return [{("link" if k == "makerworld" else k): v for k, v in item.items() if k != "makerworld" or v} for item in g["bom"]]
+
+
+def unset_makerworld(g):
+    """Ids of the printed parts whose `makerworld:` field is still empty."""
+    return [item["id"] for item in g["bom"] if "makerworld" in item and not item["makerworld"]]
+
+
 def build():
     w = yaml.safe_load((ROOT / "data/wiring.yaml").read_text(encoding="utf-8"))
     g = yaml.safe_load((ROOT / "data/guide.yaml").read_text(encoding="utf-8"))
@@ -129,7 +139,7 @@ def build():
         "storage": "autolever-guide",
         "bom": {"note": "Feel free to substitute as required for local availability and cost. Cable and tube lengths are estimates.",
                 "export": "autolever-bom.csv", "linkLabel": "MakerWorld",
-                "items": [{("link" if k == "makerworld" else k): v for k, v in item.items()} for item in g["bom"]]},
+                "items": bom_items(g)},
         "boards": {
             "wiring": {
                 "title": "Wiring", "label": "Wiring board", "size": [1360, 860], "prefix": "wire", "single": True,
@@ -153,4 +163,7 @@ def build():
 
 
 if __name__ == "__main__":
+    unset = unset_makerworld(yaml.safe_load((ROOT / "data/guide.yaml").read_text(encoding="utf-8")))
+    if unset:
+        print(f"makerworld not set (no link in the BOM): {', '.join(unset)}")
     OUT.write_text(json.dumps(build(), ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
