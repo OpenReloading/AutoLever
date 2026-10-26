@@ -2,26 +2,29 @@
 
 # AutoLever
 
-Pneumatic drive for the Lee APP reloading press. A Festo cylinder works the lever, four 24 V relays and a timer run the cycle. No microcontroller, nothing to flash.
-
-Build guide with parts list, wiring and tubing: https://openreloading.github.io/AutoLever/
-
-Built by reloaders for reloaders, with AI as a tool.
+An air cylinder works the lever of your Lee APP reloading press for sizing and decapping. START cycles it until STOP, and JOG cycles it only while you hold the button.
 
 **Pre-release, October 2026.** Nothing has been built yet, the printed parts are not on MakerWorld yet, details will change.
 
-Questions and ideas: [Discord](https://discord.gg/KkYJ5fdukR).
+For Lee APP owners (Classic or Deluxe) with compressed air at 7 to 10 bar and a 3D printer. Four relays, a timer and two sensors run the sequence, so nothing needs programming or flashing.
 
-Use at your own risk. The box runs on 24 V DC from an external desktop power supply, no mains inside.
+**Safety.** Use at your own risk. Moving parts can cause serious injury: before reaching in, unplug the power supply and release the air pressure. The box runs on 24 V DC from an enclosed external adapter, with no mains inside. E-STOP is not a safety-rated emergency stop. This is a DIY design whose safety has not been independently verified. Leave wiring to a qualified electrician, have the build checked before use and do not use it for priming.
 
-## Repo
+## Build it
 
-- `data/wiring.yaml`: every wire and terminal
-- `data/guide.yaml`: tubing steps, parts list
-- `main.py`: writes `data/buildguide.json` ([BuildGuide](https://github.com/OpenReloading/BuildGuide) data format) from both. Run `python main.py` after editing `data/` and commit the result.
-- `docs/`: the MkDocs site in Markdown; the BuildGuide MkDocs plugin draws the BOM, wiring and tubing components in it. The safety text is in `snippets/`. `pip install -r requirements.txt`, then `mkdocs serve`.
-- `tests/check_guide.py`: Playwright check against the built site served under `/AutoLever/`
+The [build guide](https://openreloading.github.io/AutoLever/) has the parts list and interactive [wiring](https://openreloading.github.io/AutoLever/wiring/) and [tubing](https://openreloading.github.io/AutoLever/tubing/) boards. To run it locally:
 
-Pull requests run the build, the `data/buildguide.json` freshness check and the browser check. A push to `main` or `develop` builds and deploys the site with GitHub Actions: `main` is the released site, `develop` a preview under `/develop/` (marked `noindex`, with a banner).
+```sh
+python -m venv .venv && .venv/bin/pip install -r requirements.txt
+.venv/bin/mkdocs serve
+```
 
-MIT licence. The BuildGuide plugin bundles JointJS (MPL 2.0) and libavoid-js (LGPL 2.1+).
+## Change it
+
+Edit `data/*.yaml`, run `.venv/bin/python main.py` and commit `data/buildguide.json`. Printable parts are in `cad/`.
+
+## Community and licence
+
+Questions: [Discord](https://discord.gg/KkYJ5fdukR). Built by reloaders for reloaders, with AI as a tool.
+
+MIT licence. The [BuildGuide](https://github.com/OpenReloading/BuildGuide) plugin bundles JointJS (MPL 2.0) and libavoid-js (LGPL 2.1+).
