@@ -21,7 +21,7 @@
 - No third-party requests: `font: false`, `repo_url` is set, but without Material's `data-md-component="source"`: `hooks/repo_facts.py` fetches the header facts (tag, stars, forks) from the GitHub API at build time and `overrides/partials/source.html` renders them, so the browser calls nothing; the browser check fails on external requests.
 - Safety warning without exact force or pressure figures.
 - Header title `site_name` stays short (the long name is cut off at 390 px). Footer links (repository, Discord, licence file) are the HTML in `copyright:` of `mkdocs.yml`, previous and next links come from `navigation.footer`, the 404 is `overrides/404.html`. A MakerWorld link follows when an address exists (issue #23).
-- Branches: `main` is the only long-lived branch. Work happens on short-lived branches; pull requests target `main` and are squash-merged, so history stays linear. The `CI` workflow (`.github/workflows/ci.yml`) runs on pull requests into `main` and on pushes to it; its jobs `check`, `workflows` and `dependency-review` are the required checks. The site deploys from `main` to the root of the Pages site (`.github/workflows/pages.yml`); there is no preview build and no release process.
+- Branches: `main` is the only long-lived branch. Work happens on short-lived branches; pull requests target `main` and are squash-merged, so history stays linear. The `CI` workflow (`.github/workflows/ci.yml`) runs on pull requests into `main` and on pushes to it; its jobs `check`, `lint-python`, `workflows` and `dependency-review` are the required checks. The site deploys from `main` to the root of the Pages site (`.github/workflows/pages.yml`); there is no preview build and no release process.
 
 ## Agent skills
 
