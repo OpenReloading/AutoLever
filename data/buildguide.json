@@ -171,7 +171,7 @@
     "group": "Electrical",
     "qty": "1 set",
     "part": "DH48S-S timer + socket",
-    "spec": "SPDT, reset on 1–3 · 24 V AC/DC · 8-pin socket · T1"
+    "spec": "Jam timer T1 · SPDT, reset on 1–3 · 24 V AC/DC · 8-pin socket · for another timer see the jam timer step on the wiring page"
    },
    {
     "id": "sensors",
@@ -192,14 +192,14 @@
     "group": "Controls",
     "qty": "1",
     "part": "22 mm emergency stop E-STOP",
-    "spec": "Red mushroom, latching, twist release · NC contact · S3 · sits on the printed yellow ring"
+    "spec": "Red mushroom, latching, twist release · closed contact (marked 11 and 12) · S3 · sits on the printed yellow ring"
    },
    {
     "id": "buttons",
     "group": "Controls",
     "qty": "3",
     "part": "22 mm momentary buttons",
-    "spec": "STOP S2 black, NC contact 1–2 · START S0 green and JOG S1 white, NO contact 3–4 or 13–14 · 1NO+1NC sets fit all three"
+    "spec": "STOP S2 black, closed contact (marked 11 and 12) · START S0 green and JOG S1 white, open contact (marked 23 and 24) · 1NO+1NC sets fit all three"
    },
    {
     "id": "switch",
@@ -213,7 +213,7 @@
     "group": "Wiring",
     "qty": "3",
     "part": "Wago 221-415 lever connectors, 5-way",
-    "spec": "X-EN: control +24 V, live while POWER is on and E-STOP released · X-M1 and X-M2: 0 V (minus)"
+    "spec": "X-EN: control +24 V, live while POWER is on and E-STOP released · X-M1 and X-M2: Ground (0 V, minus)"
    },
    {
     "id": "wago3",
@@ -233,15 +233,15 @@
     "id": "controlwire",
     "group": "Wiring",
     "qty": "10 m est.",
-    "part": "Hook-up wire, white + blue",
-    "spec": "Stranded, H05V-K · 0.5 mm² (AWG 20) · white = + / switched, blue = 0 V"
+    "part": "Hook-up wire, red + black",
+    "spec": "Stranded, H05V-K · 0.5 mm² (AWG 20) · about 7 m red = +24 V, about 3 m black = Ground"
    },
    {
     "id": "valvecable",
     "group": "Wiring",
     "qty": "3 m est.",
     "part": "2-core cable, black sheath",
-    "spec": "3 runs out of the box (valve plugs Y1, Y2 and QPM11) · 2 × 0.5 mm² (AWG 20) · sheath to suit the M12 glands"
+    "spec": "3 runs out of the box (valve plugs Y1, Y2 and QPM11) · 2 × 0.5 mm² (AWG 20) · sheath to suit the M12 glands · the board shows red and black, on a valve cable mark the +24 V core red, on the QPM11 cable (switch in the +24 V feed, no polarity) mark both cores red"
    },
    {
     "id": "terminations",
@@ -279,6 +279,7 @@
    "prefix": "wire",
    "single": true,
    "legend": [
+    "Red = +24 V, black = Ground, sensor wires keep their own colours",
     {
      "key": "diode",
      "text": "Silver ring = cathode"
@@ -286,27 +287,27 @@
     "Green = selected connection"
    ],
    "colors": {
-    "WH": {
-     "line": "#ffffff",
-     "outline": "#334155",
-     "swatch": "#fff"
+    "red": {
+     "line": "#dc2626",
+     "outline": "#7f1d1d",
+     "swatch": "#dc2626"
     },
-    "BU": {
+    "blue": {
      "line": "#2563eb",
      "outline": "#1e3a8a",
      "swatch": "#347bdc"
     },
-    "BN": {
+    "brown": {
      "line": "#92400e",
      "outline": "#451a03",
      "swatch": "#956238"
     },
-    "BK": {
+    "black": {
      "line": "#1f2937",
      "outline": "#000000",
      "swatch": "#273039"
     },
-    "GY": {
+    "grey": {
      "line": "#9ca3af",
      "outline": "#4b5563",
      "swatch": "#929ea9"
@@ -421,7 +422,7 @@
    },
    "props": [
     {
-     "name": "desktop PSU plugs into J1 (outside)",
+     "name": "24 V power supply plugs into J1 (outside)",
      "at": [
       40,
       200
@@ -474,7 +475,7 @@
      }
     },
     "F1": {
-     "name": "F1 · T 1 A",
+     "name": "F1 · fuse",
      "kind": "box",
      "at": [
       140,
@@ -492,7 +493,7 @@
      }
     },
     "K1": {
-     "name": "K1",
+     "name": "Relay K1",
      "sub": "AUTO",
      "kind": "socket",
      "at": [
@@ -519,7 +520,7 @@
      }
     },
     "K2": {
-     "name": "K2",
+     "name": "Relay K2",
      "sub": "AT FRONT",
      "kind": "socket",
      "at": [
@@ -546,7 +547,7 @@
      }
     },
     "K3": {
-     "name": "K3",
+     "name": "Relay K3",
      "sub": "RETRACT",
      "kind": "socket",
      "at": [
@@ -573,7 +574,7 @@
      }
     },
     "K4": {
-     "name": "K4",
+     "name": "Relay K4",
      "sub": "AT HOME",
      "kind": "socket",
      "at": [
@@ -600,7 +601,7 @@
      }
     },
     "T1": {
-     "name": "T1",
+     "name": "Timer T1",
      "sub": "jam timer",
      "kind": "socket",
      "at": [
@@ -692,7 +693,7 @@
     },
     "X-M1": {
      "name": "",
-     "sub": "X-M1 · 0 V",
+     "sub": "X-M1 · Ground",
      "kind": "wago",
      "at": [
       540,
@@ -714,7 +715,7 @@
     },
     "X-M2": {
      "name": "",
-     "sub": "X-M2 · 0 V",
+     "sub": "X-M2 · Ground",
      "kind": "wago",
      "at": [
       690,
@@ -950,448 +951,354 @@
    },
    "steps": [
     {
-     "id": "0",
-     "title": "Relay diodes",
-     "note": "Press an M3 heat-set insert into each of the three rail pads in the base (soldering iron, straight down, flush with the pad), then screw the rail on from above with an M3×6 pan-head screw and a washer, through the slots 37.5, 137.5 and 187.5 mm from the K1 end of the rail. Clip the sockets on the rail with their 1/4 end towards the back wall, so the busy 13/14 end faces the console. D1–D4: ring to 14, plain leg to 13; crimp each leg into a 0.5 mm² ferrule.",
+     "id": "A",
+     "title": "Rail, relays and diodes",
+     "note": "Mount the rail, the relay sockets and the Wago connectors, then fit a diode on each relay socket. Press an M3 heat-set insert into each of the three rail pads in the base (soldering iron, straight down, flush with the pad), then screw the rail on from above with an M3×6 pan-head screw and a washer, through the slots 37.5, 137.5 and 187.5 mm from the K1 end of the rail. Clip the sockets on the rail with their 1/4 end towards the back wall, so the busy 13/14 end faces the console. Clip the Wagos into the rack on the back wall, wire entries up, levers towards the relays: X-EN, X-M1, X-M2, X-D. Diodes D1–D4: ring to 14, plain leg to 13; crimp each leg into a 0.5 mm² ferrule. Put a ferrule on every wire end that goes under a screw. Pass each cable that leaves the box through its gland before you strip it.",
      "connections": [
       {
        "no": "D1",
        "a": "K1:14",
        "b": "K1:13",
        "color": "DIODE",
-       "la": "K1 terminal 14",
-       "lb": "K1 terminal 13"
+       "la": "Relay K1 terminal 14",
+       "lb": "Relay K1 terminal 13"
       },
       {
        "no": "D2",
        "a": "K2:14",
        "b": "K2:13",
        "color": "DIODE",
-       "la": "K2 terminal 14",
-       "lb": "K2 terminal 13"
+       "la": "Relay K2 terminal 14",
+       "lb": "Relay K2 terminal 13"
       },
       {
        "no": "D3",
        "a": "K3:14",
        "b": "K3:13",
        "color": "DIODE",
-       "la": "K3 terminal 14",
-       "lb": "K3 terminal 13"
+       "la": "Relay K3 terminal 14",
+       "lb": "Relay K3 terminal 13"
       },
       {
        "no": "D4",
        "a": "K4:14",
        "b": "K4:13",
        "color": "DIODE",
-       "la": "K4 terminal 14",
-       "lb": "K4 terminal 13"
+       "la": "Relay K4 terminal 14",
+       "lb": "Relay K4 terminal 13"
       }
      ]
     },
     {
-     "id": "A",
-     "title": "Power",
-     "note": "Unplug the supply and disconnect the air. J1: wire 1 on the centre-pin lug (+); with three lugs, wire 4 on the one that stays connected to the sleeve with the plug in (meter). F1 (T 1 A) comes first, then the POWER rocker Q1: IN and OUT are the pins that connect when it is switched on, GND is the third (wire 3 on GND shorts the supply). Solder lugs: solder and heat-shrink; flat tabs: insulated receptacles. Clip the Wagos into the rack on the back wall, wire entries up, levers towards the relays: X-EN, X-M1, X-M2, X-D, then the 2-way joints for D5 and D6. Twin ferrule where FROM or TO says so; on 13 and 14 the diode leg, in its own ferrule, goes on the other side of the screw. Pass each field cable through its gland before you strip it. Check: plug centre pin +24 V; POWER off, the Q1 lamp stays dark (lit: swap wires 2 and 3). Then each relay: plug it in, POWER on, test lead from S3:1 to its terminal 14: it clicks and its LED lights. POWER off, relays out again until the wiring is done.",
+     "id": "B",
+     "title": "Connect power in and Ground",
+     "note": "Connect the power jack J1 to the fuse F1 (red) and J1 to Ground (black), then take Ground to both Ground blocks and to the coil of every relay. Connectors: DC jack J1: + red, − black; fuse holder F1: tab 1 red. Crimp wires 6 and 7a into one twin ferrule, then one screw at Relay K1 terminal 13. Crimp wires 7a and 7b into one twin ferrule, then one screw at Relay K2 terminal 13. Crimp wires 7b and 7c into one twin ferrule, then one screw at Relay K3 terminal 13. Unplug the supply and disconnect the air. J1: wire 1 on the centre-pin lug (+); with three lugs, wire 4 on the one that stays connected to the sleeve with the plug in (meter). Solder lugs: solder and heat-shrink; flat tabs: insulated receptacles. On terminal 13 of each relay the diode leg from step A goes on the other side of the screw, in its own ferrule. Every slot of a Wago is connected to all the others: use one wire per slot. Check with a meter: the centre pin of the plug is +24 V.",
      "connections": [
       {
        "no": "1",
        "a": "J1:+",
        "b": "F1:1",
-       "color": "WH",
-       "la": "DC jack J1 +",
+       "color": "red",
+       "la": "DC jack J1 + (+24 V, centre pin)",
        "lb": "Fuse holder F1 tab 1",
-       "cable": "Stranded wire, white or blue",
-       "size": "0.5 mm² · AWG 20"
-      },
-      {
-       "no": "2",
-       "a": "F1:2",
-       "b": "Q1:IN",
-       "color": "WH",
-       "la": "Fuse holder F1 tab 2",
-       "lb": "Power switch Q1 IN",
-       "cable": "Stranded wire, white or blue",
-       "size": "0.5 mm² · AWG 20"
-      },
-      {
-       "no": "3",
-       "a": "Q1:OUT",
-       "b": "S3:1",
-       "color": "WH",
-       "la": "Power switch Q1 OUT",
-       "lb": "E-STOP button 1 (NC)",
-       "cable": "Stranded wire, white or blue",
+       "cable": "Stranded wire, red or black",
        "size": "0.5 mm² · AWG 20"
       },
       {
        "no": "4",
        "a": "J1:-",
        "b": "X-M1:1",
-       "color": "BU",
-       "la": "DC jack J1 −",
-       "lb": "Wago X-M1 (0 V) slot 1",
-       "cable": "Stranded wire, white or blue",
+       "color": "black",
+       "la": "DC jack J1 − (Ground)",
+       "lb": "Wago X-M1 (Ground) slot 1",
+       "cable": "Stranded wire, red or black",
        "size": "0.5 mm² · AWG 20"
       },
       {
        "no": "5",
        "a": "X-M1:2",
        "b": "X-M2:1",
-       "color": "BU",
-       "la": "Wago X-M1 (0 V) slot 2",
-       "lb": "Wago X-M2 (0 V) slot 1",
-       "cable": "Stranded wire, white or blue",
+       "color": "black",
+       "la": "Wago X-M1 (Ground) slot 2",
+       "lb": "Wago X-M2 (Ground) slot 1",
+       "cable": "Stranded wire, red or black",
        "size": "0.5 mm² · AWG 20"
       },
       {
        "no": "6",
        "a": "X-M1:3",
        "b": "K1:13",
-       "color": "BU",
-       "la": "Wago X-M1 (0 V) slot 3",
-       "lb": "K1 terminal 13 · twin ferrule with 7a",
-       "cable": "Stranded wire, white or blue",
+       "color": "black",
+       "la": "Wago X-M1 (Ground) slot 3",
+       "lb": "Relay K1 terminal 13 · one twin ferrule with wire 7a",
+       "cable": "Stranded wire, red or black",
        "size": "0.5 mm² · AWG 20"
       },
       {
        "no": "7a",
        "a": "K1:13",
        "b": "K2:13",
-       "color": "BU",
-       "la": "K1 terminal 13 · twin ferrule with 6",
-       "lb": "K2 terminal 13 · twin ferrule with 7b",
-       "cable": "Stranded wire, white or blue",
+       "color": "black",
+       "la": "Relay K1 terminal 13 · one twin ferrule with wire 6",
+       "lb": "Relay K2 terminal 13 · one twin ferrule with wire 7b",
+       "cable": "Stranded wire, red or black",
        "size": "0.5 mm² · AWG 20"
       },
       {
        "no": "7b",
        "a": "K2:13",
        "b": "K3:13",
-       "color": "BU",
-       "la": "K2 terminal 13 · twin ferrule with 7a",
-       "lb": "K3 terminal 13 · twin ferrule with 7c",
-       "cable": "Stranded wire, white or blue",
+       "color": "black",
+       "la": "Relay K2 terminal 13 · one twin ferrule with wire 7a",
+       "lb": "Relay K3 terminal 13 · one twin ferrule with wire 7c",
+       "cable": "Stranded wire, red or black",
        "size": "0.5 mm² · AWG 20"
       },
       {
        "no": "7c",
        "a": "K3:13",
        "b": "K4:13",
-       "color": "BU",
-       "la": "K3 terminal 13 · twin ferrule with 7b",
-       "lb": "K4 terminal 13",
-       "cable": "Stranded wire, white or blue",
-       "size": "0.5 mm² · AWG 20"
-      }
-     ]
-    },
-    {
-     "id": "B",
-     "title": "E-STOP, STOP and START",
-     "note": "START and JOG use their NO contact (3–4, or 13–14), never 1–2; E-STOP and STOP use their NC contact (1–2, or 11–12 / 21–22). A meter beeps across a NO contact only while the button is pressed, across an NC contact until it is pressed. E-STOP and the pressure switch feed X-EN directly, so E-STOP cuts all control power. The timer contact (T1 8–5), STOP, and START with the K1 holding contact form the AUTO latch. Wire 15 gives the Q1 lamp its 0 V. QPM11: with no air, a meter must beep across its two terminals (NC type). After power-on and after STOP, E-STOP, a jam or an air pressure fault, K1 is off and the press moves only while you hold JOG; START resumes automatic mode. The K1 LED shows it.",
-     "connections": [
-      {
-       "no": "8",
-       "a": "S3:2",
-       "b": "QPM11:1",
-       "color": "WH",
-       "la": "E-STOP button 2 (NC)",
-       "lb": "Pressure switch 1",
-       "cable": "2-core cable, black sheath",
-       "size": "0.5 mm² · AWG 20"
-      },
-      {
-       "no": "9",
-       "a": "QPM11:2",
-       "b": "X-EN:1",
-       "color": "WH",
-       "la": "Pressure switch 2",
-       "lb": "Wago X-EN (switched +24 V) slot 1",
-       "cable": "2-core cable, black sheath",
-       "size": "0.5 mm² · AWG 20"
-      },
-      {
-       "no": "10",
-       "a": "T1:5",
-       "b": "S2:1",
-       "color": "WH",
-       "la": "T1 terminal 5",
-       "lb": "STOP button 1 (NC)",
-       "cable": "Stranded wire, white or blue",
-       "size": "0.5 mm² · AWG 20"
-      },
-      {
-       "no": "11",
-       "a": "S2:2",
-       "b": "K1:9",
-       "color": "WH",
-       "la": "STOP button 2 (NC)",
-       "lb": "K1 terminal 9 · twin ferrule with 12",
-       "cable": "Stranded wire, white or blue",
-       "size": "0.5 mm² · AWG 20"
-      },
-      {
-       "no": "12",
-       "a": "K1:9",
-       "b": "S0:3",
-       "color": "WH",
-       "la": "K1 terminal 9 · twin ferrule with 11",
-       "lb": "START button 3 (NO) · twin ferrule with 20",
-       "cable": "Stranded wire, white or blue",
-       "size": "0.5 mm² · AWG 20"
-      },
-      {
-       "no": "13",
-       "a": "S0:4",
-       "b": "K1:5",
-       "color": "WH",
-       "la": "START button 4 (NO)",
-       "lb": "K1 terminal 5 · twin ferrule with 14",
-       "cable": "Stranded wire, white or blue",
-       "size": "0.5 mm² · AWG 20"
-      },
-      {
-       "no": "14",
-       "a": "K1:5",
-       "b": "K1:14",
-       "color": "WH",
-       "la": "K1 terminal 5 · twin ferrule with 13",
-       "lb": "K1 terminal 14",
-       "cable": "Stranded wire, white or blue",
-       "size": "0.5 mm² · AWG 20"
-      },
-      {
-       "no": "15",
-       "a": "Q1:GND",
-       "b": "X-M2:2",
-       "color": "BU",
-       "la": "Power switch Q1 GND",
-       "lb": "Wago X-M2 (0 V) slot 2",
-       "cable": "Stranded wire, white or blue",
+       "color": "black",
+       "la": "Relay K3 terminal 13 · one twin ferrule with wire 7b",
+       "lb": "Relay K4 terminal 13",
+       "cable": "Stranded wire, red or black",
        "size": "0.5 mm² · AWG 20"
       }
      ]
     },
     {
      "id": "C",
-     "title": "Switched +24 V (EN)",
-     "note": "X-EN is the control +24 V, live while POWER is on, E-STOP is released and the air pressure is below the trip. Wires 16 and 17 feed K1:12 and T1:8. Sensor brown cores go here. Every slot in each Wago is electrically common; use only one conductor per slot.",
+     "title": "Connect the relays to each other",
+     "note": "Connect the relays to each other. Crimp wires 26 and 27 into one twin ferrule, then one screw at Relay K3 terminal 5. Use the numbers printed on the relay socket, not the position in the drawing. K2 starts the return at the front; K3 holds itself until K4 cuts it at home. The extend coil Y1 is fed through K3 terminals 12 and 4 and K2 terminals 9 and 1 (both closed at rest; Y1 itself follows in step F). Wire 16 brings the switched +24 V from X-EN to K1.",
      "connections": [
       {
        "no": "16",
        "a": "X-EN:2",
        "b": "K1:12",
-       "color": "WH",
-       "la": "Wago X-EN (switched +24 V) slot 2",
-       "lb": "K1 terminal 12",
-       "cable": "Stranded wire, white or blue",
-       "size": "0.5 mm² · AWG 20"
-      },
-      {
-       "no": "17",
-       "a": "X-EN:3",
-       "b": "T1:8",
-       "color": "WH",
-       "la": "Wago X-EN (switched +24 V) slot 3",
-       "lb": "T1 terminal 8",
-       "cable": "Stranded wire, white or blue",
-       "size": "0.5 mm² · AWG 20"
-      },
-      {
-       "no": "18",
-       "a": "B1:BN",
-       "b": "X-EN:4",
-       "color": "BN",
-       "la": "Front sensor B1, brown core",
-       "lb": "Wago X-EN (switched +24 V) slot 4",
-       "cable": "The sensor's own cable",
-       "size": "as supplied"
-      },
-      {
-       "no": "19",
-       "a": "B0:BN",
-       "b": "X-EN:5",
-       "color": "BN",
-       "la": "Home sensor B0, brown core",
-       "lb": "Wago X-EN (switched +24 V) slot 5",
-       "cable": "The sensor's own cable",
-       "size": "as supplied"
-      }
-     ]
-    },
-    {
-     "id": "D",
-     "title": "AUTO and JOG: rod out",
-     "note": "Wire 20 feeds JOG from START's input, after STOP and the timer contact, so STOP and a jam stop JOG too. K1 (AUTO, wire 22) and JOG feed the same point, so the press runs while K1 is on or while JOG is held. The extend coil Y1 is fed through K3 12–4 and K2 9–1 (both NC, wired here; Y1 itself in step G). Use the printed terminal numbers, not the apparent position in the drawing.",
-     "connections": [
-      {
-       "no": "20",
-       "a": "S0:3",
-       "b": "S1:3",
-       "color": "WH",
-       "la": "START button 3 (NO) · twin ferrule with 12",
-       "lb": "JOG button 3 (NO)",
-       "cable": "Stranded wire, white or blue",
-       "size": "0.5 mm² · AWG 20"
-      },
-      {
-       "no": "21",
-       "a": "S1:4",
-       "b": "K3:9",
-       "color": "WH",
-       "la": "JOG button 4 (NO) · twin ferrule with 22",
-       "lb": "K3 terminal 9 · twin ferrule with 23",
-       "cable": "Stranded wire, white or blue",
-       "size": "0.5 mm² · AWG 20"
-      },
-      {
-       "no": "22",
-       "a": "K1:8",
-       "b": "S1:4",
-       "color": "WH",
-       "la": "K1 terminal 8 · twin ferrule with 24",
-       "lb": "JOG button 4 (NO) · twin ferrule with 21",
-       "cable": "Stranded wire, white or blue",
-       "size": "0.5 mm² · AWG 20"
-      },
-      {
-       "no": "23",
-       "a": "K3:9",
-       "b": "K2:12",
-       "color": "WH",
-       "la": "K3 terminal 9 · twin ferrule with 21",
-       "lb": "K2 terminal 12",
-       "cable": "Stranded wire, white or blue",
-       "size": "0.5 mm² · AWG 20"
-      },
-      {
-       "no": "24",
-       "a": "K1:8",
-       "b": "K3:12",
-       "color": "WH",
-       "la": "K1 terminal 8 · twin ferrule with 22",
-       "lb": "K3 terminal 12",
-       "cable": "Stranded wire, white or blue",
+       "color": "red",
+       "la": "Wago X-EN (+24 V while on) slot 2",
+       "lb": "Relay K1 terminal 12",
+       "cable": "Stranded wire, red or black",
        "size": "0.5 mm² · AWG 20"
       },
       {
        "no": "25",
        "a": "K3:4",
        "b": "K2:9",
-       "color": "WH",
-       "la": "K3 terminal 4",
-       "lb": "K2 terminal 9",
-       "cable": "Stranded wire, white or blue",
+       "color": "red",
+       "la": "Relay K3 terminal 4",
+       "lb": "Relay K2 terminal 9",
+       "cable": "Stranded wire, red or black",
        "size": "0.5 mm² · AWG 20"
-      }
-     ]
-    },
-    {
-     "id": "E",
-     "title": "Return: rod back",
-     "note": "At the front, K2 starts the return; K3 holds itself until K4 cuts it at home. The return runs only while K1 is on or JOG is held.",
-     "connections": [
+      },
       {
        "no": "26",
        "a": "K2:8",
        "b": "K3:5",
-       "color": "WH",
-       "la": "K2 terminal 8",
-       "lb": "K3 terminal 5 · twin ferrule with 27",
-       "cable": "Stranded wire, white or blue",
+       "color": "red",
+       "la": "Relay K2 terminal 8",
+       "lb": "Relay K3 terminal 5 · one twin ferrule with wire 27",
+       "cable": "Stranded wire, red or black",
        "size": "0.5 mm² · AWG 20"
       },
       {
        "no": "27",
        "a": "K3:5",
        "b": "K4:9",
-       "color": "WH",
-       "la": "K3 terminal 5 · twin ferrule with 26",
-       "lb": "K4 terminal 9",
-       "cable": "Stranded wire, white or blue",
+       "color": "red",
+       "la": "Relay K3 terminal 5 · one twin ferrule with wire 26",
+       "lb": "Relay K4 terminal 9",
+       "cable": "Stranded wire, red or black",
        "size": "0.5 mm² · AWG 20"
       },
       {
        "no": "28",
        "a": "K4:1",
        "b": "K3:14",
-       "color": "WH",
-       "la": "K4 terminal 1",
-       "lb": "K3 terminal 14",
-       "cable": "Stranded wire, white or blue",
+       "color": "red",
+       "la": "Relay K4 terminal 1",
+       "lb": "Relay K3 terminal 14",
+       "cable": "Stranded wire, red or black",
+       "size": "0.5 mm² · AWG 20"
+      }
+     ]
+    },
+    {
+     "id": "D",
+     "title": "Connect the power button and E-STOP",
+     "note": "Connect the fuse F1 to the power button Q1 (the blue one on the board), then the power button to E-STOP and to Ground. Connectors: fuse holder F1: tab 2 red; power button Q1: IN red, OUT red, GND black; E-STOP button: terminal 1 red. Q1 is the lit POWER button. IN and OUT are the two connectors that connect when it is switched on, GND is the third (wire 3 on GND shorts the supply). Flat tabs: insulated receptacles. E-STOP uses its closed contact: terminals 1 and 2, marked 11 and 12 on the contact block. E-STOP and the pressure switch feed X-EN directly, so E-STOP cuts all control power. Wire 15 gives the Q1 lamp its Ground. Check: POWER off, the Q1 lamp stays dark (lit: swap wires 2 and 3). Then each relay: plug it in, POWER on, test lead from E-STOP terminal 1 to its terminal 14: it clicks and its LED lights. POWER off, relays out again until the wiring is done.",
+     "connections": [
+      {
+       "no": "2",
+       "a": "F1:2",
+       "b": "Q1:IN",
+       "color": "red",
+       "la": "Fuse holder F1 tab 2",
+       "lb": "Power button Q1 IN",
+       "cable": "Stranded wire, red or black",
+       "size": "0.5 mm² · AWG 20"
+      },
+      {
+       "no": "3",
+       "a": "Q1:OUT",
+       "b": "S3:1",
+       "color": "red",
+       "la": "Power button Q1 OUT",
+       "lb": "E-STOP button terminal 1 (closed contact, marked 11)",
+       "cable": "Stranded wire, red or black",
+       "size": "0.5 mm² · AWG 20"
+      },
+      {
+       "no": "15",
+       "a": "Q1:GND",
+       "b": "X-M2:2",
+       "color": "black",
+       "la": "Power button Q1 GND",
+       "lb": "Wago X-M2 (Ground) slot 2",
+       "cable": "Stranded wire, red or black",
+       "size": "0.5 mm² · AWG 20"
+      }
+     ]
+    },
+    {
+     "id": "E",
+     "title": "Connect STOP, START and JOG",
+     "note": "Connect STOP, START and JOG to the relays and the timer. Connectors: STOP button: terminal 1 red, terminal 2 red; START button: terminal 3 red and red, terminal 4 red; JOG button: terminal 3 red, terminal 4 red and red. Crimp wires 11 and 12 into one twin ferrule, then one screw at Relay K1 terminal 9. Crimp wires 12 and 20 into one twin ferrule, then one screw at START button terminal 3 (open contact, marked 23). Crimp wires 13 and 14 into one twin ferrule, then one screw at Relay K1 terminal 5. Crimp wires 21 and 22 into one twin ferrule, then one screw at JOG button terminal 4 (open contact, marked 24). Crimp wires 21 and 23 into one twin ferrule, then one screw at Relay K3 terminal 9. Crimp wires 22 and 24 into one twin ferrule, then one screw at Relay K1 terminal 8. STOP uses its closed contact: terminals 1 and 2, marked 11 and 12 on the contact block. START and JOG use their open contact: terminals 3 and 4, marked 23 and 24. If your block is marked 21 and 22 or 13 and 14, go by the contact type. A meter beeps across a closed contact until the button is pressed and across an open contact only while it is pressed. Wire 10 takes the timer contact (T1 pins 8 and 5) to STOP: that contact, STOP and START with the K1 holding contact form the AUTO latch. Wire 20 feeds JOG from START's input, after STOP and the timer contact, so STOP and a jam stop JOG too. K1 (AUTO, wire 22) and JOG feed the same point, so the press runs while K1 is on or while JOG is held. After power-on and after STOP, E-STOP, a jam or an air pressure fault, K1 is off and the press moves only while you hold JOG; START resumes automatic mode. The K1 LED shows it.",
+     "connections": [
+      {
+       "no": "10",
+       "a": "T1:5",
+       "b": "S2:1",
+       "color": "red",
+       "la": "Jam timer T1 (8-pin timer) pin 5",
+       "lb": "STOP button terminal 1 (closed contact, marked 11)",
+       "cable": "Stranded wire, red or black",
+       "size": "0.5 mm² · AWG 20"
+      },
+      {
+       "no": "11",
+       "a": "S2:2",
+       "b": "K1:9",
+       "color": "red",
+       "la": "STOP button terminal 2 (closed contact, marked 12)",
+       "lb": "Relay K1 terminal 9 · one twin ferrule with wire 12",
+       "cable": "Stranded wire, red or black",
+       "size": "0.5 mm² · AWG 20"
+      },
+      {
+       "no": "12",
+       "a": "K1:9",
+       "b": "S0:3",
+       "color": "red",
+       "la": "Relay K1 terminal 9 · one twin ferrule with wire 11",
+       "lb": "START button terminal 3 (open contact, marked 23) · one twin ferrule with wire 20",
+       "cable": "Stranded wire, red or black",
+       "size": "0.5 mm² · AWG 20"
+      },
+      {
+       "no": "20",
+       "a": "S0:3",
+       "b": "S1:3",
+       "color": "red",
+       "la": "START button terminal 3 (open contact, marked 23) · one twin ferrule with wire 12",
+       "lb": "JOG button terminal 3 (open contact, marked 23)",
+       "cable": "Stranded wire, red or black",
+       "size": "0.5 mm² · AWG 20"
+      },
+      {
+       "no": "13",
+       "a": "S0:4",
+       "b": "K1:5",
+       "color": "red",
+       "la": "START button terminal 4 (open contact, marked 24)",
+       "lb": "Relay K1 terminal 5 · one twin ferrule with wire 14",
+       "cable": "Stranded wire, red or black",
+       "size": "0.5 mm² · AWG 20"
+      },
+      {
+       "no": "14",
+       "a": "K1:5",
+       "b": "K1:14",
+       "color": "red",
+       "la": "Relay K1 terminal 5 · one twin ferrule with wire 13",
+       "lb": "Relay K1 terminal 14",
+       "cable": "Stranded wire, red or black",
+       "size": "0.5 mm² · AWG 20"
+      },
+      {
+       "no": "21",
+       "a": "S1:4",
+       "b": "K3:9",
+       "color": "red",
+       "la": "JOG button terminal 4 (open contact, marked 24) · one twin ferrule with wire 22",
+       "lb": "Relay K3 terminal 9 · one twin ferrule with wire 23",
+       "cable": "Stranded wire, red or black",
+       "size": "0.5 mm² · AWG 20"
+      },
+      {
+       "no": "23",
+       "a": "K3:9",
+       "b": "K2:12",
+       "color": "red",
+       "la": "Relay K3 terminal 9 · one twin ferrule with wire 21",
+       "lb": "Relay K2 terminal 12",
+       "cable": "Stranded wire, red or black",
+       "size": "0.5 mm² · AWG 20"
+      },
+      {
+       "no": "22",
+       "a": "K1:8",
+       "b": "S1:4",
+       "color": "red",
+       "la": "Relay K1 terminal 8 · one twin ferrule with wire 24",
+       "lb": "JOG button terminal 4 (open contact, marked 24) · one twin ferrule with wire 21",
+       "cable": "Stranded wire, red or black",
+       "size": "0.5 mm² · AWG 20"
+      },
+      {
+       "no": "24",
+       "a": "K1:8",
+       "b": "K3:12",
+       "color": "red",
+       "la": "Relay K1 terminal 8 · one twin ferrule with wire 22",
+       "lb": "Relay K3 terminal 12",
+       "cable": "Stranded wire, red or black",
        "size": "0.5 mm² · AWG 20"
       }
      ]
     },
     {
      "id": "F",
-     "title": "End sensors",
-     "note": "PNP sensors: brown = EN, blue = 0 V, black = output. B1 drives K2 (front); B0 drives K4 (home). Brown cores were connected in step C. Check the label: SMT-8M-A-PS-… (PS = PNP). The output (max 100 mA) drives the relay coil (37 mA) directly. Position: B0 so K4 lights with the rod fully home, B1 so K2 lights 2–3 mm before the press bottoms.",
-     "connections": [
-      {
-       "no": "29",
-       "a": "B1:BK",
-       "b": "K2:14",
-       "color": "BK",
-       "la": "Front sensor B1, black core",
-       "lb": "K2 terminal 14",
-       "cable": "The sensor's own cable",
-       "size": "as supplied"
-      },
-      {
-       "no": "30",
-       "a": "B1:BU",
-       "b": "X-M1:4",
-       "color": "BU",
-       "la": "Front sensor B1, blue core",
-       "lb": "Wago X-M1 (0 V) slot 4",
-       "cable": "The sensor's own cable",
-       "size": "as supplied"
-      },
-      {
-       "no": "31",
-       "a": "B0:BK",
-       "b": "K4:14",
-       "color": "BK",
-       "la": "Home sensor B0, black core",
-       "lb": "K4 terminal 14",
-       "cable": "The sensor's own cable",
-       "size": "as supplied"
-      },
-      {
-       "no": "32",
-       "a": "B0:BU",
-       "b": "X-M1:5",
-       "color": "BU",
-       "la": "Home sensor B0, blue core",
-       "lb": "Wago X-M1 (0 V) slot 5",
-       "cable": "The sensor's own cable",
-       "size": "as supplied"
-      }
-     ]
-    },
-    {
-     "id": "G",
-     "title": "Valve coils",
-     "note": "Y1 extends; Y2 retracts. Pin 1 is + (wires 33 and 35): mark that core at both ends of each valve cable. Inside each plug, fit D7/D8 with the cores: ring on pin 1 (+), plain leg on pin 2; reversed, they short the supply. Leave them out only if the plug's datasheet shows built-in suppression (an LED alone is not enough). K2:1 and K3:8 also take wires 37 and 38 from step H: cut those now and crimp 33 with 37 and 35 with 38 into one twin ferrule each. The plugs fit either coil: with air on, press the red manual button next to each coil; the coil that drives the rod out gets plug Y1. K3 interlocks the coils: they can never be on together.",
+     "title": "Connect the valve coils",
+     "note": "Connect the two valve coils through their plugs, and the timer diodes D5 and D6 to the same relay terminals. Connectors: valve plug Y1: pin 1 red, pin 2 black; valve plug Y2: pin 1 red, pin 2 black. Crimp wires 33 and 37 into one twin ferrule, then one screw at Relay K2 terminal 1. Crimp wires 35 and 38 into one twin ferrule, then one screw at Relay K3 terminal 8. Y1 extends; Y2 retracts. Pin 1 is +24 V (red): mark that core at both ends of each valve cable. Inside each plug, fit D7/D8 with the cores: ring on pin 1 (+), plain leg on pin 2; reversed, they short the supply. Leave them out only if the plug's datasheet shows built-in suppression (an LED alone is not enough). D5's plain leg joins wire 37 in one 2-way Wago (221-412), D6's joins wire 38 in another (never 37 with 38: that ties Y1 to Y2); sleeve the bare legs with heat-shrink. The plugs fit either coil: with air on, press the red manual button next to each coil; the coil that drives the rod out gets plug Y1. K3 interlocks the coils: they can never be on together.",
      "connections": [
       {
        "no": "33",
        "a": "K2:1",
        "b": "Y1:1",
-       "color": "WH",
-       "la": "K2 terminal 1 · twin ferrule with 37",
-       "lb": "Valve plug Y1 pin 1 (+)",
+       "color": "red",
+       "la": "Relay K2 terminal 1 · one twin ferrule with wire 37",
+       "lb": "Valve plug Y1 pin 1 (+24 V)",
        "cable": "2-core cable, black sheath",
+       "size": "0.5 mm² · AWG 20"
+      },
+      {
+       "no": "37",
+       "a": "K2:1",
+       "b": "D5:A",
+       "color": "red",
+       "la": "Relay K2 terminal 1 · one twin ferrule with wire 33",
+       "lb": "Diode D5, plain leg, in its own 2-way Wago with this wire",
+       "cable": "Stranded wire, red or black",
        "size": "0.5 mm² · AWG 20"
       },
       {
        "no": "34",
        "a": "Y1:2",
        "b": "X-M2:3",
-       "color": "BU",
-       "la": "Valve plug Y1 pin 2",
-       "lb": "Wago X-M2 (0 V) slot 3",
+       "color": "black",
+       "la": "Valve plug Y1 pin 2 (Ground)",
+       "lb": "Wago X-M2 (Ground) slot 3",
        "cable": "2-core cable, black sheath",
        "size": "0.5 mm² · AWG 20"
       },
@@ -1400,26 +1307,36 @@
        "a": "Y1:1",
        "b": "Y1:2",
        "color": "DIODE",
-       "la": "Valve plug Y1 pin 1 (+)",
-       "lb": "Valve plug Y1 pin 2"
+       "la": "Valve plug Y1 pin 1 (+24 V)",
+       "lb": "Valve plug Y1 pin 2 (Ground)"
       },
       {
        "no": "35",
        "a": "K3:8",
        "b": "Y2:1",
-       "color": "WH",
-       "la": "K3 terminal 8 · twin ferrule with 38",
-       "lb": "Valve plug Y2 pin 1 (+)",
+       "color": "red",
+       "la": "Relay K3 terminal 8 · one twin ferrule with wire 38",
+       "lb": "Valve plug Y2 pin 1 (+24 V)",
        "cable": "2-core cable, black sheath",
+       "size": "0.5 mm² · AWG 20"
+      },
+      {
+       "no": "38",
+       "a": "K3:8",
+       "b": "D6:A",
+       "color": "red",
+       "la": "Relay K3 terminal 8 · one twin ferrule with wire 35",
+       "lb": "Diode D6, plain leg, in its own 2-way Wago with this wire",
+       "cable": "Stranded wire, red or black",
        "size": "0.5 mm² · AWG 20"
       },
       {
        "no": "36",
        "a": "Y2:2",
        "b": "X-M2:4",
-       "color": "BU",
-       "la": "Valve plug Y2 pin 2",
-       "lb": "Wago X-M2 (0 V) slot 4",
+       "color": "black",
+       "la": "Valve plug Y2 pin 2 (Ground)",
+       "lb": "Wago X-M2 (Ground) slot 4",
        "cable": "2-core cable, black sheath",
        "size": "0.5 mm² · AWG 20"
       },
@@ -1428,41 +1345,21 @@
        "a": "Y2:1",
        "b": "Y2:2",
        "color": "DIODE",
-       "la": "Valve plug Y2 pin 1 (+)",
-       "lb": "Valve plug Y2 pin 2"
+       "la": "Valve plug Y2 pin 1 (+24 V)",
+       "lb": "Valve plug Y2 pin 2 (Ground)"
       }
      ]
     },
     {
-     "id": "H",
-     "title": "Jam timer",
-     "note": "D5/D6 combine the two valve commands: D5's plain leg joins wire 37 in one 2-way Wago (221-412), D6's joins wire 38 in another (never 37 with 38: that ties Y1 to Y2); sleeve the bare legs with heat-shrink. Their ring legs meet at X-D (bend each leg straight into its slot, no wire), then T1:7. T1 runs only while a valve coil is on and the rod is away from home: K4 bridges 1–3 at home and holds it at zero. Set its wheels with no coil on (it reads them at power-up): left T1 (relay off) about twice one out-and-back, 30 s until you have timed it; right T2 (relay on) 1 s, never 0. Test without air: rod a few cm off home, press START: after T1 the timer clicks and K1 drops. A jam stops JOG too; let go before you try again.",
+     "id": "G",
+     "title": "Connect the jam timer",
+     "note": "Connect the jam timer T1 (the 8-pin timer) and the diode legs that feed it. Jam timer T1 ends automatic mode when a stroke takes too long. The numbers 1 to 8 are the pin numbers printed on the timer base. The timer must run on 24 V DC (+24 V on pin 7, Ground on pin 2), start counting when it gets power, restart from zero while its reset input (pins 1 and 3) is closed, and have one changeover contact (this build uses pins 8 and 5). T1 runs only while a valve coil is on and the rod is away from home: K4 closes the reset at home and holds the time at zero. Bend each ring leg of D5 and D6 straight into its X-D slot, no wire. Set the wheels with no coil on (the timer reads them at power-up): left wheel (T1, relay off) about twice one out-and-back, 30 s until you have timed it; right wheel (T2, relay on) 1 s, never 0. Test without air: rod a few cm off home, press START: after T1 the timer clicks and K1 drops. A jam stops JOG too; let go before you try again. If your timer is different: match the supply (24 V DC), a reset input and one changeover contact, and map the pins of your base onto the pins named here. A contact block (marks like 11 and 12, or 23 and 24, as behind the buttons) is not a timer and cannot replace it.",
      "connections": [
-      {
-       "no": "37",
-       "a": "K2:1",
-       "b": "D5:A",
-       "color": "WH",
-       "la": "K2 terminal 1 · twin ferrule with 33",
-       "lb": "Diode D5, plain leg, in its own 2-way Wago with this wire",
-       "cable": "Stranded wire, white or blue",
-       "size": "0.5 mm² · AWG 20"
-      },
-      {
-       "no": "38",
-       "a": "K3:8",
-       "b": "D6:A",
-       "color": "WH",
-       "la": "K3 terminal 8 · twin ferrule with 35",
-       "lb": "Diode D6, plain leg, in its own 2-way Wago with this wire",
-       "cable": "Stranded wire, white or blue",
-       "size": "0.5 mm² · AWG 20"
-      },
       {
        "no": "37b",
        "a": "D5:K",
        "b": "X-D:1",
-       "color": "GY",
+       "color": "grey",
        "la": "Diode D5, ring leg",
        "lb": "Wago X-D (diode join) slot 1",
        "cable": "Diode leg",
@@ -1472,7 +1369,7 @@
        "no": "38b",
        "a": "D6:K",
        "b": "X-D:2",
-       "color": "GY",
+       "color": "grey",
        "la": "Diode D6, ring leg",
        "lb": "Wago X-D (diode join) slot 2",
        "cable": "Diode leg",
@@ -1482,41 +1379,138 @@
        "no": "39",
        "a": "X-D:3",
        "b": "T1:7",
-       "color": "WH",
+       "color": "red",
        "la": "Wago X-D (diode join) slot 3",
-       "lb": "T1 terminal 7",
-       "cable": "Stranded wire, white or blue",
+       "lb": "Jam timer T1 (8-pin timer) pin 7",
+       "cable": "Stranded wire, red or black",
+       "size": "0.5 mm² · AWG 20"
+      },
+      {
+       "no": "17",
+       "a": "X-EN:3",
+       "b": "T1:8",
+       "color": "red",
+       "la": "Wago X-EN (+24 V while on) slot 3",
+       "lb": "Jam timer T1 (8-pin timer) pin 8",
+       "cable": "Stranded wire, red or black",
        "size": "0.5 mm² · AWG 20"
       },
       {
        "no": "40",
        "a": "T1:2",
        "b": "X-M2:5",
-       "color": "BU",
-       "la": "T1 terminal 2",
-       "lb": "Wago X-M2 (0 V) slot 5",
-       "cable": "Stranded wire, white or blue",
+       "color": "black",
+       "la": "Jam timer T1 (8-pin timer) pin 2",
+       "lb": "Wago X-M2 (Ground) slot 5",
+       "cable": "Stranded wire, red or black",
        "size": "0.5 mm² · AWG 20"
       },
       {
        "no": "41",
        "a": "K4:12",
        "b": "T1:1",
-       "color": "WH",
-       "la": "K4 terminal 12",
-       "lb": "T1 terminal 1",
-       "cable": "Stranded wire, white or blue",
+       "color": "red",
+       "la": "Relay K4 terminal 12",
+       "lb": "Jam timer T1 (8-pin timer) pin 1",
+       "cable": "Stranded wire, red or black",
        "size": "0.5 mm² · AWG 20"
       },
       {
        "no": "42",
        "a": "K4:8",
        "b": "T1:3",
-       "color": "WH",
-       "la": "K4 terminal 8",
-       "lb": "T1 terminal 3",
-       "cable": "Stranded wire, white or blue",
+       "color": "red",
+       "la": "Relay K4 terminal 8",
+       "lb": "Jam timer T1 (8-pin timer) pin 3",
+       "cable": "Stranded wire, red or black",
        "size": "0.5 mm² · AWG 20"
+      }
+     ]
+    },
+    {
+     "id": "H",
+     "title": "Connect the pressure switch and the end sensors",
+     "note": "Connect E-STOP to the pressure switch and on to X-EN, then the two end sensors. Connectors: E-STOP button: terminal 2 red; pressure switch QPM11: terminal 1 red, terminal 2 red. X-EN is the control +24 V: live while POWER is on, E-STOP is released and the air pressure is below the trip. Pressure switch QPM11: both cores of its cable are on the +24 V side (red) and it has no polarity; with no air, a meter must beep across its two terminals (closed contact type). Keep each sensor's own wire colours: brown wire = +24 V from X-EN, blue wire = Ground, black wire = signal. These are PNP sensors: check the label SMT-8M-A-PS-… (PS = PNP). B1 drives K2 (front); B0 drives K4 (home). The signal wire (max 100 mA) drives the relay coil (37 mA) directly. Position: B0 so K4 lights with the rod fully home, B1 so K2 lights 2–3 mm before the press bottoms.",
+     "connections": [
+      {
+       "no": "8",
+       "a": "S3:2",
+       "b": "QPM11:1",
+       "color": "red",
+       "la": "E-STOP button terminal 2 (closed contact, marked 12)",
+       "lb": "Pressure switch QPM11 terminal 1",
+       "cable": "2-core cable, black sheath",
+       "size": "0.5 mm² · AWG 20"
+      },
+      {
+       "no": "9",
+       "a": "QPM11:2",
+       "b": "X-EN:1",
+       "color": "red",
+       "la": "Pressure switch QPM11 terminal 2",
+       "lb": "Wago X-EN (+24 V while on) slot 1",
+       "cable": "2-core cable, black sheath",
+       "size": "0.5 mm² · AWG 20"
+      },
+      {
+       "no": "18",
+       "a": "B1:BN",
+       "b": "X-EN:4",
+       "color": "brown",
+       "la": "Brown wire (+24 V) of the front sensor B1",
+       "lb": "Wago X-EN (+24 V while on) slot 4",
+       "cable": "The sensor's own cable",
+       "size": "as supplied"
+      },
+      {
+       "no": "19",
+       "a": "B0:BN",
+       "b": "X-EN:5",
+       "color": "brown",
+       "la": "Brown wire (+24 V) of the home sensor B0",
+       "lb": "Wago X-EN (+24 V while on) slot 5",
+       "cable": "The sensor's own cable",
+       "size": "as supplied"
+      },
+      {
+       "no": "29",
+       "a": "B1:BK",
+       "b": "K2:14",
+       "color": "black",
+       "la": "Black wire (signal) of the front sensor B1",
+       "lb": "Relay K2 terminal 14",
+       "cable": "The sensor's own cable",
+       "size": "as supplied"
+      },
+      {
+       "no": "30",
+       "a": "B1:BU",
+       "b": "X-M1:4",
+       "color": "blue",
+       "la": "Blue wire (Ground) of the front sensor B1",
+       "lb": "Wago X-M1 (Ground) slot 4",
+       "cable": "The sensor's own cable",
+       "size": "as supplied"
+      },
+      {
+       "no": "31",
+       "a": "B0:BK",
+       "b": "K4:14",
+       "color": "black",
+       "la": "Black wire (signal) of the home sensor B0",
+       "lb": "Relay K4 terminal 14",
+       "cable": "The sensor's own cable",
+       "size": "as supplied"
+      },
+      {
+       "no": "32",
+       "a": "B0:BU",
+       "b": "X-M1:5",
+       "color": "blue",
+       "la": "Blue wire (Ground) of the home sensor B0",
+       "lb": "Wago X-M1 (Ground) slot 5",
+       "cable": "The sensor's own cable",
+       "size": "as supplied"
       }
      ]
     }

@@ -10,13 +10,16 @@ import yaml
 ROOT = pathlib.Path(__file__).parent
 OUT = ROOT / "data/buildguide.json"
 PLAIN = {"S3": "E-STOP button", "S2": "STOP button", "S0": "START button", "S1": "JOG button",
-         "J1": "DC jack J1", "F1": "Fuse holder F1", "Q1": "Power switch Q1", "QPM11": "Pressure switch", "B0": "Home sensor B0",
-         "B1": "Front sensor B1", "Y1": "Valve plug Y1", "Y2": "Valve plug Y2", "D5": "Diode D5", "D6": "Diode D6"}
-CORE = {"BN": "brown core", "BU": "blue core", "BK": "black core"}
-WAGO = {"X-EN": "switched +24 V", "X-M1": "0 V", "X-M2": "0 V", "X-D": "diode join"}
+         "J1": "DC jack J1", "F1": "fuse holder F1", "Q1": "power button Q1", "QPM11": "pressure switch QPM11", "B0": "home sensor B0",
+         "B1": "front sensor B1", "Y1": "valve plug Y1", "Y2": "valve plug Y2", "D5": "diode D5", "D6": "diode D6", "T1": "jam timer T1 (8-pin timer)"}
+CORE = {"BN": "brown wire (+24 V)", "BU": "blue wire (Ground)", "BK": "black wire (signal)"}
+WAGO = {"X-EN": "+24 V while on", "X-M1": "Ground", "X-M2": "Ground", "X-D": "diode join"}
+# marks on a button's contact block: terminals 1, 2 are the closed contact, 3, 4 the open contact
+MARK = {"1": "11", "2": "12", "3": "23", "4": "24"}
+CONNECTORS = ("J1", "F1", "Q1", "S3", "S2", "S0", "S1", "QPM11", "Y1", "Y2")  # parts that get a one-line connector list
 # board look: [line, outline] per wire colour, list swatch where it differs, and the part kinds
-WIRE = {"WH": ["#ffffff", "#334155", "#fff"], "BU": ["#2563eb", "#1e3a8a", "#347bdc"], "BN": ["#92400e", "#451a03", "#956238"],
-        "BK": ["#1f2937", "#000000", "#273039"], "GY": ["#9ca3af", "#4b5563", "#929ea9"], "DIODE": ["#d1d5db", "#111827", "#29363a"]}
+WIRE = {"red": ["#dc2626", "#7f1d1d", "#dc2626"], "blue": ["#2563eb", "#1e3a8a", "#347bdc"], "brown": ["#92400e", "#451a03", "#956238"],
+        "black": ["#1f2937", "#000000", "#273039"], "grey": ["#9ca3af", "#4b5563", "#929ea9"], "DIODE": ["#d1d5db", "#111827", "#29363a"]}
 KINDS = {
     "socket": {"fill": "#1f2937", "stroke": "#1f2937", "inset": 17, "diodeLoop": "around"},
     "box": {"fill": "#f1f5f9", "stroke": "#17202a", "offset": {"bottom": -16}},
@@ -62,26 +65,37 @@ def screws(w):
     return ends
 
 
-def label(end):  # noqa: PLR0911
-    """'K1:9' → 'K1 terminal 9' in words a first-timer can find on the part."""
+def cap(text):
+    """Capital first letter, the rest untouched (str.capitalize lowercases 'E-STOP')."""
+    return text[:1].upper() + text[1:]
+
+
+def terminal(part, pin):
+    """The short terminal name: 'terminal 3', 'pin 1', 'IN'."""
+    return {"F1": f"tab {pin}", "T1": f"pin {pin}", "Y1": f"pin {pin}", "Y2": f"pin {pin}", "Q1": pin, "J1": "+" if pin == "+" else "\u2212"}.get(part, f"terminal {pin}")
+
+
+def detail(part, pin):
+    """What the terminal is, in words, where the short name does not say: the contact of a button, the pole of a plug."""
+    if part in ("S0", "S1", "S2", "S3"):   # E-STOP and STOP use their closed contact, the others their open contact
+        return f" ({'closed' if part in ('S2', 'S3') else 'open'} contact, marked {MARK[pin]})"
+    if part in ("Y1", "Y2"):
+        return " (+24 V)" if pin == "1" else " (Ground)"
+    return {"+": " (+24 V, centre pin)", "-": " (Ground)"}.get(pin, "") if part == "J1" else ""
+
+
+def label(end):
+    """'K1:9' → 'Relay K1 terminal 9' in words a first-timer can find on the part."""
     part, pin = end.split(":", 1)
-    if part[0] == "K" or part == "T1":
-        return f"{part} terminal {pin}"
+    if part[0] == "K":
+        return f"Relay {part} terminal {pin}"
     if part.startswith("X-"):
         return f"Wago {part} ({WAGO[part]}) slot {pin}"
     if part in ("B0", "B1"):
-        return f"{PLAIN[part]}, {CORE[pin]}"
+        return f"{cap(CORE[pin])} of the {PLAIN[part]}"
     if part in ("D5", "D6"):
-        return f"{PLAIN[part]}, " + ("plain leg, in its own 2-way Wago with this wire" if pin == "A" else "ring leg")
-    if part in ("Y1", "Y2"):
-        return f"{PLAIN[part]} pin {pin}" + (" (+)" if pin == "1" else "")
-    if part == "F1":
-        return f"{PLAIN[part]} tab {pin}"
-    if part == "J1":
-        return f"{PLAIN[part]} {pin.replace('-', '−')}"  # noqa: RUF001
-    if part in ("S0", "S1", "S2", "S3"):   # E-STOP and STOP use their NC contact, the others their NO contact
-        return f"{PLAIN[part]} {pin} ({'NC' if part in ('S2', 'S3') else 'NO'})"
-    return f"{PLAIN.get(part, part)} {pin}"
+        return f"{cap(PLAIN[part])}, " + ("plain leg, in its own 2-way Wago with this wire" if pin == "A" else "ring leg")
+    return f"{cap(PLAIN.get(part, part))} {terminal(part, pin)}{detail(part, pin)}"
 
 
 def cable_of(w, a, b, col):  # noqa: ARG001
@@ -93,7 +107,7 @@ def cable_of(w, a, b, col):  # noqa: ARG001
         return "sensor"
     if parts & {"Y1", "Y2"}:
         return "valve"
-    if col == "GY":
+    if col == "grey":
         return "leg"
     return "field" if "QPM11" in parts else "core"
 
@@ -105,7 +119,7 @@ def cable_text(c):
 def connection(w, shared, no, a, b, col):  # noqa: PLR0913
     def twin(end):
         """Two wires on one screw go into one twin ferrule: name the partner."""
-        return "".join(f" · twin ferrule with {n}" for n in shared.get(end, []) if n != no)
+        return "".join(f" · one twin ferrule with wire {n}" for n in shared.get(end, []) if n != no)
 
     cable = w["cables"][cable_of(w, a, b, col)]
     c = {"no": no, "a": a, "b": b, "color": col,
@@ -114,6 +128,36 @@ def connection(w, shared, no, a, b, col):  # noqa: PLR0913
     if col != "DIODE":
         c.update(cable=cable["name"], size=cable_text(cable))
     return c
+
+
+def twin_ferrules(step, shared):
+    """One sentence for each screw of the step that takes two wires: they are crimped once, into one twin ferrule."""
+    nos = [wire[0] for wire in step["wires"]]
+    ends = dict.fromkeys(end for wire in step["wires"] if wire[3] != "DIODE" for end in wire[1:3])
+    return " ".join(f"Crimp wires {' and '.join(shared[end])} into one twin ferrule, then one screw at {label(end)}."
+                    for end in ends if len(shared.get(end, [])) == 2 and set(shared[end]) <= set(nos))
+
+
+def connector_line(w, step):
+    """'Connectors: power button Q1: IN red, OUT red, GND black' for each part of CONNECTORS that the step wires, with the wire colour at each terminal."""
+    colours = {}
+    for _no, a, b, col in step["wires"]:
+        if col != "DIODE":
+            for end in (a, b):
+                colours.setdefault(end, []).append(col)
+    parts = []
+    for part in CONNECTORS:
+        ends = [end for end in colours if end.split(":")[0] == part]
+        if ends:
+            ends.sort(key=lambda end: [p for side in w["parts"][part]["ports"].values() for p in side].index(end.split(":", 1)[1]))
+            parts.append(f"{PLAIN[part]}: " + ", ".join(f"{terminal(*end.split(':', 1))} {' and '.join(colours[end])}" for end in ends))
+    return f"Connectors: {'; '.join(parts)}." if parts else ""
+
+
+def step_note(w, g, step, shared):
+    """The instruction, the connector line, the twin ferrule sentences, then the details of guide.yaml."""
+    note = g["wiring_notes"][str(step["id"])]
+    return " ".join(x for x in (note["do"], connector_line(w, step), twin_ferrules(step, shared), note["text"]) if x)
 
 
 def bom_items(g):
@@ -132,6 +176,9 @@ def build():
     shared = screws(w)
     over = {k: v for k, v in shared.items() if len(v) > 2}
     assert not over, f"more than two wires under one screw: {over}"
+    step_of = {wire[0]: str(s["id"]) for s in w["steps"] for wire in s["wires"]}
+    split = {end: nos for end, nos in shared.items() if len({step_of[no] for no in nos}) > 1}
+    assert not split, f"wires under one screw (one twin ferrule) belong in one step: {split}"
     notes = g["wiring_notes"]
     ids = {str(s["id"]) for s in w["steps"]}
     assert set(notes) == ids, f"wiring_notes and wiring steps differ: notes only {sorted(set(notes) - ids)}, steps only {sorted(ids - set(notes))}"
@@ -143,11 +190,11 @@ def build():
         "boards": {
             "wiring": {
                 "title": "Wiring", "label": "Wiring board", "size": [1360, 860], "prefix": "wire", "single": True,
-                "legend": [{"key": "diode", "text": "Silver ring = cathode"}, "Green = selected connection"],
+                "legend": ["Red = +24 V, black = Ground, sensor wires keep their own colours", {"key": "diode", "text": "Silver ring = cathode"}, "Green = selected connection"],
                 "colors": {k: {"line": line, "outline": outline, "swatch": swatch, **({"diode": True} if k == "DIODE" else {})}
                            for k, (line, outline, swatch) in WIRE.items()},
                 "kinds": KINDS, "areas": w["areas"], "props": w["props"], "parts": w["parts"],
-                "steps": [{"id": str(s["id"]), "title": s["title"], "note": notes[str(s["id"])], "connections": [connection(w, shared, *wire) for wire in s["wires"]]}
+                "steps": [{"id": str(s["id"]), "title": s["title"], "note": step_note(w, g, s, shared), "connections": [connection(w, shared, *wire) for wire in s["wires"]]}
                           for s in w["steps"]],
             },
             "tubing": {
