@@ -2,6 +2,8 @@
 
 # AutoLever
 
+[![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.gg/hUCSjDYNaa)
+
 An air cylinder works the lever of your Lee APP reloading press for sizing and decapping. START cycles it until STOP, and JOG cycles it only while you hold the button.
 
 **Pre-release, October 2026.** Nothing has been built yet, the printed parts are not on MakerWorld yet, details will change.
@@ -25,6 +27,6 @@ Edit `data/*.yaml`, run `.venv/bin/python main.py` and commit `data/buildguide.j
 
 ## Community and licence
 
-Questions: [Discord](https://discord.gg/KkYJ5fdukR). Built by reloaders for reloaders, with AI as a tool.
+Built by reloaders for reloaders, with AI as a tool.
 
 MIT licence. The [BuildGuide](https://github.com/OpenReloading/BuildGuide) plugin bundles JointJS (MPL 2.0) and libavoid-js (LGPL 2.1+).

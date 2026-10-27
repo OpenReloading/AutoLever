@@ -152,7 +152,8 @@ with sync_playwright() as p:
     for step in tubing:
         go(f"tubing/#tubing={step['id']}");ready()  # noqa: E702
         expect(page.locator('.ag-step-note')).to_have_text(step['note'])
-    go('wiring/#wiring=A/1');ready()  # noqa: E702
+    first=wiring[0]['id']+'/'+wiring[0]['connections'][0]['no']
+    go('wiring/#wiring='+first);ready()  # noqa: E702
     page.locator('[data-role=scope]').select_option('single');ready()  # noqa: E702
     expect(page.locator('[data-connection]')).to_have_count(1)
     page.locator('[data-role=scope]').select_option('all');ready()  # noqa: E702
@@ -163,18 +164,18 @@ with sync_playwright() as p:
     page.reload(wait_until='domcontentloaded')
     expect(page.locator('.ag-verify input')).to_be_checked()
     page.locator('[data-action=next-wire]').click()
-    expect(page.locator('.ag-wire-row.selected .ag-wire-number')).to_have_text('2')
+    expect(page.locator('.ag-wire-row.selected .ag-wire-number')).to_have_text(wiring[0]['connections'][1]['no'])
     expect(page.locator('.ag-verify input')).not_to_be_checked()
     # A tick belongs to one exact connection: a tick for wire 16 with other ends stays unchecked, the real key is checked.
-    c16=next(c for st in wiring for c in st['connections'] if c['no']=='16')
+    step16,c16=next((st,c) for st in wiring for c in st['connections'] if c['no']=='16')
     for key,done in [(f"wire-16:{c16['a']}:X",False),(f"wire-16:{c16['a']}:{c16['b']}",True)]:
         page.evaluate("key=>localStorage.setItem('autolever-guide',JSON.stringify({[key]:true}))",key)
-        go('wiring/#wiring=C/16');page.reload(wait_until='domcontentloaded');ready()   # same URL: goto alone keeps the old state  # noqa: E702
+        go(f"wiring/#wiring={step16['id']}/16");page.reload(wait_until='domcontentloaded');ready()   # same URL: goto alone keeps the old state  # noqa: E702
         (expect(page.locator('.ag-verify input')).to_be_checked if done else expect(page.locator('.ag-verify input')).not_to_be_checked)()
-    go('wiring/#wiring=A/1')
+    go('wiring/#wiring='+wiring[1]['id']+'/'+wiring[1]['connections'][0]['no'])   # the first wire of the second step: previous is the last wire of the first
     page.locator('[data-action=prev-wire]').click()
     expect(page.locator('.ag-wire-row.selected .ag-wire-number')).to_have_text(wiring[0]['connections'][-1]['no'])
-    go('wiring/#wiring=H/'+wiring[-1]['connections'][-1]['no'])
+    go('wiring/#wiring='+wiring[-1]['id']+'/'+wiring[-1]['connections'][-1]['no'])
     expect(page.locator('[data-action=next-wire]')).to_be_disabled()   # the last connection of the board: the page, not the component, links on
     # Tubing has the same workspace, zoom, scope, selection and fullscreen controls.
     for step in tubing:
@@ -294,7 +295,7 @@ with sync_playwright() as p:
             page.locator('.ag-wire-navigation .ag-primary').scroll_into_view_if_needed()
     # The board stays readable on laptop screens.
     page.set_viewport_size({'width':1024,'height':768})
-    go('wiring/#wiring=A/1');ready()  # noqa: E702
+    go('wiring/#wiring='+first);ready()  # noqa: E702
     assert page.locator('.ag-board-canvas').evaluate('e=>e.clientHeight')>=300,'board too small at 1024x768'
     # Print on A4 (718 px between 10 mm margins), also from the dark scheme: the boards fit the width BuildGuide prints them at (700 px), the controls and counters are hidden and the text is dark on white paper.
     page.set_viewport_size({'width':718,'height':1123})
