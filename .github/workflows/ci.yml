@@ -24,8 +24,9 @@ jobs:
       - run: '.venv/bin/pip install --only-binary :all: --require-hashes -r requirements-dev.txt'
       # tests/test_cad.py renders cad/*.scad and skips itself without OpenSCAD
       # install steps are time-boxed (3 minutes per attempt, one retry): a stalled mirror must not run into the job timeout
+      # the apt wrapper runs as root so that timeout can SIGKILL apt-get itself; an unprivileged timeout could only kill sudo
       - timeout-minutes: 7
-        run: .github/scripts/retry-once.sh 180 sudo sh -c 'apt-get update && apt-get install -y --no-install-recommends openscad'
+        run: sudo .github/scripts/retry-once.sh 180 sh -c 'apt-get update && apt-get install -y --no-install-recommends openscad'
       - run: .venv/bin/pytest --cov
       # data/buildguide.json is committed: it must match data/*.yaml
       - run: .venv/bin/python main.py && git diff --exit-code data/buildguide.json

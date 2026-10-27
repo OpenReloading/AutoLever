@@ -27,3 +27,15 @@ def test_stall_times_out_and_fails_after_two_attempts(tmp_path: Path):
     result = run("1", "sh", "-c", f"echo x >> {count}; sleep 30")
     assert result.returncode == 1
     assert len(count.read_text().split()) == 2
+
+
+def test_timeout_kills_descendants(tmp_path: Path):
+    pidfile = tmp_path / "pid"
+    run("1", "sh", "-c", f"sleep 30 & echo $! > {pidfile}; wait")
+    pid = int(pidfile.read_text())
+    assert subprocess.run(["kill", "-0", str(pid)], capture_output=True, check=False).returncode != 0
+
+
+def test_apt_install_runs_the_wrapper_as_root():
+    ci = (SCRIPT.parent.parent / "workflows" / "ci.yml").read_text()
+    assert "run: sudo .github/scripts/retry-once.sh 180 sh -c 'apt-get update" in ci
