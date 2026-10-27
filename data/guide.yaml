@@ -73,7 +73,8 @@ wiring_notes:
     do: Connect E-STOP to the pressure switch and on to X-EN, then the two end sensors.
     text: >-
       X-EN is the control +24 V: live while POWER is on, E-STOP is released and the air pressure is below the trip. Pressure
-      switch QPM11: with no air, a meter must beep across its two terminals (closed contact type). Keep each sensor's own wire
+      switch QPM11: both cores of its cable are on the +24 V side (red) and it has no polarity; with no air, a meter must beep
+      across its two terminals (closed contact type). Keep each sensor's own wire
       colours: brown wire = +24 V from X-EN, blue wire = Ground, black wire = signal. These are PNP sensors: check the label
       SMT-8M-A-PS-… (PS = PNP). B1 drives K2 (front); B0 drives K4 (home). The signal wire (max 100 mA) drives the relay coil
       (37 mA) directly. Position: B0 so K4 lights with the rod fully home, B1 so K2 lights 2–3 mm before the press bottoms.
@@ -305,7 +306,7 @@ bom:
   group: Wiring
   qty: 3 m est.
   part: 2-core cable, black sheath
-  spec: 3 runs out of the box (valve plugs Y1, Y2 and QPM11) · 2 × 0.5 mm² (AWG 20) · sheath to suit the M12 glands · the board shows red and black, so mark the +24 V core of the valve cables red
+  spec: 3 runs out of the box (valve plugs Y1, Y2 and QPM11) · 2 × 0.5 mm² (AWG 20) · sheath to suit the M12 glands · the board shows red and black, on a valve cable mark the +24 V core red, on the QPM11 cable (switch in the +24 V feed, no polarity) mark both cores red
 - id: terminations
   group: Wiring
   qty: 1 set

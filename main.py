@@ -190,7 +190,7 @@ def build():
         "boards": {
             "wiring": {
                 "title": "Wiring", "label": "Wiring board", "size": [1360, 860], "prefix": "wire", "single": True,
-                "legend": ["Red wire = +24 V, black wire = Ground", {"key": "diode", "text": "Silver ring = cathode"}, "Green = selected connection"],
+                "legend": ["Red = +24 V, black = Ground, sensor wires keep their own colours", {"key": "diode", "text": "Silver ring = cathode"}, "Green = selected connection"],
                 "colors": {k: {"line": line, "outline": outline, "swatch": swatch, **({"diode": True} if k == "DIODE" else {})}
                            for k, (line, outline, swatch) in WIRE.items()},
                 "kinds": KINDS, "areas": w["areas"], "props": w["props"], "parts": w["parts"],
