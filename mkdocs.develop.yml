@@ -1,9 +1,0 @@
-# Preview build of the develop branch, published under /develop/ (.github/workflows/pages.yml).
-# The released site at the root is built from mkdocs.yml alone.
-INHERIT: mkdocs.yml
-site_url: https://openreloading.github.io/AutoLever/develop/
-extra:
-  preview: true   # overrides/main.html: noindex meta and banner
-hooks:   # a hooks list replaces the inherited one
-  - hooks/repo_facts.py
-  - hooks/preview.py

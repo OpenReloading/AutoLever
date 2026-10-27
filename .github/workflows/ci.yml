@@ -1,16 +1,15 @@
 name: CI
 on:
   push:
-    branches: [develop]
+    branches: [main]
   pull_request:
+    branches: [main]
 permissions: {}
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
   check:
-    # Skipped only on the promotion pull request (develop to main, same repository): the push to develop already checked it.
-    if: ${{ !(github.event_name == 'pull_request' && github.head_ref == 'develop' && github.base_ref == 'main' && github.event.pull_request.head.repo.full_name == github.repository) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     permissions:
@@ -31,18 +30,14 @@ jobs:
       # data/buildguide.json is committed: it must match data/*.yaml
       - run: .venv/bin/python main.py && git diff --exit-code data/buildguide.json
       - run: .venv/bin/mkdocs build --strict -d /tmp/www/AutoLever
-      # the preview of the Pages workflow (mkdocs.develop.yml), next to the root as on the deployed site
-      - run: .venv/bin/mkdocs build --strict -f mkdocs.develop.yml -d /tmp/www/AutoLever/develop
       - timeout-minutes: 7
         run: .github/scripts/retry-once.sh 180 .venv/bin/playwright install --with-deps chromium
       - run: |
           python3 -m http.server -d /tmp/www 8000 &
           .venv/bin/python tests/check_guide.py http://127.0.0.1:8000/AutoLever
-          .venv/bin/python tests/check_guide.py http://127.0.0.1:8000/AutoLever/develop
   # ruff and basedpyright from the hash-locked requirements-dev.txt. Rules are in pyproject.toml, the basedpyright
   # baseline in .basedpyright/baseline.json, the ruff baseline as noqa comments.
   lint-python:
-    if: ${{ !(github.event_name == 'pull_request' && github.head_ref == 'develop' && github.base_ref == 'main' && github.event.pull_request.head.repo.full_name == github.repository) }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -62,7 +57,6 @@ jobs:
       - run: .venv/bin/ruff check .
       - run: .venv/bin/basedpyright --pythonpath .venv/bin/python
   workflows:
-    if: ${{ !(github.event_name == 'pull_request' && github.head_ref == 'develop' && github.base_ref == 'main' && github.event.pull_request.head.repo.full_name == github.repository) }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
@@ -78,8 +72,7 @@ jobs:
           version: 1.31.1
           advanced-security: false
   dependency-review:
-    # also skipped on the promotion pull request, see `check`
-    if: ${{ github.event_name == 'pull_request' && !(github.head_ref == 'develop' && github.base_ref == 'main' && github.event.pull_request.head.repo.full_name == github.repository) }}
+    if: ${{ github.event_name == 'pull_request' }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:

@@ -56,15 +56,7 @@ with sync_playwright() as p:
         expect(page.locator('.ag-guide' if path else 'main h1')).to_be_visible()
     def ready():
         expect(page.locator('.ag-board-canvas')).to_have_attribute('data-ready','true')
-    # The preview under /develop/ is marked noindex with a banner on every page and has no sitemap; the released site has none of these.
-    preview=BASE.endswith('/develop')
-    for path in ['','bom/','wiring/','tubing/','404.html']:
-        html=context.request.get(BASE+'/'+path).text()
-        assert ('<meta name="robots" content="noindex">' in html)==preview,path
-        assert ('class="md-banner"' in html)==preview,path
-        assert ('Development preview, not the released site.' in html)==preview,path
-    assert (context.request.get(BASE+'/sitemap.xml').status==404)==preview
-    # Link preview meta on every page, with the card URL built from site_url (the /develop/ preview points to its own copy); the card is a 1200 x 630 PNG that says nothing beyond the site title and description.
+    # Link preview meta on every page, with the card URL built from site_url; the card is a 1200 x 630 PNG that says nothing beyond the site title and description.
     config=yaml.safe_load(Path(main.ROOT,'mkdocs.yml').read_text(encoding='utf-8'))
     origin=urlparse(config['site_url'])
     card=f'{origin.scheme}://{origin.netloc}'+urlparse(BASE).path+'/assets/social-card.png'
