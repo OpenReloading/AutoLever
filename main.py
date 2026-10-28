@@ -10,7 +10,7 @@ import yaml
 ROOT = pathlib.Path(__file__).parent
 OUT = ROOT / "data/buildguide.json"
 PLAIN = {"S3": "E-STOP button", "S2": "STOP button", "S0": "START button", "S1": "JOG button",
-         "J1": "DC jack J1", "F1": "fuse holder F1", "FU1": "inline fuse holder FU1", "PLC": "StamPLC", "Q1": "power button Q1", "QPM11": "pressure switch QPM11", "B0": "home sensor B0",
+         "J1": "DC jack J1", "F1": "fuse holder F1", "PLC": "StamPLC", "Q1": "power button Q1", "QPM11": "pressure switch QPM11", "B0": "home sensor B0",
          "B1": "front sensor B1", "Y1": "valve plug Y1", "Y2": "valve plug Y2", "D5": "diode D5", "D6": "diode D6", "T1": "jam timer T1 (8-pin timer)"}
 CORE = {"BN": "brown wire (+24 V)", "BU": "blue wire (Ground)", "BK": "black wire (signal)"}
 WAGO = {"X-EN": "+24 V while on", "X-M1": "Ground", "X-M2": "Ground", "X-D": "diode join",
@@ -21,7 +21,7 @@ PLC_INPUT = {"1": "home sensor B0", "2": "front sensor B1", "3": "rail after the
 PLC_POLE = {"NC": ("NC", " (closed at rest)"), "C": ("COM", " (common)"), "NO": ("NO", " (closed when the relay is on)")}
 # marks on a button's contact block: terminals 1, 2 are the closed contact, 3, 4 the open contact
 MARK = {"1": "11", "2": "12", "3": "23", "4": "24"}
-CONNECTORS = ("J1", "F1", "FU1", "Q1", "S3", "S2", "S0", "S1", "QPM11", "Y1", "Y2", "PLC")  # parts that get a one-line connector list
+CONNECTORS = ("J1", "F1", "Q1", "S3", "S2", "S0", "S1", "QPM11", "Y1", "Y2", "PLC")  # parts that get a one-line connector list
 # board look: [line, outline] per wire colour, list swatch where it differs, and the part kinds
 WIRE = {"red": ["#dc2626", "#7f1d1d", "#dc2626"], "blue": ["#2563eb", "#1e3a8a", "#347bdc"], "brown": ["#92400e", "#451a03", "#956238"],
         "black": ["#1f2937", "#000000", "#273039"], "grey": ["#9ca3af", "#4b5563", "#929ea9"], "DIODE": ["#d1d5db", "#111827", "#29363a"]}
@@ -79,7 +79,7 @@ def terminal(part, pin):
     """The short terminal name: 'terminal 3', 'pin 1', 'IN'."""
     if part == "PLC":
         return PLC_POWER[pin][0] if pin in PLC_POWER else f"input {pin}" if pin.isdigit() else f"relay {pin[0]} {PLC_POLE[pin[1:]][0]}"
-    return {"F1": f"tab {pin}", "FU1": f"lead {pin}", "T1": f"pin {pin}", "Y1": f"pin {pin}", "Y2": f"pin {pin}", "Q1": pin, "J1": "+" if pin == "+" else "\u2212"}.get(part, f"terminal {pin}")
+    return {"F1": f"tab {pin}", "T1": f"pin {pin}", "Y1": f"pin {pin}", "Y2": f"pin {pin}", "Q1": pin, "J1": "+" if pin == "+" else "\u2212"}.get(part, f"terminal {pin}")
 
 
 def detail(part, pin):
@@ -169,16 +169,6 @@ def step_note(w, notes, step, shared):
     return " ".join(x for x in (note["do"], connector_line(w, step), twin_ferrules(step, shared), note["text"]) if x)
 
 
-def bom_items(g):
-    """BOM rows for the guide: the makerworld address becomes the link, an unset one shows no link (a dead link is worse than none)."""
-    return [{("link" if k == "makerworld" else k): v for k, v in item.items() if k != "makerworld" or v} for item in g["bom"]]
-
-
-def unset_makerworld(g):
-    """Ids of the printed parts whose `makerworld:` field is still empty."""
-    return [item["id"] for item in g["bom"] if "makerworld" in item and not item["makerworld"]]
-
-
 def wiring_board(w, notes, title, prefix, size):
     """One wiring board from a wiring file (wiring.yaml, relay.yaml) and the notes of its steps in guide.yaml."""
     shared = screws(w)
@@ -208,8 +198,8 @@ def build():
     return {
         "storage": "autolever-guide",
         "bom": {"note": "Feel free to substitute as required for local availability and cost. Cable and tube lengths are estimates.",
-                "export": "autolever-bom.csv", "linkLabel": "MakerWorld",
-                "items": bom_items(g)},
+                "export": "autolever-bom.csv",
+                "items": g["bom"]},
         "boards": {
             "wiring": wiring_board(load("wiring.yaml"), g["wiring_notes"], "Wiring", "plc", [1360, 860]),
             "relay": wiring_board(load("relay.yaml"), g["relay_notes"], "Wiring (relay edition)", "wire", [1360, 860]),
@@ -226,7 +216,4 @@ def build():
 
 
 if __name__ == "__main__":
-    unset = unset_makerworld(yaml.safe_load((ROOT / "data/guide.yaml").read_text(encoding="utf-8")))
-    if unset:
-        print(f"makerworld not set (no link in the BOM): {', '.join(unset)}")
     OUT.write_text(json.dumps(build(), ensure_ascii=False, indent=1) + "\n", encoding="utf-8")

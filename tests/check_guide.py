@@ -256,17 +256,16 @@ with sync_playwright() as p:
     with tempfile.TemporaryDirectory() as temp:
         target=Path(temp)/'bom.csv';download.value.save_as(target)  # noqa: E702
         rows=list(csv.DictReader(io.StringIO(target.read_text(encoding='utf-8-sig'))))
-        assert list(rows[0])==['Group','Component','Specification','Quantity','MakerWorld']
+        assert list(rows[0])==['Group','Component','Specification','Quantity','Link']
         assert [r['Quantity'] for r in rows]==['3','2','2','1']
         assert download.value.suggested_filename=='autolever-bom.csv'
     page.locator('[data-role=search]').fill('does-not-exist')
     expect(page.locator('.ag-empty')).to_be_visible()
     page.locator('[data-role=search]').fill('')
     expect(page.locator('tbody tr:not(.ag-group)')).to_have_count(len(bom))
-    # Printed parts are grouped, marked as 3D printed and link to MakerWorld.
+    # Printed parts are grouped and marked as 3D printed.
     page.locator('[data-role=search]').fill('3D printed')
     expect(page.locator('tr.ag-group')).to_have_text(['3D printed','Relay edition only (deprecated)'])
-    expect(page.locator('tbody a', has_text='MakerWorld')).to_have_count(sum('link' in row for row in bom))
     page.locator('[data-role=search]').fill('')
     page.set_viewport_size({'width':390,'height':844})
     for path in ['', 'bom/', 'wiring/', 'tubing/', 'relay/']:

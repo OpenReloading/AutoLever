@@ -64,7 +64,6 @@ def test_a_wire_with_an_unknown_end_names_its_number_and_end(wire, message):
     ("PLC:1NC", "StamPLC relay 1 NC (closed at rest)"),
     ("PLC:2C", "StamPLC relay 2 COM (common)"),
     ("PLC:2NO", "StamPLC relay 2 NO (closed when the relay is on)"),
-    ("FU1:2", "Inline fuse holder FU1 lead 2"),
     ("X-24:2", "Wago X-24 (+24 V after POWER) slot 2"),
     ("UNKNOWN:1", "UNKNOWN terminal 1"),
 ])
@@ -181,9 +180,3 @@ def test_board_canvas_ratio_in_the_stylesheet_is_the_board_size(board):
     width, height = json.loads((main.ROOT / "data/buildguide.json").read_text(encoding="utf-8"))["boards"][board]["size"]
     css = (main.ROOT / "docs/stylesheets/extra.css").read_text(encoding="utf-8")
     assert f'[data-board="{board}"] {{\n  --board-ratio: {width} / {height};' in css
-
-
-def test_a_set_makerworld_address_is_the_link_and_an_unset_one_shows_none():
-    g = {"bom": [{"id": "a", "part": "A", "makerworld": "https://makerworld.com/models/1"}, {"id": "b", "part": "B", "makerworld": None}, {"id": "c", "part": "C"}]}
-    assert main.bom_items(g) == [{"id": "a", "part": "A", "link": "https://makerworld.com/models/1"}, {"id": "b", "part": "B"}, {"id": "c", "part": "C"}]
-    assert main.unset_makerworld(g) == ["b"]

@@ -6,7 +6,7 @@
 
 An air cylinder works the lever of your Lee APP reloading press for sizing and decapping. START cycles it until you press START again, and JOG cycles it only while you hold the button.
 
-**Pre-release, October 2026.** Nothing has been built yet, the printed parts are not on MakerWorld yet, details will change.
+**Pre-release, October 2026.** Nothing has been built yet, the print files are not published yet, details will change.
 
 For Lee APP owners (Classic or Deluxe) with compressed air at 7 to 10 bar and a 3D printer. A StamPLC controller and two sensors run the sequence; flash its firmware once over USB-C.
 

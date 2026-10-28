@@ -3,7 +3,6 @@
  "bom": {
   "note": "Feel free to substitute as required for local availability and cost. Cable and tube lengths are estimates.",
   "export": "autolever-bom.csv",
-  "linkLabel": "MakerWorld",
   "items": [
    {
     "id": "press",
@@ -146,11 +145,11 @@
     "spec": "5.5 × 2.1 mm, 8 mm thread (DC-099 type) · ≥ 2 A · 8 mm panel hole"
    },
    {
-    "id": "inlinefuse",
+    "id": "fuse",
     "group": "Electrical",
     "qty": "1",
-    "part": "Inline fuse holder FU1 + fuse",
-    "spec": "5 × 20 mm · fuse T 1 A (slow-blow) + spare · in the + lead from J1 to Q1"
+    "part": "Panel fuse holder F1 + fuse",
+    "spec": "5 × 20 mm · 12 mm thread, at most 28 mm behind the panel · fuse T 1 A (slow-blow) + spare"
    },
    {
     "id": "sensors",
@@ -220,7 +219,7 @@
     "group": "Wiring",
     "qty": "1 set",
     "part": "Ferrules, receptacles and labels",
-    "spec": "30 ferrules 0.5 mm² · 3 insulated flat receptacles for the Q1 tabs · heat-shrink · wire labels"
+    "spec": "30 ferrules 0.5 mm² · 5 insulated flat receptacles for the Q1 and F1 tabs · heat-shrink · wire labels"
    },
    {
     "id": "adapter",
@@ -235,7 +234,8 @@
     "group": "3D printed",
     "qty": "1",
     "part": "Control box",
-    "spec": "3D printed in PETG or ASA, 15–20 % infill · base, lid, E-STOP ring (yellow) and USB-C plug · the front of the StamPLC sits flush in the lid, so display, buttons and terminals stay reachable · DIN rail, Wago rack, POWER rocker and DC jack in the box · one oval cable exit at the back · no mains inside"
+    "spec": "3D printed in PETG or ASA, 15–20 % infill · base, lid, E-STOP ring (yellow) and USB-C plug · the front of the StamPLC sits flush in the lid, so display, buttons and terminals stay reachable · DIN rail, Wago rack, POWER rocker, DC jack and fuse holder in the box · one oval cable exit at the back · no mains inside",
+    "image": "boxes/stamplc_box.png"
    },
    {
     "id": "glands",
@@ -243,13 +243,6 @@
     "qty": "5",
     "part": "Cable glands M12 × 1.5",
     "spec": "3 × clamping 3–6.5 mm (valve Y1, Y2 · QPM11) · 2 × clamping 2–5 mm (sensors B0, B1)"
-   },
-   {
-    "id": "fuse",
-    "group": "Relay edition only (deprecated)",
-    "qty": "1",
-    "part": "Panel fuse holder F1 + fuse",
-    "spec": "5 × 20 mm · 12 mm thread, at most 28 mm behind the panel · fuse T 1 A (slow-blow) + spare"
    },
    {
     "id": "relays",
@@ -494,8 +487,8 @@
       ]
      }
     },
-    "FU1": {
-     "name": "FU1 · fuse",
+    "F1": {
+     "name": "F1 · fuse",
      "kind": "box",
      "at": [
       150,
@@ -798,24 +791,24 @@
     {
      "id": "A",
      "title": "Connect power in and Ground",
-     "note": "Mount the rail, the StamPLC and the Wago connectors, then connect power in and Ground. Connectors: DC jack J1: + red, − black; inline fuse holder FU1: lead 1 red, lead 2 red; power button Q1: IN red, GND black. Press an M3 heat-set insert into each of the two rail pads in the base (soldering iron, straight down, flush with the pad) and screw the rail on from above with an M3×6 pan-head screw and a washer. Clip the StamPLC on the rail, front towards the lid. Clip the Wagos into the rack on the front wall, wire entries up, levers towards the unit, left to right: X-24, X-0V1, X-0V2, X-S, X-V. Put a ferrule on every wire end that goes under a screw. Pass each cable that leaves the box through the oval exit before you strip it. Unplug the supply and disconnect the air. J1: wire 1 on the centre-pin lug (+); with three lugs, wire 3 on the one that stays connected to the sleeve with the plug in (meter). Solder lugs: solder and heat-shrink. FU1 sits in the lead from J1 to Q1; the fuse goes in last. Wire 5 joins the two Ground Wagos. Every slot of a Wago is connected to all the others: use one wire per slot. Check with a meter: the centre pin of the plug is +24 V.",
+     "note": "Mount the rail, the StamPLC and the Wago connectors, then connect power in and Ground. Connectors: DC jack J1: + red, − black; fuse holder F1: tab 1 red, tab 2 red; power button Q1: IN red, GND black. Press an M3 heat-set insert into each of the two rail pads in the base (soldering iron, straight down, flush with the pad) and screw the rail on from above with an M3×6 pan-head screw and a washer. Clip the StamPLC on the rail, front towards the lid. Clip the Wagos into the rack on the front wall, wire entries up, levers towards the unit, left to right: X-24, X-0V1, X-0V2, X-S, X-V. Put a ferrule on every wire end that goes under a screw. Pass each cable that leaves the box through the oval exit before you strip it. Unplug the supply and disconnect the air. J1: wire 1 on the centre-pin lug (+); with three lugs, wire 3 on the one that stays connected to the sleeve with the plug in (meter). Solder lugs: solder and heat-shrink. F1 is the panel fuse holder next to the jack, flat tabs with insulated receptacles; the fuse goes in last. Wire 5 joins the two Ground Wagos. Every slot of a Wago is connected to all the others: use one wire per slot. Check with a meter: the centre pin of the plug is +24 V.",
      "connections": [
       {
        "no": "1",
        "a": "J1:+",
-       "b": "FU1:1",
+       "b": "F1:1",
        "color": "red",
        "la": "DC jack J1 + (+24 V, centre pin)",
-       "lb": "Inline fuse holder FU1 lead 1",
+       "lb": "Fuse holder F1 tab 1",
        "cable": "Stranded wire, red or black",
        "size": "0.5 mm² · AWG 20"
       },
       {
        "no": "2",
-       "a": "FU1:2",
+       "a": "F1:2",
        "b": "Q1:IN",
        "color": "red",
-       "la": "Inline fuse holder FU1 lead 2",
+       "la": "Fuse holder F1 tab 2",
        "lb": "Power button Q1 IN",
        "cable": "Stranded wire, red or black",
        "size": "0.5 mm² · AWG 20"

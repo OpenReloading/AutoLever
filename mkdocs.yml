@@ -3,7 +3,7 @@ site_url: !ENV [SITE_URL, 'https://openreloading.github.io/AutoLever/']
 site_description: An air cylinder works the lever of a Lee APP press, run by a 24 V StamPLC controller and two sensors. Parts, wiring and tubing.
 repo_url: https://github.com/OpenReloading/AutoLever
 repo_name: OpenReloading/AutoLever
-# footer links (README: repository, Discord); the licence file is in the repository; MakerWorld follows with #23
+# footer links (README: repository, Discord); the licence file is in the repository
 copyright: >-
   <a href="https://github.com/OpenReloading/AutoLever">Repository</a>
   <a href="https://discord.gg/hUCSjDYNaa">Discord</a>

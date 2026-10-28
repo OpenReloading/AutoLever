@@ -3,7 +3,7 @@
 //          terminals) sits flush in a window, so every control and the wiring stay reachable with the lid on.
 //          E-STOP (22 mm, on a yellow ring) at the left. A notch on the USB-C side takes the plug; the usb_plug
 //          part fills it when no cable is attached.
-//   Left wall: POWER (Ø20 snap-in rocker). Right wall at the back: DC jack. Back wall: ONE oval opening for the
+//   Left wall: POWER (Ø20 snap-in rocker). Back wall: DC jack at the right, panel fuse holder at the left, ONE oval opening for the
 //          whole cable bundle (valve, pressure switch, both sensors) with two tie slots beside it.
 //   Front wall: a clip rack for five Wago 221 connectors (3 x 221-415, 2 x 221-413), each standing on edge, wire
 //          entries up, levers towards the unit, close to the relay terminals of the StamPLC.
@@ -16,7 +16,7 @@
 // Print: PETG or ASA, 4 perimeters, 15-20 % infill, no supports. Base upright, lid face down, ring flat in yellow.
 // Hardware: 4 x M3x8 + 4 x M3 heat-set inserts (lid), 2 x M3x6 pan-head + 2 inserts (rail), 35 mm DIN rail cut to
 //           100 mm (slot centres 12.5 and 87.5 from its end), 4 cable ties.
-// Fit order: base -> inserts, rail, jack, rocker -> StamPLC onto the rail -> wire -> lid over the unit.
+// Fit order: base -> inserts, rail, jack, fuse holder, rocker -> StamPLC onto the rail -> wire -> lid over the unit.
 // Test fit the base with the unit before printing the lid: rail_gap and plc_depth set the height of the unit.
 
 part = "assembly";        // "base" | "lid" | "estop_ring" | "usb_plug" | "assembly" | "exploded"
@@ -40,6 +40,7 @@ rocker_d     = 20.2;      // POWER, round snap-in rocker
 rocker_panel = 2;         // its clips want a thin panel: the wall is thinned to this from inside
 rocker_recess = 28;
 jack_d       = 8.2;       // panel DC jack, 5.5 x 2.1 mm
+fuse_d       = 12.2;      // panel fuse holder, 5 x 20 mm, 12 mm thread (at most 28 mm behind the panel)
 rail_w       = 35;
 rail_h       = 7.5;
 rail_len     = 100;
@@ -63,6 +64,7 @@ right_room = 34;          // beside the window on the USB-C side
 exit_d   = [30, 14];      // cable opening, width x height
 exit_z   = 36;
 jack_z   = 33;
+fuse_x   = 45;            // fuse holder on the back wall, cavity x
 rocker_z = 33;
 rocker_y = 30;            // on the left wall, cavity y
 
@@ -161,6 +163,8 @@ module base() {
             translate([-2.1, -0.9, 0]) cube([4.2, 1.8, t + 2]);
         // DC jack, back wall, right
         translate([t + cx - 15, D - t - 1, jack_z]) rotate([-90, 0, 0]) cylinder(d = jack_d, h = t + 2);
+        // fuse holder, back wall, left of the unit
+        translate([t + fuse_x, D - t - 1, jack_z]) rotate([-90, 0, 0]) cylinder(d = fuse_d, h = t + 2);
         // POWER rocker, left wall, thinned from inside
         translate([-1, t + rocker_y, rocker_z]) rotate([0, 90, 0]) cylinder(d = rocker_d, h = t + 2);
         translate([rocker_panel, t + rocker_y, rocker_z]) rotate([0, 90, 0]) cylinder(d = rocker_recess, h = t);
@@ -216,6 +220,7 @@ module ghosts() {
     color("red") translate([t + estop_x, t + cy / 2, Hz - estop_depth]) cylinder(d = 30, h = estop_depth + 20);
     color("#3b82f6") translate([0, t + rocker_y, rocker_z]) rotate([0, 90, 0]) cylinder(d = rocker_d, h = 22);
     for (i = [0 : len(wagos) - 1]) color("orange", 0.8) cav() translate([slot_x(i) + arm_t, 0, rack_z]) cube([wagos[i], wago_h[i], 18.6]);
+    color("#c2410c") translate([t + fuse_x, D - 28, jack_z]) rotate([-90, 0, 0]) cylinder(d = 14, h = 28);
     color("#333") translate([t + cx - 15, D - 22, jack_z]) rotate([-90, 0, 0]) cylinder(d = 12, h = 22);
 }
 

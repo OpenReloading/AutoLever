@@ -11,7 +11,7 @@ hide: [navigation]
 
 !!! warning "Pre-release, October 2026"
 
-    Nothing has been built yet, the printed parts are not on MakerWorld yet, details will change. The StamPLC firmware and wiring have passed their automated tests only; the bench check on the real unit is still open.
+    Nothing has been built yet, the print files are not published yet, details will change. The StamPLC firmware and wiring have passed their automated tests only; the bench check on the real unit is still open.
 
 Give your Lee APP an air-powered upgrade. AutoLever takes over the lever work for sizing and decapping. Press START and a Festo cylinder keeps it cycling, stroke after stroke. Press START again when you’re done.
 
