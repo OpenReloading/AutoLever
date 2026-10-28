@@ -51,6 +51,7 @@ def test_default_box_size(tmp_path):
     ({"usb_notch": "[40,16]"}, "USB notch reaches the right wall"),
     ({"x_left": 60}, "E-STOP body overlaps the rail"),
     ({"estop_depth": 20}, "unit sits too low"),
+    ({"rack_x0": 60}, "Wago rack reaches the right wall"),
 ])
 def test_clearance_asserts(tmp_path, params, message):
     result = render(tmp_path / "out.stl", "base", **params)
