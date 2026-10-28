@@ -1,20 +1,21 @@
 """Writes docs/assets/social-card.png (1200 x 630) from the logo, the light palette tokens of extra.css and the
 site description in mkdocs.yml. Run after changing any of them, in the dev container (needs Chromium):
-.venv/bin/python tools/social_card.py
+.venv/bin/python -m tools.social_card
 """
 import html
 import re
 from pathlib import Path
 
-import yaml
 from playwright.sync_api import sync_playwright
+
+from tools.site_config import site_config
 
 ROOT = Path(__file__).parent.parent
 OUT = ROOT / "docs/assets/social-card.png"
 
 
 def card_html() -> str:
-    config = yaml.safe_load((ROOT / "mkdocs.yml").read_text(encoding="utf-8"))
+    config = site_config()
     css = (ROOT / "docs/stylesheets/extra.css").read_text(encoding="utf-8")
     light = css.split("}", 1)[0]  # the first rule is the light scheme
     token = dict(re.findall(r"--([\w-]+):\s*(#\w+);", light))

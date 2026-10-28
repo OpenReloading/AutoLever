@@ -16,6 +16,7 @@ from playwright.sync_api import sync_playwright, expect
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 import main
+from tools.site_config import site_config
 
 # A wire with an unknown part or terminal fails with its number and end, not a bare KeyError.
 wiring_yaml=yaml.safe_load(Path(main.ROOT,'data/wiring.yaml').read_text(encoding='utf-8'))
@@ -57,7 +58,7 @@ with sync_playwright() as p:
     def ready():
         expect(page.locator('.ag-board-canvas')).to_have_attribute('data-ready','true')
     # Link preview meta on every page, with the card URL built from site_url; the card is a 1200 x 630 PNG that says nothing beyond the site title and description.
-    config=yaml.safe_load(Path(main.ROOT,'mkdocs.yml').read_text(encoding='utf-8'))
+    config=site_config()
     origin=urlparse(config['site_url'])
     card=f'{origin.scheme}://{origin.netloc}'+urlparse(BASE).path+'/assets/social-card.png'
     for path in ['','bom/','wiring/','tubing/','404.html']:
