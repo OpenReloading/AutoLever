@@ -98,6 +98,13 @@ with sync_playwright() as p:
         else:
             expect(warning).not_to_contain_text('Household electricity')
             expect(warning.locator('a')).to_have_attribute('href','../')
+        # The build step pages carry the step label of the numbered steps on the introduction above the title.
+        label=page.locator('main .step-label + h1')
+        if path in ('bom/','wiring/','tubing/'):
+            expect(label).to_have_count(1)
+            expect(page.locator('main .step-label')).to_have_text(f"Build step {1 if path=='bom/' else 3} of 4")
+        else:
+            expect(label).to_have_count(0)
     # The header title is not cut off on a phone; every page ends with the repository, Discord and licence links and previous and next links.
     phone=browser.new_page(viewport={'width':390,'height':844})
     pages=['','bom/','wiring/','tubing/','relay/']
@@ -272,8 +279,9 @@ with sync_playwright() as p:
     for path in ['', 'bom/', 'wiring/', 'tubing/', 'relay/']:
         go(path)
         assert page.evaluate('document.body.scrollWidth<=innerWidth'),path
-        # Phones: every control is at least 24 px; the canvas is as tall as its drawing, with Fullscreen above it in the first screen.
+        # Phones: every control is at least 24 px and every button 44 px; the canvas is as tall as its drawing, with Fullscreen above it in the first screen.
         assert page.evaluate("[...document.querySelectorAll('.ag-guide button, .ag-guide select, .ag-guide input')].every(e=>{const r=e.getBoundingClientRect();return !r.width||(r.width>=23.9&&r.height>=23.9)})"),path+': control under 24 px'
+        assert page.evaluate("[...document.querySelectorAll('.ag-guide button, .ag-guide select')].every(e=>{const r=e.getBoundingClientRect();return !r.width||r.height>=43.9})"),path+': button under 44 px'
         if path in ('wiring/','tubing/','relay/'):
             ready()
             canvas,drawing,fullscreen=page.evaluate("['.ag-board-canvas','.ag-board-canvas > div','[data-action=fullscreen]'].map(s=>{const r=document.querySelector(s).getBoundingClientRect();return {y:r.y,height:r.height}})")
@@ -328,6 +336,10 @@ with sync_playwright() as p:
         page.set_viewport_size({'width':width,'height':844})
         page.emulate_media(color_scheme=scheme)
         go('bom/' if width==390 else '')  # a nested page checks the relative base of the search files
+        if width==390:   # component text: the step label, the counter and the primary button
+            for selector in ['.step-label','.ag-progress','.ag-primary']:
+                ratio=page.evaluate(CONTRAST,[selector,None])
+                assert ratio>=4.5,(width,scheme,selector,ratio)
         toggle=page.locator('label.md-header__button[for=__search]')
         if width<500:
             expect(toggle).to_be_visible()
