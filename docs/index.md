@@ -43,9 +43,14 @@ Built by reloaders for reloaders, with AI as a tool.
 
 ## At the controls
 
-POWER on. The three buttons under the display: A starts and stops automatic cycling, B jogs while held, C shows the info screen. E-STOP cuts the power to the valves (the StamPLC stays on and shows the fault); twist to release. A supply fault clears itself when the power is back; after a jam or a sensor fault, press A.
+The three buttons under the display:
 
-Release JOG after any stop or trip. A held JOG never starts the press; release it and press it again.
+1. **POWER** on.
+2. **A** starts and stops automatic cycling
+3. **B** jogs while held
+4. **C** shows the info screen
+
+E-STOP cuts the power to the valves (the StamPLC stays on and shows the fault); twist to release. A supply fault clears itself when the power is back; after a jam or a sensor fault, press A. Release JOG after any stop or trip. A held JOG never starts the press; release it and press it again.
 
 Check the printed handle adapter for cracks before each session.
 
@@ -59,9 +64,24 @@ Check the printed handle adapter for cracks before each session.
 
 PETG or ASA. Handle adapter: 6 walls and 40% infill. Control box: 15–20% infill. The base and lid fit on a 256 mm bed. Print the E-STOP ring in yellow.
 
+!!! danger "Safety"
+
+    --8<-- "safety-short.md"
+
 ## Build it
 
 1. Print the parts and gather the components from the [BOM](bom.md).
 2. Mount the press, cylinder, valve and filter-regulator on a board. Clamp the handle adapter onto the press lever.
 3. Follow the [Wiring](wiring.md) and [Tubing](tubing.md) guides to connect everything.
 4. Flash the bench image (`pio run -e bench -t upload` in `firmware/`): it shows all eight inputs live and toggles the relays. Set the sensors with air disconnected: POWER on, move the rod by hand. Then flash the press firmware (`pio run -e stamplc -t upload`) and test with air at 2 bar using JOG before trying START.
+
+<div class="change-it" markdown>
+
+## Change it
+
+Edit `data/*.yaml`, run `.venv/bin/python main.py` and commit `data/buildguide.json`. Printable parts are in `cad/`.
+
+    .venv/bin/python main.py
+    .venv/bin/mkdocs serve
+
+</div>
