@@ -5,3 +5,4 @@ __pycache__/
 .coverage
 cad/stl/
 firmware/.pio/
+coverage.xml
