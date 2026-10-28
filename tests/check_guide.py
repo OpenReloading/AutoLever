@@ -276,25 +276,30 @@ with sync_playwright() as p:
     expect(page.locator('tbody a', has_text='MakerWorld')).to_have_count(sum('link' in row for row in bom))
     page.locator('[data-role=search]').fill('')
     page.set_viewport_size({'width':390,'height':844})
-    for path in ['', 'bom/', 'wiring/', 'tubing/', 'relay/']:
-        go(path)
-        assert page.evaluate('document.body.scrollWidth<=innerWidth'),path
-        # Phones: every control is at least 24 px and every button 44 px; the canvas is as tall as its drawing, with Fullscreen above it in the first screen.
-        assert page.evaluate("[...document.querySelectorAll('.ag-guide button, .ag-guide select, .ag-guide input')].every(e=>{const r=e.getBoundingClientRect();return !r.width||(r.width>=23.9&&r.height>=23.9)})"),path+': control under 24 px'
-        assert page.evaluate("[...document.querySelectorAll('.ag-guide button, .ag-guide select')].every(e=>{const r=e.getBoundingClientRect();return !r.width||r.height>=43.9})"),path+': button under 44 px'
-        if path in ('wiring/','tubing/','relay/'):
-            ready()
-            canvas,drawing,fullscreen=page.evaluate("['.ag-board-canvas','.ag-board-canvas > div','[data-action=fullscreen]'].map(s=>{const r=document.querySelector(s).getBoundingClientRect();return {y:r.y,height:r.height}})")
-            assert abs(canvas['height']-drawing['height'])<=2,f"{path}: canvas {canvas['height']} px, drawing {drawing['height']} px"
-            assert fullscreen['y']+fullscreen['height']<=844,path+': Fullscreen below the first screen'
-            assert fullscreen['y']+fullscreen['height']<=canvas['y'],path+': Fullscreen overlaps or follows the drawing'
-            # in fullscreen the zoom controls stay inside the screen
-            page.locator('[data-action=fullscreen]').click()
-            assert page.evaluate("document.querySelector('[data-action=zoom-in]').getBoundingClientRect().right<=innerWidth"),path+': zoom controls outside the fullscreen view'
-            page.locator('[data-action=fullscreen]').click()
-            expect(page.locator('.ag-guide')).not_to_have_class(re.compile('ag-expanded'))
-        if path=='bom/':   # every specification on screen, not hidden in a sideways scroller
-            assert page.evaluate("[...document.querySelectorAll('tbody tr:not(.ag-group) td:nth-child(3)')].every(td=>{const r=td.getBoundingClientRect();return r.width>0&&r.left>=0&&r.right<=innerWidth})"),'BOM specification off screen'
+    for scheme in ('light','dark'):
+        page.emulate_media(color_scheme=scheme)
+        for path in ['', 'bom/', 'wiring/', 'tubing/', 'relay/']:
+            go(path)
+            assert page.evaluate('document.body.scrollWidth<=innerWidth'),path
+            # Phones: every control is at least 24 px and every button 44 px high, the board controls 44 x 44 on a toolbar without a sideways scroll, in both schemes; the canvas is as tall as its drawing, with Fullscreen above it in the first screen.
+            assert page.evaluate("[...document.querySelectorAll('.ag-guide button, .ag-guide select, .ag-guide input')].every(e=>{const r=e.getBoundingClientRect();return !r.width||(r.width>=23.9&&r.height>=23.9)})"),path+': control under 24 px'
+            assert page.evaluate("[...document.querySelectorAll('.ag-guide button, .ag-guide select')].every(e=>{const r=e.getBoundingClientRect();return !r.width||r.height>=43.9})"),path+': button under 44 px'
+            if path in ('wiring/','tubing/','relay/'):
+                ready()
+                canvas,drawing,fullscreen=page.evaluate("['.ag-board-canvas','.ag-board-canvas > div','[data-action=fullscreen]'].map(s=>{const r=document.querySelector(s).getBoundingClientRect();return {y:r.y,height:r.height}})")
+                assert abs(canvas['height']-drawing['height'])<=2,f"{path}: canvas {canvas['height']} px, drawing {drawing['height']} px"
+                assert page.evaluate("[...document.querySelectorAll('.ag-board-controls button')].every(e=>{const r=e.getBoundingClientRect();return r.width>=43.9&&r.height>=43.9})"),path+': board control under 44 x 44 px'
+                assert page.evaluate("[...document.querySelectorAll('.ag-board-toolbar, .ag-board-controls')].every(e=>e.scrollWidth<=e.clientWidth&&e.getBoundingClientRect().right<=innerWidth)"),path+': board toolbar overflows'
+                assert fullscreen['y']+fullscreen['height']<=844,path+': Fullscreen below the first screen'
+                assert fullscreen['y']+fullscreen['height']<=canvas['y'],path+': Fullscreen overlaps or follows the drawing'
+                # in fullscreen the zoom controls stay inside the screen
+                page.locator('[data-action=fullscreen]').click()
+                assert page.evaluate("document.querySelector('[data-action=zoom-in]').getBoundingClientRect().right<=innerWidth"),path+': zoom controls outside the fullscreen view'
+                page.locator('[data-action=fullscreen]').click()
+                expect(page.locator('.ag-guide')).not_to_have_class(re.compile('ag-expanded'))
+            if path=='bom/':   # every specification on screen, not hidden in a sideways scroller
+                assert page.evaluate("[...document.querySelectorAll('tbody tr:not(.ag-group) td:nth-child(3)')].every(td=>{const r=td.getBoundingClientRect();return r.width>0&&r.left>=0&&r.right<=innerWidth})"),'BOM specification off screen'
+    page.emulate_media(color_scheme='null')
     # The next action stays on screen across step lengths and viewport changes.
     for width,height in [(1440,900),(1280,720),(390,844),(375,667),(844,390)]:
         page.set_viewport_size({'width':width,'height':height})

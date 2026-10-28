@@ -690,9 +690,13 @@ button:focus-visible {
     flex: 1 0 100%;
   }
 
-  /* 44 px touch targets for every button and the scope menu (the tick boxes stay at 24 px) */
+  /* 44 px touch targets for every button and the scope menu, the board controls 44 x 44 (the tick boxes stay at 24 px) */
   .ag-guide :is(.ag-primary, .ag-quiet, .ag-board-controls button, .ag-board-toolbar select, .ag-wire-row button) {
     min-height: 44px;
+  }
+
+  [data-md-color-scheme] .ag-guide .ag-board-controls button {
+    min-width: 44px;
   }
 }
 
