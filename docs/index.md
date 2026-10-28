@@ -81,6 +81,7 @@ PETG or ASA. Handle adapter: 6 walls and 40% infill. Control box: 15–20% infil
 
 Edit `data/*.yaml`, run `.venv/bin/python main.py` and commit `data/buildguide.json`. Printable parts are in `cad/`.
 
+    python -m venv .venv && .venv/bin/pip install -r requirements.txt
     .venv/bin/python main.py
     .venv/bin/mkdocs serve
 
