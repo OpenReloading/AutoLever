@@ -66,8 +66,8 @@
   --md-footer-bg-color: var(--header-bg);
   --md-footer-bg-color--dark: var(--header-bg);
   --md-footer-fg-color: var(--header-ink);
-  --md-footer-fg-color--light: var(--header-ink);
-  --md-footer-fg-color--lighter: var(--header-ink);
+  --md-footer-fg-color--light: var(--muted);
+  --md-footer-fg-color--lighter: var(--muted);
   --md-admonition-bg-color: var(--page);
 }
 
@@ -85,8 +85,54 @@ button:focus-visible {
   outline-color: var(--header-ink);
 }
 
+/* Header: a page-coloured bar, 8 px vertical padding on a phone and 20 px from 1280 px; Material's sidebars and anchor targets get the extra height */
 .md-header {
   border-bottom: 1px solid var(--line);
+}
+
+.md-header__inner {
+  padding-block: 8px;
+}
+
+.md-header__title {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+@media screen and (min-width: 1280px) {
+  .md-header__inner {
+    padding-block: 20px;
+  }
+
+  .md-sidebar {
+    top: calc(2.4rem + 41px);
+  }
+
+  .md-typeset :target {
+    --md-scroll-margin: calc(3.6rem + 40px);
+  }
+}
+
+/* The repository link is an outlined button; its ink text keeps full opacity on hover */
+.md-header__source .md-source {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  border: 1px solid var(--control-line);
+  border-radius: 8px;
+  color: var(--ink);
+}
+
+.md-header__source .md-source:hover {
+  opacity: 1;
+}
+
+.md-header__source .md-source__icon {
+  height: auto;
+}
+
+.md-header__source .md-source__icon svg {
+  margin-top: 0;
 }
 
 /* The logo file is white for the dark header; on the white light header it is drawn black */
@@ -167,15 +213,27 @@ button:focus-visible {
   --ag-surface-head: var(--surface-alt);
 }
 
-/* Material dims inactive tabs to 0.7; 0.85 keeps them apart from the active tab and above 4.5:1 */
-.md-tabs__link {
-  opacity: 0.85;
+/* Tabs: muted, ink on hover and when active, the active tab underlined in the accent; the link itself is the 44 px target */
+.md-tabs__item {
+  height: auto;
 }
 
-.md-tabs__link--active,
-.md-tabs__link:hover,
-.md-tabs__link:focus {
+.md-tabs__link {
+  align-items: center;
+  min-height: 44px;
+  margin-top: 0;
+  border-bottom: 2px solid transparent;
+  color: var(--muted);
   opacity: 1;
+}
+
+.md-tabs__link:is(:hover, :focus),
+.md-tabs__item--active .md-tabs__link {
+  color: var(--ink);
+}
+
+.md-tabs__item--active .md-tabs__link {
+  border-bottom-color: var(--accent);
 }
 
 /* Home page: lead paragraph, call to action and the three cards, the list after the button (docs/index.md) */
@@ -315,16 +373,27 @@ button:focus-visible {
   }
 }
 
-/* Footer links: underlined so they do not rely on colour, spaced and padded for touch; the "Previous" and "Next" labels keep full opacity for contrast */
+/* Footer: a line above, muted text; the links underlined so they do not rely on colour, 44 px high and 28 px apart; the "Previous" and "Next" links and labels keep full opacity for contrast, also on focus and hover */
+.md-footer {
+  border-top: 1px solid var(--line);
+}
+
+.md-copyright__highlight {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 28px;
+}
+
 .md-copyright a {
-  display: inline-block;
-  margin-right: 1rem;
-  padding: 0.3rem 0;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
   color: var(--md-footer-fg-color);
   text-decoration: underline;
 }
 
-.md-footer__direction {
+.md-footer__direction,
+.md-footer .md-footer__link:is(:focus, :hover) {
   opacity: 1;
 }
 
