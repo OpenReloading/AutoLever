@@ -1,5 +1,8 @@
 #include "logic.h"
 
+#include <cctype>
+#include <cstring>
+
 namespace autolever {
 
 const char* state_name(State s) {
@@ -99,6 +102,15 @@ Outputs Controller::step(const Inputs& in, uint32_t now_ms) {
         return {};
     }
     return {phase_ == Phase::Extend, phase_ == Phase::Retract};
+}
+
+bool same_origin(const char* source, const char* host) {
+    if (!*source) return true;
+    const char* sep = std::strstr(source, "://");
+    if (sep) source = sep + 3;
+    for (; *source && *source != '/'; ++source, ++host)
+        if (std::tolower((unsigned char)*source) != std::tolower((unsigned char)*host)) return false;
+    return !*host;
 }
 
 }  // namespace autolever
