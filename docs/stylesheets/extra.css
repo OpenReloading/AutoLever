@@ -240,7 +240,7 @@ button:focus-visible {
   border-bottom-color: var(--accent);
 }
 
-/* Home page (docs/index.md): the label above the title scopes these rules to it. Hero: amber label, title, safety panel, muted lead and two buttons. */
+/* Home page (docs/index.md): the paragraph with the primary button scopes these rules to it, so they hold when the pre-release label and status band are gone. Hero: amber label, title, safety panel, muted lead and two buttons. */
 .md-typeset .hero-label {
   display: inline-block;
   padding: 4px 12px;
@@ -253,14 +253,14 @@ button:focus-visible {
   font-weight: 700;
 }
 
-.md-typeset .hero-label + h1 {
+.md-content__inner > h1:has(~ p > .md-button--primary) {
   margin: 16px 0 24px;
   font-size: 34px;
   line-height: 1.1;
   letter-spacing: -0.02em;
 }
 
-.md-typeset .hero-label ~ .admonition.danger + p {
+.md-content__inner > .admonition.danger + p:has(~ p > .md-button--primary) {
   max-width: 620px;
   color: var(--muted);
   font-size: 21px;
@@ -273,7 +273,7 @@ button:focus-visible {
 }
 
 /* The buttons: stacked at full width and 48 px high on a phone, in a row and 52 px high from 720 px; the second one is outlined */
-.md-typeset .hero-label ~ p:has(> .md-button) {
+.md-content__inner > p:has(> .md-button--primary) {
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -315,7 +315,7 @@ button:focus-visible {
 }
 
 /* Fact strip, the list after the notes: two cells per row with 1 px dividers, the bold lead as the figure in monospace, the rest muted */
-.md-typeset .hero-label ~ ul:first-of-type {
+.md-content__inner > p:has(> .md-button--primary) ~ ul:first-of-type {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1px;
@@ -326,14 +326,14 @@ button:focus-visible {
   list-style: none;
 }
 
-.md-typeset .hero-label ~ ul:first-of-type > li {
+.md-content__inner > p:has(> .md-button--primary) ~ ul:first-of-type > li {
   margin: 0;
   padding: 16px;
   background-color: var(--page);
   color: var(--muted);
 }
 
-.md-typeset .hero-label ~ ul:first-of-type strong {
+.md-content__inner > p:has(> .md-button--primary) ~ ul:first-of-type strong {
   display: block;
   margin-bottom: 8px;
   color: var(--ink);
@@ -344,7 +344,7 @@ button:focus-visible {
 }
 
 @media screen and (min-width: 720px) {
-  .md-typeset .hero-label ~ p:has(> .md-button) {
+  .md-content__inner > p:has(> .md-button--primary) {
     flex-direction: row;
   }
 
@@ -352,14 +352,14 @@ button:focus-visible {
     min-height: 52px;
   }
 
-  .md-typeset .hero-label ~ ul:first-of-type strong {
+  .md-content__inner > p:has(> .md-button--primary) ~ ul:first-of-type strong {
     font-size: 34px;
   }
 }
 
 /* From 1280 px: the 60 px title, the status label beside its text and four facts in one row */
 @media screen and (min-width: 1280px) {
-  .md-typeset .hero-label + h1 {
+  .md-content__inner > h1:has(~ p > .md-button--primary) {
     font-size: 60px;
   }
 
@@ -373,11 +373,11 @@ button:focus-visible {
     flex: none;
   }
 
-  .md-typeset .hero-label ~ ul:first-of-type {
+  .md-content__inner > p:has(> .md-button--primary) ~ ul:first-of-type {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
-  .md-typeset .hero-label ~ ul:first-of-type > li {
+  .md-content__inner > p:has(> .md-button--primary) ~ ul:first-of-type > li {
     padding: 20px;
   }
 }
@@ -388,7 +388,7 @@ button:focus-visible {
     border-color: ButtonText;
   }
 
-  .md-typeset .hero-label ~ ul:first-of-type > li {
+  .md-content__inner > p:has(> .md-button--primary) ~ ul:first-of-type > li {
     outline: 1px solid CanvasText;
   }
 }
