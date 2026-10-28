@@ -21,6 +21,12 @@ struct Outputs {
 enum class State { Idle, Auto, Jog, Fault };
 enum class Fault { None, EStop, Pressure, Sensor, Jam };
 
+const char* state_name(State s);
+const char* fault_name(Fault f);   // empty for Fault::None
+
+// Settings page value in seconds to the jam timeout, kept between 2 and 120 s.
+inline uint32_t jam_ms_from_seconds(long s) { return (uint32_t)(s < 2 ? 2 : s > 120 ? 120 : s) * 1000u; }
+
 class Controller {
 public:
     // Longest time for one stroke (out or back); longer is a jam.

@@ -2,6 +2,25 @@
 
 namespace autolever {
 
+const char* state_name(State s) {
+    switch (s) {
+        case State::Idle: return "IDLE";
+        case State::Auto: return "AUTO";
+        case State::Jog: return "JOG";
+        default: return "FAULT";
+    }
+}
+
+const char* fault_name(Fault f) {
+    switch (f) {
+        case Fault::EStop: return "E-STOP";
+        case Fault::Pressure: return "PRESSURE";
+        case Fault::Sensor: return "SENSOR";
+        case Fault::Jam: return "JAM";
+        default: return "";
+    }
+}
+
 void Controller::enter_fault(Fault f) {
     state_ = State::Fault;
     fault_ = f;

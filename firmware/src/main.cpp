@@ -2,6 +2,7 @@
 #include <Preferences.h>
 
 #include "logic.h"
+#include "web.h"
 
 using namespace autolever;
 
@@ -19,38 +20,20 @@ static uint32_t shown_cycles = UINT32_MAX;
 static bool info_screen = false;
 static bool redraw = true;
 
-static const char* state_name(State s) {
-    switch (s) {
-        case State::Idle: return "IDLE";
-        case State::Auto: return "AUTO";
-        case State::Jog: return "JOG";
-        default: return "FAULT";
-    }
-}
-
-static const char* fault_name(Fault f) {
-    switch (f) {
-        case Fault::EStop: return "E-STOP";
-        case Fault::Pressure: return "PRESSURE";
-        case Fault::Sensor: return "SENSOR";
-        case Fault::Jam: return "JAM";
-        default: return "";
-    }
-}
-
 static void draw() {
     auto& d = M5StamPLC.Display();
     d.fillScreen(TFT_BLACK);
     d.setTextColor(TFT_WHITE);
-    d.setTextSize(2);
+    d.setTextSize(info_screen ? 1 : 2);
     d.setCursor(4, 4);
-    d.printf("%s", info_screen ? "INFO" : state_name(press.state()));
-    d.setCursor(4, 30);
-    if (info_screen) d.printf("Cycles %lu\nJam %lu s", (unsigned long)press.cycles(), (unsigned long)(press.jam_ms / 1000));
-    else d.printf("%s%s", fault_name(press.fault()), press.stopping() ? "STOPPING" : "");
-    if (!info_screen) {
-        d.setCursor(4, 56);
-        d.printf("Cycles %lu", (unsigned long)press.cycles());
+    if (info_screen) {
+        d.printf("INFO\nWi-Fi  %s\nPass   %s\nPhone  192.168.4.1\nHome   %s\nName   autolever.local\n"
+                 "Cycles %lu   Jam %lu s",
+                 web_ap_ssid().c_str(), web_ap_password().c_str(), web_ip().c_str(),
+                 (unsigned long)press.cycles(), (unsigned long)(press.jam_ms / 1000));
+    } else {
+        d.printf("%s\n%s%s\nCycles %lu", state_name(press.state()), fault_name(press.fault()),
+                 press.stopping() ? "STOPPING" : "", (unsigned long)press.cycles());
     }
     d.setTextSize(1);
     d.setCursor(4, 120);
@@ -63,10 +46,12 @@ void setup() {
     prefs.begin("autolever");
     press.set_cycles(prefs.getUInt("cycles", 0));
     press.jam_ms = prefs.getUInt("jam_ms", press.jam_ms);
+    web_begin(press, prefs);
 }
 
 void loop() {
     M5StamPLC.update();
+    web_loop(press.state() == State::Idle);
     if (M5StamPLC.BtnC().wasPressed()) {
         info_screen = !info_screen;
         redraw = true;
@@ -85,7 +70,7 @@ void loop() {
     if (M5StamPLC.readPlcRelay(RELAY_RETRACT) != out.retract) M5StamPLC.writePlcRelay(RELAY_RETRACT, out.retract);
 
     if (press.cycles() != shown_cycles) {
-        if (shown_cycles != UINT32_MAX) prefs.putUInt("cycles", press.cycles());
+        if (shown_cycles != UINT32_MAX) prefs.putUInt("cycles", press.cycles());   // also after a reset from the page
         shown_cycles = press.cycles();
         redraw = true;
     }
@@ -93,6 +78,11 @@ void loop() {
         if (press.state() == State::Fault) M5StamPLC.tone(2000, 200);
         shown_state = press.state();
         shown_fault = press.fault();
+        redraw = true;
+    }
+    static uint32_t last_info = 0;   // the home address arrives some seconds after power-up
+    if (info_screen && millis() - last_info > 2000) {
+        last_info = millis();
         redraw = true;
     }
     if (redraw) {

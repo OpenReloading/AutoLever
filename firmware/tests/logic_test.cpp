@@ -198,6 +198,8 @@ int main() {
         CHECK(r.out.retract && !r.out.extend);
     }
     for (uint32_t seed : {1u, 2u, 3u, 12345u}) random_run(seed, 800);
+    CHECK(jam_ms_from_seconds(0) == 2000 && jam_ms_from_seconds(-5) == 2000);
+    CHECK(jam_ms_from_seconds(15) == 15000 && jam_ms_from_seconds(500) == 120000);
     std::puts("ok");
     return 0;
 }
