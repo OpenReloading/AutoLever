@@ -15,23 +15,16 @@
    {
     "id": "rail",
     "group": "Mounting",
-    "qty": "1 set",
-    "part": "DIN rail + end stops",
-    "spec": "TS35 × 7.5 · cut to 211 mm, 12.5 mm from a slot centre · 2 end stops"
-   },
-   {
-    "id": "glands",
-    "group": "Mounting",
-    "qty": "5",
-    "part": "Cable glands M12 × 1.5",
-    "spec": "3 × clamping 3–6.5 mm (valve Y1, Y2 · QPM11) · 2 × clamping 2–5 mm (sensors B0, B1)"
+    "qty": "1",
+    "part": "DIN rail",
+    "spec": "TS35 × 7.5 · cut to 100 mm so that a slot centre is 12.5 mm from each end"
    },
    {
     "id": "hardware",
     "group": "Mounting",
     "qty": "1 set",
     "part": "Board and mounting hardware",
-    "spec": "Plywood board ≥ 15 mm · 13 × M3 heat-set inserts (4.2 mm hole, ≤ 6 mm long) · 3 × M3×6 pan-head screws with washers (rail) · 4 × M3×8 (lid) · 6 × M3×8 countersunk (console plate) · 4 × 4×16 countersunk wood screws for the box, only if you print the base with the wood-screw holes · wood screws for the press, cylinder pivot, valve and FRL bracket · cable ties"
+    "spec": "Plywood board ≥ 15 mm · 6 × M3 heat-set inserts (4.2 mm hole, ≤ 6 mm long) · 2 × M3×6 pan-head screws with washers (rail) · 4 × M3×8 (lid) · 4 × 4×16 countersunk wood screws for the box, only if you print the base with the wood-screw holes · wood screws for the press, cylinder pivot, valve and FRL bracket · cable ties"
    },
    {
     "id": "mechanism",
@@ -125,6 +118,13 @@
     "spec": "3/2-way hand valve with exhaust, 6 mm tube connections · between the filter-regulator and the tee"
    },
    {
+    "id": "plc",
+    "group": "Electrical",
+    "qty": "1",
+    "part": "M5Stack StamPLC (K141)",
+    "spec": "Controller with 4 relays (NC, COM, NO), 8 optically isolated inputs, display and 3 buttons · DIN rail clip · 24 V DC · programmed with PlatformIO over USB-C"
+   },
+   {
     "id": "psu",
     "group": "Electrical",
     "qty": "1",
@@ -146,32 +146,11 @@
     "spec": "5.5 × 2.1 mm, 8 mm thread (DC-099 type) · ≥ 2 A · 8 mm panel hole"
    },
    {
-    "id": "fuse",
+    "id": "inlinefuse",
     "group": "Electrical",
     "qty": "1",
-    "part": "Panel fuse holder F1 + fuse",
-    "spec": "5 × 20 mm · 12 mm thread, at most 28 mm behind the panel · fuse T 1 A (slow-blow) + spare"
-   },
-   {
-    "id": "relays",
-    "group": "Electrical",
-    "qty": "4",
-    "part": "HH52P-L / MY2NJ relays",
-    "spec": "24 V DC coil with LED · DPDT · K1–K4"
-   },
-   {
-    "id": "sockets",
-    "group": "Electrical",
-    "qty": "4",
-    "part": "PYF08A relay sockets",
-    "spec": "Compatible with fitted relays · DIN mounting"
-   },
-   {
-    "id": "timer",
-    "group": "Electrical",
-    "qty": "1 set",
-    "part": "DH48S-S timer + socket",
-    "spec": "Jam timer T1 · SPDT, reset on 1–3 · 24 V AC/DC · 8-pin socket · for another timer see the jam timer step on the wiring page"
+    "part": "Inline fuse holder FU1 + fuse",
+    "spec": "5 × 20 mm · fuse T 1 A (slow-blow) + spare · in the + lead from J1 to Q1"
    },
    {
     "id": "sensors",
@@ -183,9 +162,16 @@
    {
     "id": "diodes",
     "group": "Electrical",
-    "qty": "8",
+    "qty": "2",
     "part": "1N4007 diodes",
-    "spec": "D1–D4 relay suppression · D5/D6 timer feed · D7/D8 in the valve plugs"
+    "spec": "D7/D8 in the valve plugs"
+   },
+   {
+    "id": "resistors",
+    "group": "Electrical",
+    "qty": "2",
+    "part": "4.7 kΩ resistors",
+    "spec": "Only if a sensor input reads on with the sensor off, see the sensors step on the wiring page"
    },
    {
     "id": "stop",
@@ -193,13 +179,6 @@
     "qty": "1",
     "part": "22 mm emergency stop E-STOP",
     "spec": "Red mushroom, latching, twist release · closed contact (marked 11 and 12) · S3 · sits on the printed yellow ring"
-   },
-   {
-    "id": "buttons",
-    "group": "Controls",
-    "qty": "3",
-    "part": "22 mm momentary buttons",
-    "spec": "STOP S2 black, closed contact (marked 11 and 12) · START S0 green and JOG S1 white, open contact (marked 23 and 24) · 1NO+1NC sets fit all three"
    },
    {
     "id": "switch",
@@ -213,42 +192,35 @@
     "group": "Wiring",
     "qty": "3",
     "part": "Wago 221-415 lever connectors, 5-way",
-    "spec": "X-EN: control +24 V, live while POWER is on and E-STOP released · X-M1 and X-M2: Ground (0 V, minus)"
+    "spec": "X-24: +24 V after POWER · X-0V1 and X-0V2: Ground (0 V, minus), joined by one wire"
    },
    {
     "id": "wago3",
     "group": "Wiring",
-    "qty": "1",
-    "part": "Wago 221-413 lever connector, 3-way",
-    "spec": "X-D: joins diodes D5 and D6 and feeds timer T1"
-   },
-   {
-    "id": "wago2",
-    "group": "Wiring",
     "qty": "2",
-    "part": "Wago 221-412 lever connectors, 2-way",
-    "spec": "One per joint: D5 plain leg + wire 37, D6 plain leg + wire 38"
+    "part": "Wago 221-413 lever connectors, 3-way",
+    "spec": "X-S: after the E-STOP, feeds the pressure switch and StamPLC input 3 · X-V: valve rail after the pressure switch, feeds StamPLC input 4 and relay 1"
    },
    {
     "id": "controlwire",
     "group": "Wiring",
-    "qty": "10 m est.",
+    "qty": "5 m est.",
     "part": "Hook-up wire, red + black",
-    "spec": "Stranded, H05V-K · 0.5 mm² (AWG 20) · about 7 m red = +24 V, about 3 m black = Ground"
+    "spec": "Stranded, H05V-K · 0.5 mm² (AWG 20) · about 3 m red = +24 V, about 2 m black = Ground"
    },
    {
     "id": "valvecable",
     "group": "Wiring",
     "qty": "3 m est.",
     "part": "2-core cable, black sheath",
-    "spec": "3 runs out of the box (valve plugs Y1, Y2 and QPM11) · 2 × 0.5 mm² (AWG 20) · sheath to suit the M12 glands · the board shows red and black, on a valve cable mark the +24 V core red, on the QPM11 cable (switch in the +24 V feed, no polarity) mark both cores red"
+    "spec": "3 runs out of the box (valve plugs Y1, Y2 and QPM11) · 2 × 0.5 mm² (AWG 20) · all cables, sensors included, leave through the one oval exit, 30 × 14 mm · the board shows red and black, on a valve cable mark the +24 V core red, on the QPM11 cable (switch in the +24 V feed, no polarity) mark both cores red"
    },
    {
     "id": "terminations",
     "group": "Wiring",
     "qty": "1 set",
     "part": "Ferrules, receptacles and labels",
-    "spec": "50 ferrules 0.5 mm² · 12 twin ferrules 2 × 0.5 mm² · 5 insulated flat receptacles for the Q1 and F1 tabs · heat-shrink · wire labels"
+    "spec": "30 ferrules 0.5 mm² · 3 insulated flat receptacles for the Q1 tabs · heat-shrink · wire labels"
    },
    {
     "id": "adapter",
@@ -263,6 +235,76 @@
     "group": "3D printed",
     "qty": "1",
     "part": "Control box",
+    "spec": "3D printed in PETG or ASA, 15–20 % infill · base, lid, E-STOP ring (yellow) and USB-C plug · the front of the StamPLC sits flush in the lid, so display, buttons and terminals stay reachable · DIN rail, Wago rack, POWER rocker and DC jack in the box · one oval cable exit at the back · no mains inside"
+   },
+   {
+    "id": "glands",
+    "group": "Relay edition only (deprecated)",
+    "qty": "5",
+    "part": "Cable glands M12 × 1.5",
+    "spec": "3 × clamping 3–6.5 mm (valve Y1, Y2 · QPM11) · 2 × clamping 2–5 mm (sensors B0, B1)"
+   },
+   {
+    "id": "fuse",
+    "group": "Relay edition only (deprecated)",
+    "qty": "1",
+    "part": "Panel fuse holder F1 + fuse",
+    "spec": "5 × 20 mm · 12 mm thread, at most 28 mm behind the panel · fuse T 1 A (slow-blow) + spare"
+   },
+   {
+    "id": "relays",
+    "group": "Relay edition only (deprecated)",
+    "qty": "4",
+    "part": "HH52P-L / MY2NJ relays",
+    "spec": "24 V DC coil with LED · DPDT · K1–K4"
+   },
+   {
+    "id": "sockets",
+    "group": "Relay edition only (deprecated)",
+    "qty": "4",
+    "part": "PYF08A relay sockets",
+    "spec": "Compatible with fitted relays · DIN mounting"
+   },
+   {
+    "id": "timer",
+    "group": "Relay edition only (deprecated)",
+    "qty": "1 set",
+    "part": "DH48S-S timer + socket",
+    "spec": "Jam timer T1 · SPDT, reset on 1–3 · 24 V AC/DC · 8-pin socket · for another timer see the jam timer step on the relay edition page"
+   },
+   {
+    "id": "buttons",
+    "group": "Relay edition only (deprecated)",
+    "qty": "3",
+    "part": "22 mm momentary buttons",
+    "spec": "STOP S2 black, closed contact (marked 11 and 12) · START S0 green and JOG S1 white, open contact (marked 23 and 24) · 1NO+1NC sets fit all three"
+   },
+   {
+    "id": "wago2",
+    "group": "Relay edition only (deprecated)",
+    "qty": "2",
+    "part": "Wago 221-412 lever connectors, 2-way",
+    "spec": "One per joint: D5 plain leg + wire 37, D6 plain leg + wire 38"
+   },
+   {
+    "id": "relayrail",
+    "group": "Relay edition only (deprecated)",
+    "qty": "1",
+    "part": "DIN rail for the relay box",
+    "spec": "TS35 × 7.5 · cut to 211 mm, 12.5 mm from a slot centre · 2 end stops"
+   },
+   {
+    "id": "relayparts",
+    "group": "Relay edition only (deprecated)",
+    "qty": "1 set",
+    "part": "Relay box extras",
+    "spec": "6 × 1N4007 more (D1–D6; 8 in all with D7/D8) · 1 × Wago 221-413 (X-D) · 3 × M3×6 rail screws with washers and 13 × M3 heat-set inserts instead of the 2 and 6 above · 6 × M3×8 countersunk (console plate) · 12 twin ferrules, 50 ferrules, 5 receptacles instead of the set above · 10 m hook-up wire"
+   },
+   {
+    "id": "relaybox",
+    "group": "Relay edition only (deprecated)",
+    "qty": "1",
+    "part": "Relay control box",
     "spec": "3D printed in PETG or ASA, 15–20 % infill · relays, timer, buttons, a clip rack for the lever connectors and the 24 V entry in one box, no mains inside · buttons on a separate console plate, wired on the bench · cable entries at the back, or glands on the left · base, lid and plate fit a 256 mm bed · labels in a second colour · E-STOP ring in yellow",
     "image": "boxes/control_box.png"
    }
@@ -271,6 +313,813 @@
  "boards": {
   "wiring": {
    "title": "Wiring",
+   "label": "Wiring board",
+   "size": [
+    1360,
+    860
+   ],
+   "prefix": "plc",
+   "single": true,
+   "legend": [
+    "Red = +24 V, black = Ground, sensor wires keep their own colours",
+    {
+     "key": "diode",
+     "text": "Silver ring = cathode"
+    },
+    "Green = selected connection"
+   ],
+   "colors": {
+    "red": {
+     "line": "#dc2626",
+     "outline": "#7f1d1d",
+     "swatch": "#dc2626"
+    },
+    "blue": {
+     "line": "#2563eb",
+     "outline": "#1e3a8a",
+     "swatch": "#347bdc"
+    },
+    "brown": {
+     "line": "#92400e",
+     "outline": "#451a03",
+     "swatch": "#956238"
+    },
+    "black": {
+     "line": "#1f2937",
+     "outline": "#000000",
+     "swatch": "#273039"
+    },
+    "grey": {
+     "line": "#9ca3af",
+     "outline": "#4b5563",
+     "swatch": "#929ea9"
+    },
+    "DIODE": {
+     "line": "#d1d5db",
+     "outline": "#111827",
+     "swatch": "#29363a",
+     "diode": true
+    }
+   },
+   "kinds": {
+    "socket": {
+     "fill": "#1f2937",
+     "stroke": "#1f2937",
+     "inset": 17,
+     "diodeLoop": "around"
+    },
+    "box": {
+     "fill": "#f1f5f9",
+     "stroke": "#17202a",
+     "offset": {
+      "bottom": -16
+     }
+    },
+    "diode": {
+     "fill": "#111827",
+     "stroke": "#111827",
+     "band": true
+    },
+    "wago": {
+     "fill": "#f1f5f9",
+     "stroke": "#64748b"
+    },
+    "plug": {
+     "fill": "#1f2937",
+     "stroke": "#1f2937"
+    },
+    "sensor": {
+     "fill": "#e8f5ec",
+     "stroke": "#15803d",
+     "pins": {
+      "BN": "#92400e",
+      "BU": "#2563eb",
+      "BK": "#111827"
+     }
+    },
+    "button": {
+     "round": true,
+     "stroke": "#9ca3af"
+    }
+   },
+   "areas": {
+    "box": {
+     "title": "Control box",
+     "at": [
+      20,
+      270
+     ],
+     "size": [
+      1320,
+      580
+     ],
+     "color": "#334155"
+    },
+    "air": {
+     "title": "Air row",
+     "at": [
+      330,
+      10
+     ],
+     "size": [
+      600,
+      230
+     ],
+     "color": "#0f766e"
+    },
+    "machine": {
+     "title": "Cylinder",
+     "at": [
+      950,
+      10
+     ],
+     "size": [
+      390,
+      230
+     ],
+     "color": "#475569"
+    }
+   },
+   "props": [
+    {
+     "name": "24 V power supply plugs into J1 (outside)",
+     "at": [
+      40,
+      200
+     ],
+     "size": [
+      250,
+      30
+     ]
+    },
+    {
+     "name": "5/3 valve",
+     "at": [
+      475,
+      125
+     ],
+     "size": [
+      140,
+      50
+     ]
+    },
+    {
+     "name": "cylinder → press lever",
+     "at": [
+      975,
+      45
+     ],
+     "size": [
+      340,
+      40
+     ]
+    }
+   ],
+   "parts": {
+    "J1": {
+     "name": "J1 · 24 V in",
+     "kind": "box",
+     "at": [
+      45,
+      330
+     ],
+     "size": [
+      80,
+      100
+     ],
+     "ports": {
+      "bottom": [
+       "+",
+       "-"
+      ]
+     }
+    },
+    "FU1": {
+     "name": "FU1 · fuse",
+     "kind": "box",
+     "at": [
+      150,
+      330
+     ],
+     "size": [
+      70,
+      100
+     ],
+     "ports": {
+      "bottom": [
+       "1",
+       "2"
+      ]
+     }
+    },
+    "Q1": {
+     "name": "",
+     "sub": "POWER",
+     "kind": "button",
+     "color": "#3b82f6",
+     "at": [
+      150,
+      520
+     ],
+     "size": [
+      68,
+      48
+     ],
+     "ports": {
+      "top": [
+       "IN",
+       "OUT",
+       "GND"
+      ]
+     }
+    },
+    "S3": {
+     "name": "",
+     "sub": "E-STOP",
+     "kind": "button",
+     "color": "#dc2626",
+     "at": [
+      60,
+      720
+     ],
+     "size": [
+      48,
+      48
+     ],
+     "ports": {
+      "top": [
+       "1",
+       "2"
+      ]
+     }
+    },
+    "X-24": {
+     "name": "",
+     "sub": "X-24 · +24 V",
+     "kind": "wago",
+     "at": [
+      330,
+      330
+     ],
+     "size": [
+      122,
+      30
+     ],
+     "ports": {
+      "top": [
+       "1",
+       "2",
+       "3",
+       "4",
+       "5"
+      ]
+     }
+    },
+    "X-0V1": {
+     "name": "",
+     "sub": "X-0V1 · Ground",
+     "kind": "wago",
+     "at": [
+      480,
+      330
+     ],
+     "size": [
+      122,
+      30
+     ],
+     "ports": {
+      "top": [
+       "1",
+       "2",
+       "3",
+       "4",
+       "5"
+      ]
+     }
+    },
+    "X-0V2": {
+     "name": "",
+     "sub": "X-0V2 · Ground",
+     "kind": "wago",
+     "at": [
+      630,
+      330
+     ],
+     "size": [
+      122,
+      30
+     ],
+     "ports": {
+      "top": [
+       "1",
+       "2",
+       "3",
+       "4",
+       "5"
+      ]
+     }
+    },
+    "X-S": {
+     "name": "",
+     "sub": "X-S · E-STOP",
+     "kind": "wago",
+     "at": [
+      800,
+      330
+     ],
+     "size": [
+      78,
+      30
+     ],
+     "ports": {
+      "top": [
+       "1",
+       "2",
+       "3"
+      ]
+     }
+    },
+    "X-V": {
+     "name": "",
+     "sub": "X-V · valves",
+     "kind": "wago",
+     "at": [
+      900,
+      330
+     ],
+     "size": [
+      78,
+      30
+     ],
+     "ports": {
+      "top": [
+       "1",
+       "2",
+       "3"
+      ]
+     }
+    },
+    "PLC": {
+     "name": "StamPLC",
+     "sub": "front face, as printed",
+     "kind": "box",
+     "at": [
+      330,
+      520
+     ],
+     "size": [
+      700,
+      120
+     ],
+     "ports": {
+      "top": [
+       "+",
+       "-",
+       "C",
+       "1",
+       "2",
+       "3",
+       "4",
+       "5",
+       "6",
+       "7",
+       "8"
+      ],
+      "bottom": [
+       "1NC",
+       "1C",
+       "1NO",
+       "2NC",
+       "2C",
+       "2NO",
+       "3NC",
+       "3C",
+       "3NO",
+       "4NC",
+       "4C",
+       "4NO"
+      ]
+     }
+    },
+    "QPM11": {
+     "name": "QPM11 pressure switch",
+     "kind": "box",
+     "at": [
+      770,
+      95
+     ],
+     "size": [
+      140,
+      90
+     ],
+     "ports": {
+      "bottom": [
+       "1",
+       "2"
+      ]
+     }
+    },
+    "Y1": {
+     "name": "Y1 · extend",
+     "kind": "plug",
+     "at": [
+      1150,
+      400
+     ],
+     "size": [
+      140,
+      70
+     ],
+     "ports": {
+      "left": [
+       "1",
+       "2"
+      ]
+     }
+    },
+    "Y2": {
+     "name": "Y2 · retract",
+     "kind": "plug",
+     "at": [
+      1150,
+      540
+     ],
+     "size": [
+      140,
+      70
+     ],
+     "ports": {
+      "left": [
+       "1",
+       "2"
+      ]
+     }
+    },
+    "B0": {
+     "name": "B0 · home sensor",
+     "kind": "sensor",
+     "at": [
+      1000,
+      150
+     ],
+     "size": [
+      72,
+      34
+     ],
+     "ports": {
+      "bottom": [
+       "BN",
+       "BU",
+       "BK"
+      ]
+     }
+    },
+    "B1": {
+     "name": "B1 · front sensor",
+     "kind": "sensor",
+     "at": [
+      1220,
+      150
+     ],
+     "size": [
+      72,
+      34
+     ],
+     "ports": {
+      "bottom": [
+       "BN",
+       "BU",
+       "BK"
+      ]
+     }
+    }
+   },
+   "steps": [
+    {
+     "id": "A",
+     "title": "Connect power in and Ground",
+     "note": "Mount the rail, the StamPLC and the Wago connectors, then connect power in and Ground. Connectors: DC jack J1: + red, − black; inline fuse holder FU1: lead 1 red, lead 2 red; power button Q1: IN red, GND black. Press an M3 heat-set insert into each of the two rail pads in the base (soldering iron, straight down, flush with the pad) and screw the rail on from above with an M3×6 pan-head screw and a washer. Clip the StamPLC on the rail, front towards the lid. Clip the Wagos into the rack on the front wall, wire entries up, levers towards the unit, left to right: X-24, X-0V1, X-0V2, X-S, X-V. Put a ferrule on every wire end that goes under a screw. Pass each cable that leaves the box through the oval exit before you strip it. Unplug the supply and disconnect the air. J1: wire 1 on the centre-pin lug (+); with three lugs, wire 3 on the one that stays connected to the sleeve with the plug in (meter). Solder lugs: solder and heat-shrink. FU1 sits in the lead from J1 to Q1; the fuse goes in last. Wire 5 joins the two Ground Wagos. Every slot of a Wago is connected to all the others: use one wire per slot. Check with a meter: the centre pin of the plug is +24 V.",
+     "connections": [
+      {
+       "no": "1",
+       "a": "J1:+",
+       "b": "FU1:1",
+       "color": "red",
+       "la": "DC jack J1 + (+24 V, centre pin)",
+       "lb": "Inline fuse holder FU1 lead 1",
+       "cable": "Stranded wire, red or black",
+       "size": "0.5 mm² · AWG 20"
+      },
+      {
+       "no": "2",
+       "a": "FU1:2",
+       "b": "Q1:IN",
+       "color": "red",
+       "la": "Inline fuse holder FU1 lead 2",
+       "lb": "Power button Q1 IN",
+       "cable": "Stranded wire, red or black",
+       "size": "0.5 mm² · AWG 20"
+      },
+      {
+       "no": "3",
+       "a": "J1:-",
+       "b": "X-0V1:1",
+       "color": "black",
+       "la": "DC jack J1 − (Ground)",
+       "lb": "Wago X-0V1 (Ground) slot 1",
+       "cable": "Stranded wire, red or black",
+       "size": "0.5 mm² · AWG 20"
+      },
+      {
+       "no": "4",
+       "a": "Q1:GND",
+       "b": "X-0V1:2",
+       "color": "black",
+       "la": "Power button Q1 GND",
+       "lb": "Wago X-0V1 (Ground) slot 2",
+       "cable": "Stranded wire, red or black",
+       "size": "0.5 mm² · AWG 20"
+      },
+      {
+       "no": "5",
+       "a": "X-0V1:5",
+       "b": "X-0V2:1",
+       "color": "black",
+       "la": "Wago X-0V1 (Ground) slot 5",
+       "lb": "Wago X-0V2 (Ground) slot 1",
+       "cable": "Stranded wire, red or black",
+       "size": "0.5 mm² · AWG 20"
+      }
+     ]
+    },
+    {
+     "id": "B",
+     "title": "Connect the StamPLC",
+     "note": "Connect the power button Q1 to the +24 V Wago X-24, then the StamPLC to X-24 and to Ground. Connectors: power button Q1: OUT red; StamPLC: + red, − black, C black. Q1 is the lit POWER rocker. IN and OUT are the two connectors that connect when it is switched on, GND is the third (wire 6 on GND shorts the supply). Flat tabs: insulated receptacles. Wire 4 gives the Q1 lamp its Ground. Terminal C of the StamPLC is the common of all eight inputs: it goes to Ground (wire 9), which suits PNP sensors. Check: POWER off, the Q1 lamp stays dark (lit: swap wires 2 and 6). Then insert the fuse, POWER on: the StamPLC starts and shows its screen. POWER off.",
+     "connections": [
+      {
+       "no": "6",
+       "a": "Q1:OUT",
+       "b": "X-24:1",
+       "color": "red",
+       "la": "Power button Q1 OUT",
+       "lb": "Wago X-24 (+24 V after POWER) slot 1",
+       "cable": "Stranded wire, red or black",
+       "size": "0.5 mm² · AWG 20"
+      },
+      {
+       "no": "7",
+       "a": "X-24:2",
+       "b": "PLC:+",
+       "color": "red",
+       "la": "Wago X-24 (+24 V after POWER) slot 2",
+       "lb": "StamPLC + (+24 V in)",
+       "cable": "Stranded wire, red or black",
+       "size": "0.5 mm² · AWG 20"
+      },
+      {
+       "no": "8",
+       "a": "PLC:-",
+       "b": "X-0V1:3",
+       "color": "black",
+       "la": "StamPLC − (Ground)",
+       "lb": "Wago X-0V1 (Ground) slot 3",
+       "cable": "Stranded wire, red or black",
+       "size": "0.5 mm² · AWG 20"
+      },
+      {
+       "no": "9",
+       "a": "PLC:C",
+       "b": "X-0V2:5",
+       "color": "black",
+       "la": "StamPLC C (input common, Ground)",
+       "lb": "Wago X-0V2 (Ground) slot 5",
+       "cable": "Stranded wire, red or black",
+       "size": "0.5 mm² · AWG 20"
+      }
+     ]
+    },
+    {
+     "id": "C",
+     "title": "Connect E-STOP and the pressure switch",
+     "note": "Connect X-24 through the E-STOP and the pressure switch to the valve rail, and report both rails to the StamPLC. Connectors: E-STOP button: terminal 1 red, terminal 2 red; pressure switch QPM11: terminal 1 red, terminal 2 red; StamPLC: input 3 red, input 4 red. The valve rail X-V is live only while POWER is on, E-STOP is released and the air pressure is below the trip. E-STOP uses its closed contact: terminals 1 and 2, marked 11 and 12 on the contact block. Pressure switch QPM11: both cores of its cable are on the +24 V side (red) and it has no polarity; with no air, a meter must beep across its two terminals (closed contact type). The StamPLC inputs 3 and 4 only read the two rails: input 3 on shows E-STOP released, input 4 on shows the pressure is fine. An input accepts either polarity, it only needs the voltage between the input and C. E-STOP and the pressure switch cut only the valve rail: the StamPLC stays powered and shows the fault. Check: POWER on, air off: inputs 3 and 4 on; press E-STOP: both off.",
+     "connections": [
+      {
+       "no": "10",
+       "a": "X-24:5",
+       "b": "S3:1",
+       "color": "red",
+       "la": "Wago X-24 (+24 V after POWER) slot 5",
+       "lb": "E-STOP button terminal 1 (closed contact, marked 11)",
+       "cable": "Stranded wire, red or black",
+       "size": "0.5 mm² · AWG 20"
+      },
+      {
+       "no": "11",
+       "a": "S3:2",
+       "b": "X-S:1",
+       "color": "red",
+       "la": "E-STOP button terminal 2 (closed contact, marked 12)",
+       "lb": "Wago X-S (rail after the E-STOP) slot 1",
+       "cable": "Stranded wire, red or black",
+       "size": "0.5 mm² · AWG 20"
+      },
+      {
+       "no": "12",
+       "a": "X-S:2",
+       "b": "QPM11:1",
+       "color": "red",
+       "la": "Wago X-S (rail after the E-STOP) slot 2",
+       "lb": "Pressure switch QPM11 terminal 1",
+       "cable": "2-core cable, black sheath",
+       "size": "0.5 mm² · AWG 20"
+      },
+      {
+       "no": "13",
+       "a": "QPM11:2",
+       "b": "X-V:1",
+       "color": "red",
+       "la": "Pressure switch QPM11 terminal 2",
+       "lb": "Wago X-V (valve rail) slot 1",
+       "cable": "2-core cable, black sheath",
+       "size": "0.5 mm² · AWG 20"
+      },
+      {
+       "no": "14",
+       "a": "X-S:3",
+       "b": "PLC:3",
+       "color": "red",
+       "la": "Wago X-S (rail after the E-STOP) slot 3",
+       "lb": "StamPLC input 3 (valve rail after the E-STOP)",
+       "cable": "Stranded wire, red or black",
+       "size": "0.5 mm² · AWG 20"
+      },
+      {
+       "no": "15",
+       "a": "X-V:2",
+       "b": "PLC:4",
+       "color": "red",
+       "la": "Wago X-V (valve rail) slot 2",
+       "lb": "StamPLC input 4 (valve rail after the pressure switch)",
+       "cable": "Stranded wire, red or black",
+       "size": "0.5 mm² · AWG 20"
+      }
+     ]
+    },
+    {
+     "id": "D",
+     "title": "Connect the end sensors",
+     "note": "Connect the two end sensors. Connectors: StamPLC: input 1 black, input 2 black. Keep each sensor's own wire colours: brown wire = +24 V from X-24, blue wire = Ground, black wire = signal. These are PNP sensors: check the label SMT-8M-A-PS-… (PS = PNP). B0 reports home on input 1, B1 reports front on input 2. The signal wire drives the StamPLC input directly. If an input reads on with its sensor off (leakage current of the sensor), add a 4.7 kΩ resistor from that input to C. Position: B0 so input 1 is on with the rod fully home, B1 so input 2 is on 2–3 mm before the press bottoms.",
+     "connections": [
+      {
+       "no": "16",
+       "a": "B0:BN",
+       "b": "X-24:3",
+       "color": "brown",
+       "la": "Brown wire (+24 V) of the home sensor B0",
+       "lb": "Wago X-24 (+24 V after POWER) slot 3",
+       "cable": "The sensor's own cable",
+       "size": "as supplied"
+      },
+      {
+       "no": "17",
+       "a": "B0:BU",
+       "b": "X-0V1:4",
+       "color": "blue",
+       "la": "Blue wire (Ground) of the home sensor B0",
+       "lb": "Wago X-0V1 (Ground) slot 4",
+       "cable": "The sensor's own cable",
+       "size": "as supplied"
+      },
+      {
+       "no": "18",
+       "a": "B0:BK",
+       "b": "PLC:1",
+       "color": "black",
+       "la": "Black wire (signal) of the home sensor B0",
+       "lb": "StamPLC input 1 (home sensor B0)",
+       "cable": "The sensor's own cable",
+       "size": "as supplied"
+      },
+      {
+       "no": "19",
+       "a": "B1:BN",
+       "b": "X-24:4",
+       "color": "brown",
+       "la": "Brown wire (+24 V) of the front sensor B1",
+       "lb": "Wago X-24 (+24 V after POWER) slot 4",
+       "cable": "The sensor's own cable",
+       "size": "as supplied"
+      },
+      {
+       "no": "20",
+       "a": "B1:BU",
+       "b": "X-0V2:2",
+       "color": "blue",
+       "la": "Blue wire (Ground) of the front sensor B1",
+       "lb": "Wago X-0V2 (Ground) slot 2",
+       "cable": "The sensor's own cable",
+       "size": "as supplied"
+      },
+      {
+       "no": "21",
+       "a": "B1:BK",
+       "b": "PLC:2",
+       "color": "black",
+       "la": "Black wire (signal) of the front sensor B1",
+       "lb": "StamPLC input 2 (front sensor B1)",
+       "cable": "The sensor's own cable",
+       "size": "as supplied"
+      }
+     ]
+    },
+    {
+     "id": "E",
+     "title": "Connect the valve coils",
+     "note": "Connect the two valve coils through their plugs and relays 1 and 2 of the StamPLC. Connectors: valve plug Y1: pin 1 red, pin 2 black; valve plug Y2: pin 1 red, pin 2 black; StamPLC: relay 1 NC red, relay 1 COM red, relay 1 NO red, relay 2 COM red, relay 2 NO red. Y1 extends; Y2 retracts. Pin 1 is +24 V (red): mark that core at both ends of each valve cable. Relay terminals are NC, COM and NO: follow the labels on the unit, they are not in the order of this drawing. Relay 1 COM comes from the valve rail X-V, relay 1 NC feeds relay 2 COM, so relay 1 and 2 can never switch the two coils on together. Inside each plug, fit D7/D8 with the cores: ring on pin 1 (+), plain leg on pin 2; reversed, they short the supply. Leave them out only if the plug's datasheet shows built-in suppression (an LED alone is not enough). The plugs fit either coil: with air on, press the red manual button next to each coil; the coil that drives the rod out gets plug Y1. Check without air, meter on the plug pins, with the bench program (firmware/bench) toggling the relays: both off, neither plug is live; relay 1 on, only Y1 is live; relay 2 on, only Y2 is live; both on, only Y1 is live.",
+     "connections": [
+      {
+       "no": "22",
+       "a": "X-V:3",
+       "b": "PLC:1C",
+       "color": "red",
+       "la": "Wago X-V (valve rail) slot 3",
+       "lb": "StamPLC relay 1 COM (common)",
+       "cable": "Stranded wire, red or black",
+       "size": "0.5 mm² · AWG 20"
+      },
+      {
+       "no": "23",
+       "a": "PLC:1NC",
+       "b": "PLC:2C",
+       "color": "red",
+       "la": "StamPLC relay 1 NC (closed at rest)",
+       "lb": "StamPLC relay 2 COM (common)",
+       "cable": "Stranded wire, red or black",
+       "size": "0.5 mm² · AWG 20"
+      },
+      {
+       "no": "24",
+       "a": "PLC:1NO",
+       "b": "Y1:1",
+       "color": "red",
+       "la": "StamPLC relay 1 NO (closed when the relay is on)",
+       "lb": "Valve plug Y1 pin 1 (+24 V)",
+       "cable": "2-core cable, black sheath",
+       "size": "0.5 mm² · AWG 20"
+      },
+      {
+       "no": "25",
+       "a": "PLC:2NO",
+       "b": "Y2:1",
+       "color": "red",
+       "la": "StamPLC relay 2 NO (closed when the relay is on)",
+       "lb": "Valve plug Y2 pin 1 (+24 V)",
+       "cable": "2-core cable, black sheath",
+       "size": "0.5 mm² · AWG 20"
+      },
+      {
+       "no": "26",
+       "a": "Y1:2",
+       "b": "X-0V2:3",
+       "color": "black",
+       "la": "Valve plug Y1 pin 2 (Ground)",
+       "lb": "Wago X-0V2 (Ground) slot 3",
+       "cable": "2-core cable, black sheath",
+       "size": "0.5 mm² · AWG 20"
+      },
+      {
+       "no": "27",
+       "a": "Y2:2",
+       "b": "X-0V2:4",
+       "color": "black",
+       "la": "Valve plug Y2 pin 2 (Ground)",
+       "lb": "Wago X-0V2 (Ground) slot 4",
+       "cable": "2-core cable, black sheath",
+       "size": "0.5 mm² · AWG 20"
+      },
+      {
+       "no": "D7",
+       "a": "Y1:1",
+       "b": "Y1:2",
+       "color": "DIODE",
+       "la": "Valve plug Y1 pin 1 (+24 V)",
+       "lb": "Valve plug Y1 pin 2 (Ground)"
+      },
+      {
+       "no": "D8",
+       "a": "Y2:1",
+       "b": "Y2:2",
+       "color": "DIODE",
+       "la": "Valve plug Y2 pin 1 (+24 V)",
+       "lb": "Valve plug Y2 pin 2 (Ground)"
+      }
+     ]
+    }
+   ]
+  },
+  "relay": {
+   "title": "Wiring (relay edition)",
    "label": "Wiring board",
    "size": [
     1360,

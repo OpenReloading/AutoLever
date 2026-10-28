@@ -228,6 +228,10 @@ button:focus-visible {
   --board-ratio: 1360 / 860;
 }
 
+.ag-guide[data-board="relay"] {
+  --board-ratio: 1360 / 860;
+}
+
 .ag-guide[data-board="tubing"] {
   --board-ratio: 1100 / 530;
 }
