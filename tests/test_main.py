@@ -56,6 +56,16 @@ def test_a_wire_with_an_unknown_end_names_its_number_and_end(wire, message):
     ("S0:3", "START button terminal 3 (open contact, marked 23)"),
     ("S1:4", "JOG button terminal 4 (open contact, marked 24)"),
     ("QPM11:1", "Pressure switch QPM11 terminal 1"),
+    ("PLC:+", "StamPLC + (+24 V in)"),
+    ("PLC:-", "StamPLC \u2212 (Ground)"),
+    ("PLC:C", "StamPLC C (input common, Ground)"),
+    ("PLC:3", "StamPLC input 3 (rail after the E-STOP (X-S))"),
+    ("PLC:8", "StamPLC input 8"),
+    ("PLC:1NC", "StamPLC relay 1 NC (closed at rest)"),
+    ("PLC:2C", "StamPLC relay 2 COM (common)"),
+    ("PLC:2NO", "StamPLC relay 2 NO (closed when the relay is on)"),
+    ("FU1:2", "Inline fuse holder FU1 lead 2"),
+    ("X-24:2", "Wago X-24 (+24 V after POWER) slot 2"),
     ("UNKNOWN:1", "UNKNOWN terminal 1"),
 ])
 def test_label_names_the_terminal_in_words(end, text):
@@ -120,7 +130,7 @@ def edit(path, change):
 
 def test_the_committed_guide_data_builds_and_matches_the_file():
     built = main.build()
-    assert sorted(built["boards"]) == ["tubing", "wiring"]
+    assert sorted(built["boards"]) == ["relay", "tubing", "wiring"]
     assert all(step["connections"] for board in built["boards"].values() for step in board["steps"])
     assert json.loads(main.OUT.read_text(encoding="utf-8")) == built
 
@@ -142,27 +152,31 @@ def test_a_twin_ferrule_split_over_two_steps_fails_the_build(data):
         for s in doc["steps"]:
             if wire in s["wires"] and s is not doc["steps"][-1]:
                 s["wires"].remove(wire)
-    edit(data / "wiring.yaml", move)
+    edit(data / "relay.yaml", move)
     with pytest.raises(AssertionError, match="one twin ferrule"):
         main.build()
 
 
-def test_the_wires_of_the_box_are_red_and_black_and_a_sensor_keeps_its_own_colours():
-    steps = main.build()["boards"]["wiring"]["steps"]
+@pytest.mark.parametrize(("board", "red", "black", "sensor"), [
+    ("wiring", ("1", "2", "6", "10", "22"), ("3", "4", "9", "26"), ("16", "17", "18")),
+    ("relay", ("1", "2", "3", "10", "16"), ("4", "15", "40"), ("18", "30", "29")),
+])
+def test_the_wires_of_the_box_are_red_and_black_and_a_sensor_keeps_its_own_colours(board, red, black, sensor):
+    steps = main.build()["boards"][board]["steps"]
     colour = {c["no"]: c["color"] for s in steps for c in s["connections"]}
-    assert {colour[n] for n in ("1", "2", "3", "10", "16")} == {"red"}
-    assert {colour[n] for n in ("4", "15", "40")} == {"black"}
-    assert (colour["18"], colour["30"], colour["29"]) == ("brown", "blue", "black")
+    assert {colour[n] for n in red} == {"red"}
+    assert {colour[n] for n in black} == {"black"}
+    assert tuple(colour[n] for n in sensor) == ("brown", "blue", "black")
 
 
-def test_wiring_notes_must_match_the_wiring_steps(data):
-    edit(data / "guide.yaml", lambda doc: doc["wiring_notes"].popitem())
-    with pytest.raises(AssertionError, match="wiring_notes and wiring steps differ"):
+@pytest.mark.parametrize("notes", ["wiring_notes", "relay_notes"])
+def test_notes_must_match_the_steps_of_their_board(data, notes):
+    edit(data / "guide.yaml", lambda doc: doc[notes].popitem())
+    with pytest.raises(AssertionError, match="notes and steps differ"):
         main.build()
 
 
-
-@pytest.mark.parametrize("board", ["wiring", "tubing"])
+@pytest.mark.parametrize("board", ["wiring", "relay", "tubing"])
 def test_board_canvas_ratio_in_the_stylesheet_is_the_board_size(board):
     width, height = json.loads((main.ROOT / "data/buildguide.json").read_text(encoding="utf-8"))["boards"][board]["size"]
     css = (main.ROOT / "docs/stylesheets/extra.css").read_text(encoding="utf-8")

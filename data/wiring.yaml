@@ -1,63 +1,55 @@
-# Every wire of the pneumatic press control (24 V DC only, no mains in the box; automatic: START runs,
-# STOP ends, JOG is hold-to-run, E-STOP cuts the power). Single source of truth:
+# Every wire of the pneumatic press control, StamPLC edition (24 V DC only, no mains in the box; the StamPLC runs
+# the press: START/STOP and JOG are its front buttons, E-STOP cuts the valve supply). Single source of truth:
 # the wiring page (interactive board + wire lists) and the build checks read this file.
+# The relay edition (deprecated prototype) is in relay.yaml.
 #
 # parts: at = [x, y] on the board picture, size = [w, h], ports = terminals per side
 #        (left/right/top/bottom, in drawing order). The picture is not to scale.
+#        PLC ports: "+", "-", "C" and the inputs "1" to "8" on the top edge (as printed on the unit), the relays
+#        "1NC", "1C", "1NO" to "4NO" on the bottom edge (C = common).
 # steps: one build step each (the step notes are in guide.yaml); wire = [number, "PART:terminal", "PART:terminal", colour]
 #        colours: red (+24 V, also the switched +24 V), black (Ground, 0 V) for the wires of the box, brown, blue and
-#        black for a sensor's own wires, grey = diode leg, DIODE = a 1N4007 across two terminals (ring end first;
+#        black for a sensor's own wires, DIODE = a 1N4007 across two terminals (ring end first;
 #        not counted as a wire under the screw)
 #        Wire numbers and ends are what the saved ticks of a builder are keyed on: never renumber or swap an end.
 
 # cable types. Every wire gets one in main.py: sensor (B0/B1 own cable), valve (to Y1/Y2),
-# field (to QPM11, out through its gland), leg (diode leg), core (everything inside the box)
+# field (to QPM11), core (everything inside the box)
 cables:
   core:   {name: "Stranded wire, red or black", size: "0.5 mm²", awg: "AWG 20"}
   field:  {name: "2-core cable, black sheath", size: "0.5 mm²", awg: "AWG 20"}
   valve:  {name: "2-core cable, black sheath", size: "0.5 mm²", awg: "AWG 20"}
   sensor: {name: "The sensor's own cable", size: "as supplied", awg: ""}
   diode:  {name: "Diode 1N4007, no wire", size: "", awg: ""}
-  leg:    {name: "Diode leg", size: "", awg: ""}
 
-# areas: a dashed frame with its title; frame: false = title only, marking a zone inside the box.
-# One box, gland wall at the top (back or left wall, as printed: the board doesn't name it). glands = [x, label]:
-# gaps in that wall, in the real order, each under its field part (fences keep every cable in its own gland).
+# areas: a dashed frame with its title. One box; every cable that leaves it uses the one oval exit.
 areas:
-  box:     {title: "Control box", at: [20, 270], size: [1320, 580], color: "#334155",
-            glands: [[405, Y1], [685, Y2], [840, P], [1036, B0], [1256, B1]]}
+  box:     {title: "Control box", at: [20, 270], size: [1320, 580], color: "#334155"}
   air:     {title: "Air row", at: [330, 10], size: [600, 230], color: "#0f766e"}
   machine: {title: "Cylinder", at: [950, 10], size: [390, 230], color: "#475569"}
 
-socket: &socket {left: ["13", "9", "5", "1"], right: ["14", "12", "8", "4"]}
-button: &button {top: ["1", "2"]}      # E-STOP, STOP: the closed contact (marked 11, 12 on the block)
-nobutton: &nobutton {top: ["3", "4"]}  # START, JOG: the open contact (marked 23, 24 on the block)
+button: &button {top: ["1", "2"]}      # E-STOP: the closed contact (marked 11, 12 on the block)
 wago5: &wago5 {top: ["1", "2", "3", "4", "5"]}
+wago3: &wago3 {top: ["1", "2", "3"]}
 sensor: &sensor {bottom: ["BN", "BU", "BK"]}
-plug: &plug {bottom: ["1", "2"]}
+plug: &plug {left: ["1", "2"]}
 
 parts:
-  J1: {name: "J1 · 24 V in", kind: box, at: [45, 380], size: [80, 100], ports: {bottom: ["+", "-"]}}
-  F1: {name: "F1 · fuse", kind: box, at: [140, 380], size: [70, 100], ports: {bottom: ["1", "2"]}}
-  K1: {name: "Relay K1", sub: AUTO, kind: socket, at: [385, 460], size: [62, 160], ports: *socket}
-  K2: {name: "Relay K2", sub: AT FRONT, kind: socket, at: [497, 460], size: [62, 160], ports: *socket}
-  K3: {name: "Relay K3", sub: RETRACT, kind: socket, at: [609, 460], size: [62, 160], ports: *socket}
-  K4: {name: "Relay K4", sub: AT HOME, kind: socket, at: [721, 460], size: [62, 160], ports: *socket}
-  T1: {name: "Timer T1", sub: jam timer, kind: socket, at: [833, 460], size: [92, 160], ports: {left: ["1", "2", "3", "4"], right: ["8", "7", "6", "5"]}}
-  D5: {name: "", sub: "D5 · ring →", kind: diode, at: [1120, 330], size: [60, 22], ports: {left: ["A"], right: ["K"]}}
-  D6: {name: "", sub: "D6 · ring →", kind: diode, at: [1120, 376], size: [60, 22], ports: {left: ["A"], right: ["K"]}}
-  X-EN: {name: "", sub: "X-EN · +24 V while on", kind: wago, at: [390, 330], size: [122, 30], ports: *wago5}
-  X-M1: {name: "", sub: "X-M1 · Ground", kind: wago, at: [540, 330], size: [122, 30], ports: *wago5}
-  X-M2: {name: "", sub: "X-M2 · Ground", kind: wago, at: [690, 330], size: [122, 30], ports: *wago5}
-  X-D:  {name: "", sub: "X-D · to timer", kind: wago, at: [960, 330], size: [78, 30], ports: {top: ["1", "2", "3"]}}
+  J1: {name: "J1 · 24 V in", kind: box, at: [45, 330], size: [80, 100], ports: {bottom: ["+", "-"]}}
+  FU1: {name: "FU1 · fuse", kind: box, at: [150, 330], size: [70, 100], ports: {bottom: ["1", "2"]}}
+  Q1: {name: "", sub: POWER, kind: button, color: "#3b82f6", at: [150, 520], size: [68, 48], ports: {top: ["IN", "OUT", "GND"]}}
+  S3: {name: "", sub: E-STOP, kind: button, color: "#dc2626", at: [60, 720], size: [48, 48], ports: *button}
+  X-24:  {name: "", sub: "X-24 · +24 V", kind: wago, at: [330, 330], size: [122, 30], ports: *wago5}
+  X-0V1: {name: "", sub: "X-0V1 · Ground", kind: wago, at: [480, 330], size: [122, 30], ports: *wago5}
+  X-0V2: {name: "", sub: "X-0V2 · Ground", kind: wago, at: [630, 330], size: [122, 30], ports: *wago5}
+  X-S:   {name: "", sub: "X-S · E-STOP", kind: wago, at: [800, 330], size: [78, 30], ports: *wago3}
+  X-V:   {name: "", sub: "X-V · valves", kind: wago, at: [900, 330], size: [78, 30], ports: *wago3}
+  PLC: {name: "StamPLC", sub: "front face, as printed", kind: box, at: [330, 520], size: [700, 120],
+        ports: {top: ["+", "-", "C", "1", "2", "3", "4", "5", "6", "7", "8"],
+                bottom: ["1NC", "1C", "1NO", "2NC", "2C", "2NO", "3NC", "3C", "3NO", "4NC", "4C", "4NO"]}}
   QPM11: {name: "QPM11 pressure switch", kind: box, at: [770, 95], size: [140, 90], ports: {bottom: ["1", "2"]}}
-  S3: {name: "", sub: E-STOP, kind: button, color: "#dc2626", at: [40, 770], size: [48, 48], ports: *button}
-  S2: {name: "", sub: STOP, kind: button, color: "#111827", at: [110, 770], size: [48, 48], ports: *button}
-  S0: {name: "", sub: START, kind: button, color: "#16a34a", at: [180, 770], size: [48, 48], ports: *nobutton}
-  S1: {name: "", sub: JOG, kind: button, color: "#f8fafc", at: [250, 770], size: [48, 48], ports: *nobutton}
-  Q1: {name: "", sub: POWER, kind: button, color: "#3b82f6", at: [320, 770], size: [68, 48], ports: {top: ["IN", "OUT", "GND"]}}
-  Y1: {name: "Y1 · extend coil", kind: plug, at: [350, 115], size: [110, 70], ports: *plug}
-  Y2: {name: "Y2 · retract coil", kind: plug, at: [630, 115], size: [110, 70], ports: *plug}
+  Y1: {name: "Y1 · extend", kind: plug, at: [1150, 400], size: [140, 70], ports: *plug}
+  Y2: {name: "Y2 · retract", kind: plug, at: [1150, 540], size: [140, 70], ports: *plug}
   B0: {name: "B0 · home sensor", kind: sensor, at: [1000, 150], size: [72, 34], ports: *sensor}
   B1: {name: "B1 · front sensor", kind: sensor, at: [1220, 150], size: [72, 34], ports: *sensor}
 
@@ -69,78 +61,46 @@ props:
 
 steps:
   - id: A
-    title: "Rail, relays and diodes"
-    wires:
-      - ["D1", "K1:14", "K1:13", DIODE]
-      - ["D2", "K2:14", "K2:13", DIODE]
-      - ["D3", "K3:14", "K3:13", DIODE]
-      - ["D4", "K4:14", "K4:13", DIODE]
-  - id: B
     title: "Connect power in and Ground"
     wires:
-      - ["1", "J1:+", "F1:1", red]
-      - ["4", "J1:-", "X-M1:1", black]
-      - ["5", "X-M1:2", "X-M2:1", black]
-      - ["6", "X-M1:3", "K1:13", black]
-      - ["7a", "K1:13", "K2:13", black]
-      - ["7b", "K2:13", "K3:13", black]
-      - ["7c", "K3:13", "K4:13", black]
+      - ["1", "J1:+", "FU1:1", red]
+      - ["2", "FU1:2", "Q1:IN", red]
+      - ["3", "J1:-", "X-0V1:1", black]
+      - ["4", "Q1:GND", "X-0V1:2", black]
+      - ["5", "X-0V1:5", "X-0V2:1", black]
+  - id: B
+    title: "Connect the StamPLC"
+    wires:
+      - ["6", "Q1:OUT", "X-24:1", red]
+      - ["7", "X-24:2", "PLC:+", red]
+      - ["8", "PLC:-", "X-0V1:3", black]
+      - ["9", "PLC:C", "X-0V2:5", black]
   - id: C
-    title: "Connect the relays to each other"
+    title: "Connect E-STOP and the pressure switch"
     wires:
-      - ["16", "X-EN:2", "K1:12", red]
-      - ["25", "K3:4", "K2:9", red]
-      - ["26", "K2:8", "K3:5", red]
-      - ["27", "K3:5", "K4:9", red]
-      - ["28", "K4:1", "K3:14", red]
+      - ["10", "X-24:5", "S3:1", red]
+      - ["11", "S3:2", "X-S:1", red]
+      - ["12", "X-S:2", "QPM11:1", red]
+      - ["13", "QPM11:2", "X-V:1", red]
+      - ["14", "X-S:3", "PLC:3", red]
+      - ["15", "X-V:2", "PLC:4", red]
   - id: D
-    title: "Connect the power button and E-STOP"
+    title: "Connect the end sensors"
     wires:
-      - ["2", "F1:2", "Q1:IN", red]
-      - ["3", "Q1:OUT", "S3:1", red]
-      - ["15", "Q1:GND", "X-M2:2", black]
+      - ["16", "B0:BN", "X-24:3", brown]
+      - ["17", "B0:BU", "X-0V1:4", blue]
+      - ["18", "B0:BK", "PLC:1", black]
+      - ["19", "B1:BN", "X-24:4", brown]
+      - ["20", "B1:BU", "X-0V2:2", blue]
+      - ["21", "B1:BK", "PLC:2", black]
   - id: E
-    title: "Connect STOP, START and JOG"
-    wires:
-      - ["10", "T1:5", "S2:1", red]
-      - ["11", "S2:2", "K1:9", red]
-      - ["12", "K1:9", "S0:3", red]
-      - ["20", "S0:3", "S1:3", red]
-      - ["13", "S0:4", "K1:5", red]
-      - ["14", "K1:5", "K1:14", red]
-      - ["21", "S1:4", "K3:9", red]
-      - ["23", "K3:9", "K2:12", red]
-      - ["22", "K1:8", "S1:4", red]
-      - ["24", "K1:8", "K3:12", red]
-  - id: F
     title: "Connect the valve coils"
     wires:
-      - ["33", "K2:1", "Y1:1", red]
-      - ["37", "K2:1", "D5:A", red]
-      - ["34", "Y1:2", "X-M2:3", black]
+      - ["22", "X-V:3", "PLC:1C", red]
+      - ["23", "PLC:1NC", "PLC:2C", red]
+      - ["24", "PLC:1NO", "Y1:1", red]
+      - ["25", "PLC:2NO", "Y2:1", red]
+      - ["26", "Y1:2", "X-0V2:3", black]
+      - ["27", "Y2:2", "X-0V2:4", black]
       - ["D7", "Y1:1", "Y1:2", DIODE]
-      - ["35", "K3:8", "Y2:1", red]
-      - ["38", "K3:8", "D6:A", red]
-      - ["36", "Y2:2", "X-M2:4", black]
       - ["D8", "Y2:1", "Y2:2", DIODE]
-  - id: G
-    title: "Connect the jam timer"
-    wires:
-      - ["37b", "D5:K", "X-D:1", grey]
-      - ["38b", "D6:K", "X-D:2", grey]
-      - ["39", "X-D:3", "T1:7", red]
-      - ["17", "X-EN:3", "T1:8", red]
-      - ["40", "T1:2", "X-M2:5", black]
-      - ["41", "K4:12", "T1:1", red]
-      - ["42", "K4:8", "T1:3", red]
-  - id: H
-    title: "Connect the pressure switch and the end sensors"
-    wires:
-      - ["8", "S3:2", "QPM11:1", red]
-      - ["9", "QPM11:2", "X-EN:1", red]
-      - ["18", "B1:BN", "X-EN:4", brown]
-      - ["19", "B0:BN", "X-EN:5", brown]
-      - ["29", "B1:BK", "K2:14", black]
-      - ["30", "B1:BU", "X-M1:4", blue]
-      - ["31", "B0:BK", "K4:14", black]
-      - ["32", "B0:BU", "X-M1:5", blue]

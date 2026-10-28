@@ -4,11 +4,11 @@
 
 [![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.gg/hUCSjDYNaa)
 
-An air cylinder works the lever of your Lee APP reloading press for sizing and decapping. START cycles it until STOP, and JOG cycles it only while you hold the button.
+An air cylinder works the lever of your Lee APP reloading press for sizing and decapping. START cycles it until you press START again, and JOG cycles it only while you hold the button.
 
 **Pre-release, October 2026.** Nothing has been built yet, the printed parts are not on MakerWorld yet, details will change.
 
-For Lee APP owners (Classic or Deluxe) with compressed air at 7 to 10 bar and a 3D printer. Four relays, a timer and two sensors run the sequence, so nothing needs programming or flashing.
+For Lee APP owners (Classic or Deluxe) with compressed air at 7 to 10 bar and a 3D printer. A StamPLC controller and two sensors run the sequence; flash its firmware once over USB-C.
 
 **Safety.** Use at your own risk. Moving parts can cause serious injury: before reaching in, unplug the power supply and release the air pressure. The box runs on 24 V DC from an enclosed external adapter, with no mains inside. E-STOP is not a safety-rated emergency stop. This is a DIY design whose safety has not been independently verified. Leave wiring to a qualified electrician, have the build checked before use and do not use it for priming.
 

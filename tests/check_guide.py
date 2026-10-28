@@ -19,7 +19,7 @@ import main
 from tools.site_config import site_config
 
 # A wire with an unknown part or terminal fails with its number and end, not a bare KeyError.
-wiring_yaml=yaml.safe_load(Path(main.ROOT,'data/wiring.yaml').read_text(encoding='utf-8'))
+wiring_yaml=yaml.safe_load(Path(main.ROOT,'data/relay.yaml').read_text(encoding='utf-8'))
 for end,message in [('K9:1','wire 6, to end K9:1: unknown part K9'),('K1:99','wire 6, to end K1:99: part K1 has no terminal 99')]:
     broken=yaml.safe_load(yaml.safe_dump(wiring_yaml))
     wire=next(w for s in broken['steps'] for w in s['wires'] if w[0]=='6')
@@ -61,7 +61,7 @@ with sync_playwright() as p:
     config=site_config()
     origin=urlparse(config['site_url'])
     card=f'{origin.scheme}://{origin.netloc}'+urlparse(BASE).path+'/assets/social-card.png'
-    for path in ['','bom/','wiring/','tubing/','404.html']:
+    for path in ['','bom/','wiring/','tubing/','relay/','404.html']:
         tags=dict(re.findall(r'<meta (?:property|name)="((?:og|twitter):[\w:]+)" content="([^"]*)"',context.request.get(BASE+'/'+path).text()))
         assert tags['og:image']==tags['twitter:image']==card,path
         assert tags['og:description']==tags['twitter:description']==config['site_description'],path
@@ -83,9 +83,9 @@ with sync_playwright() as p:
     expect(page.locator('main h2')).to_have_text(re.findall(r'^## (.+)$',index,re.M))
     expect(page.locator('.md-content__inner > p').first).to_contain_text('Lee APP')
     expect(page.locator('.ag-guide')).to_have_count(0)
-    expect(page.locator('.md-tabs__link')).to_have_text(['Introduction','BOM','Wiring','Tubing'])
+    expect(page.locator('.md-tabs__link')).to_have_text(['Introduction','BOM','Wiring','Tubing','Relay edition (deprecated prototype)'])
     # The safety admonition sits under the title on every page, without exact figures: full text on the introduction and BOM, short with a link on wiring and tubing.
-    for path,full in [('',True),('bom/',True),('wiring/',False),('tubing/',False)]:
+    for path,full in [('',True),('bom/',True),('wiring/',False),('tubing/',False),('relay/',False)]:
         go(path)
         warning=page.locator('main h1 + .admonition.danger')
         expect(warning).to_have_count(1)
@@ -100,8 +100,8 @@ with sync_playwright() as p:
             expect(warning.locator('a')).to_have_attribute('href','../')
     # The header title is not cut off on a phone; every page ends with the repository, Discord and licence links and previous and next links.
     phone=browser.new_page(viewport={'width':390,'height':844})
-    pages=['','bom/','wiring/','tubing/']
-    names=['Introduction','BOM','Wiring','Tubing']
+    pages=['','bom/','wiring/','tubing/','relay/']
+    names=['Introduction','BOM','Wiring','Tubing','Relay edition (deprecated prototype)']
     for i,path in enumerate(pages):
         phone.goto(BASE+'/'+path,wait_until='domcontentloaded')
         title=phone.locator('.md-header__title .md-ellipsis').first
@@ -143,6 +143,15 @@ with sync_playwright() as p:
             expect(page.locator('.ag-connection-detail')).to_contain_text(wire['lb'])
             expect(page.locator('[data-connection]')).to_have_count(len(step['connections']))
             expect(page.locator('[data-connection="'+wire['no']+'"]')).to_have_attribute('aria-label',wire['no']+': '+wire['la']+' to '+wire['lb']+('; ring at '+wire['la'] if wire['color']=='DIODE' else ''))
+    # The relay edition is marked as a deprecated prototype and keeps its own board, with the first and last wire of each step matching the source.
+    go('relay/')
+    expect(page.locator('main .admonition.warning')).to_contain_text('Deprecated prototype')
+    expect(page.locator('main h1')).to_have_text('Wiring (relay edition)')
+    for step in data['boards']['relay']['steps']:
+        for wire in (step['connections'][0],step['connections'][-1]):
+            go(f"relay/#relay={step['id']}/{wire['no']}");ready()  # noqa: E702
+            expect(page.locator('.ag-connection-detail')).to_contain_text(wire['la'])
+            expect(page.locator('.ag-connection-detail')).to_contain_text(wire['lb'])
     # Each wiring step shows its own note, and the note changes with the step.
     assert all(s['note'] for s in wiring)
     for step in wiring:
@@ -169,7 +178,7 @@ with sync_playwright() as p:
     expect(page.locator('.ag-verify input')).not_to_be_checked()
     # A tick belongs to one exact connection: a tick for wire 16 with other ends stays unchecked, the real key is checked.
     step16,c16=next((st,c) for st in wiring for c in st['connections'] if c['no']=='16')
-    for key,done in [(f"wire-16:{c16['a']}:X",False),(f"wire-16:{c16['a']}:{c16['b']}",True)]:
+    for key,done in [(f"plc-16:{c16['a']}:X",False),(f"plc-16:{c16['a']}:{c16['b']}",True)]:
         page.evaluate("key=>localStorage.setItem('autolever-guide',JSON.stringify({[key]:true}))",key)
         go(f"wiring/#wiring={step16['id']}/16");page.reload(wait_until='domcontentloaded');ready()   # same URL: goto alone keeps the old state  # noqa: E702
         (expect(page.locator('.ag-verify input')).to_be_checked if done else expect(page.locator('.ag-verify input')).not_to_be_checked)()
@@ -231,7 +240,7 @@ with sync_playwright() as p:
     page.reload(wait_until='domcontentloaded')
     expect(page.locator('tbody input[type=checkbox]').first).to_be_checked()
     expect(page.locator('.ag-progress')).to_have_text(f"1 / {len(bom)} checked")
-    page.locator('[data-role=search]').fill('Wago')
+    page.locator('[data-role=search]').fill('lever connectors')
     page.locator('tbody input[type=checkbox]').first.check()
     expect(page.locator('.ag-progress')).to_have_text(f"2 / {len(bom)} checked")
     page.locator('[data-role=search]').fill('')
@@ -240,15 +249,15 @@ with sync_playwright() as p:
     expect(page.locator('.ag-progress')).to_have_text(f"3 / {len(bom)} checked")
     expect(page.locator('tbody tr:not(.ag-group)').nth(2).locator('input[type=checkbox]')).to_be_checked()
     assert all('status' not in row for row in bom)
-    page.locator('[data-role=search]').fill('Wago')
-    expect(page.locator('tbody tr:not(.ag-group)')).to_have_count(3)
+    page.locator('[data-role=search]').fill('lever connectors')   # the three Wago rows and the relay box
+    expect(page.locator('tbody tr:not(.ag-group)')).to_have_count(4)
     with page.expect_download() as download:
         page.locator('[data-action=export]').click()
     with tempfile.TemporaryDirectory() as temp:
         target=Path(temp)/'bom.csv';download.value.save_as(target)  # noqa: E702
         rows=list(csv.DictReader(io.StringIO(target.read_text(encoding='utf-8-sig'))))
         assert list(rows[0])==['Group','Component','Specification','Quantity','MakerWorld']
-        assert [r['Quantity'] for r in rows]==['3','1','2']
+        assert [r['Quantity'] for r in rows]==['3','2','2','1']
         assert download.value.suggested_filename=='autolever-bom.csv'
     page.locator('[data-role=search]').fill('does-not-exist')
     expect(page.locator('.ag-empty')).to_be_visible()
@@ -256,16 +265,16 @@ with sync_playwright() as p:
     expect(page.locator('tbody tr:not(.ag-group)')).to_have_count(len(bom))
     # Printed parts are grouped, marked as 3D printed and link to MakerWorld.
     page.locator('[data-role=search]').fill('3D printed')
-    expect(page.locator('tr.ag-group')).to_have_text(['3D printed'])
+    expect(page.locator('tr.ag-group')).to_have_text(['3D printed','Relay edition only (deprecated)'])
     expect(page.locator('tbody a', has_text='MakerWorld')).to_have_count(sum('link' in row for row in bom))
     page.locator('[data-role=search]').fill('')
     page.set_viewport_size({'width':390,'height':844})
-    for path in ['', 'bom/', 'wiring/', 'tubing/']:
+    for path in ['', 'bom/', 'wiring/', 'tubing/', 'relay/']:
         go(path)
         assert page.evaluate('document.body.scrollWidth<=innerWidth'),path
         # Phones: every control is at least 24 px; the canvas is as tall as its drawing, with Fullscreen above it in the first screen.
         assert page.evaluate("[...document.querySelectorAll('.ag-guide button, .ag-guide select, .ag-guide input')].every(e=>{const r=e.getBoundingClientRect();return !r.width||(r.width>=23.9&&r.height>=23.9)})"),path+': control under 24 px'
-        if path in ('wiring/','tubing/'):
+        if path in ('wiring/','tubing/','relay/'):
             ready()
             canvas,drawing,fullscreen=page.evaluate("['.ag-board-canvas','.ag-board-canvas > div','[data-action=fullscreen]'].map(s=>{const r=document.querySelector(s).getBoundingClientRect();return {y:r.y,height:r.height}})")
             assert abs(canvas['height']-drawing['height'])<=2,f"{path}: canvas {canvas['height']} px, drawing {drawing['height']} px"
@@ -281,7 +290,7 @@ with sync_playwright() as p:
     # The next action stays on screen across step lengths and viewport changes.
     for width,height in [(1440,900),(1280,720),(390,844),(375,667),(844,390)]:
         page.set_viewport_size({'width':width,'height':height})
-        for slug in ['wiring','tubing']:
+        for slug in ['wiring','tubing','relay']:
             go(slug+'/');ready()  # noqa: E702
             steps=page.locator('.ag-steps button')
             for index in range(steps.count()):
@@ -301,7 +310,7 @@ with sync_playwright() as p:
     # Print on A4 (718 px between 10 mm margins), also from the dark scheme: the boards fit the width BuildGuide prints them at (700 px), the controls and counters are hidden and the text is dark on white paper.
     page.set_viewport_size({'width':718,'height':1123})
     page.emulate_media(media='print',color_scheme='dark')
-    for slug in ['bom','wiring','tubing']:
+    for slug in ['bom','wiring','tubing','relay']:
         go(slug+'/')
         if slug!='bom':
             ready()
@@ -356,4 +365,4 @@ with sync_playwright() as p:
     assert 'This guide needs JavaScript.' in fallback.content()
     browser.close()
     wires=[w for s in wiring for w in s['connections']]
-    print(f"PASS: four Markdown pages with BuildGuide components; {len(wires)} connections ({sum(w['color']=='DIODE' for w in wires)} diodes), {len(tubing)} tubing steps, grouped BOM with 3D printed parts, safety admonition on every page (full on introduction and BOM, short with link on wiring and tubing); matching layouts, zoom, fullscreen, scrolling, persistence, CSV and mobile; link preview meta and card on every page; self-hosted search at 390 and 1440 px in light and dark; no JS errors, missing assets or third-party requests.")
+    print(f"PASS: five Markdown pages with BuildGuide components; {len(wires)} connections ({sum(w['color']=='DIODE' for w in wires)} diodes), {len(tubing)} tubing steps, grouped BOM with 3D printed parts, safety admonition on every page (full on introduction and BOM, short with link on wiring and tubing); matching layouts, zoom, fullscreen, scrolling, persistence, CSV and mobile; link preview meta and card on every page; self-hosted search at 390 and 1440 px in light and dark; no JS errors, missing assets or third-party requests.")

@@ -1,8 +1,59 @@
-# Guide content: wiring notes, tubing steps and BOM. Wire endpoints live in wiring.yaml. The introduction is docs/index.md, the safety text snippets/.
+# Guide content: wiring notes, tubing steps and BOM. Wire endpoints live in wiring.yaml and relay.yaml. The introduction is docs/index.md, the safety text snippets/.
 # makerworld: the model address of a printed part. Leave it empty until the model is published: the BOM then shows no link, and main.py lists the unset ones.
 wiring_notes:
   # one entry per wiring step id: do = the instruction, text = the details. main.py adds the connector line of each part
   # and the twin ferrule sentence from wiring.yaml between the two.
+  A:
+    do: Mount the rail, the StamPLC and the Wago connectors, then connect power in and Ground.
+    text: >-
+      Press an M3 heat-set insert into each of the two rail pads in the base (soldering iron, straight down, flush with the
+      pad) and screw the rail on from above with an M3×6 pan-head screw and a washer. Clip the StamPLC on the rail, front
+      towards the lid. Clip the Wagos into the rack on the front wall, wire entries up, levers towards the unit, left to
+      right: X-24, X-0V1, X-0V2, X-S, X-V. Put a ferrule on every wire end that goes under a screw. Pass each cable that
+      leaves the box through the oval exit before you strip it. Unplug the supply and disconnect the air. J1: wire 1 on the
+      centre-pin lug (+); with three lugs, wire 3 on the one that stays connected to the sleeve with the plug in (meter).
+      Solder lugs: solder and heat-shrink. FU1 sits in the lead from J1 to Q1; the fuse goes in last. Wire 5 joins the two
+      Ground Wagos. Every slot of a Wago is connected to all the others: use one wire per slot. Check with a meter: the
+      centre pin of the plug is +24 V.
+  B:
+    do: Connect the power button Q1 to the +24 V Wago X-24, then the StamPLC to X-24 and to Ground.
+    text: >-
+      Q1 is the lit POWER rocker. IN and OUT are the two connectors that connect when it is switched on, GND is the third
+      (wire 6 on GND shorts the supply). Flat tabs: insulated receptacles. Wire 4 gives the Q1 lamp its Ground. Terminal C
+      of the StamPLC is the common of all eight inputs: it goes to Ground (wire 9), which suits PNP sensors. Check: POWER
+      off, the Q1 lamp stays dark (lit: swap wires 2 and 6). Then insert the fuse, POWER on: the StamPLC starts and shows
+      its screen. POWER off.
+  C:
+    do: Connect X-24 through the E-STOP and the pressure switch to the valve rail, and report both rails to the StamPLC.
+    text: >-
+      The valve rail X-V is live only while POWER is on, E-STOP is released and the air pressure is below the trip. E-STOP
+      uses its closed contact: terminals 1 and 2, marked 11 and 12 on the contact block. Pressure switch QPM11: both cores
+      of its cable are on the +24 V side (red) and it has no polarity; with no air, a meter must beep across its two
+      terminals (closed contact type). The StamPLC inputs 3 and 4 only read the two rails: input 3 on shows E-STOP
+      released, input 4 on shows the pressure is fine. An input accepts either polarity, it only needs the voltage between
+      the input and C. E-STOP and the pressure switch cut only the valve rail: the StamPLC stays powered and shows the fault. Check: POWER
+      on, air off: inputs 3 and 4 on; press E-STOP: both off.
+  D:
+    do: Connect the two end sensors.
+    text: >-
+      Keep each sensor's own wire colours: brown wire = +24 V from X-24, blue wire = Ground, black wire = signal. These are
+      PNP sensors: check the label SMT-8M-A-PS-… (PS = PNP). B0 reports home on input 1, B1 reports front on input 2. The
+      signal wire drives the StamPLC input directly. If an input reads on with its sensor off (leakage current of the
+      sensor), add a 4.7 kΩ resistor from that input to C. Position: B0 so input 1 is on with the rod fully home, B1 so
+      input 2 is on 2–3 mm before the press bottoms.
+  E:
+    do: Connect the two valve coils through their plugs and relays 1 and 2 of the StamPLC.
+    text: >-
+      Y1 extends; Y2 retracts. Pin 1 is +24 V (red): mark that core at both ends of each valve cable. Relay terminals are
+      NC, COM and NO: follow the labels on the unit, they are not in the order of this drawing. Relay 1 COM comes from the
+      valve rail X-V, relay 1 NC feeds relay 2 COM, so relay 1 and 2 can never switch the two coils on together. Inside each
+      plug, fit D7/D8 with the cores: ring on pin 1 (+), plain leg on pin 2; reversed, they short the supply. Leave them out
+      only if the plug's datasheet shows built-in suppression (an LED alone is not enough). The plugs fit either coil: with
+      air on, press the red manual button next to each coil; the coil that drives the rod out gets plug Y1. Check without
+      air, meter on the plug pins, with the bench program (firmware/bench) toggling the relays: both off, neither plug is
+      live; relay 1 on, only Y1 is live; relay 2 on, only Y2 is live; both on, only Y1 is live.
+relay_notes:
+  # the relay edition (deprecated prototype): same layout as wiring_notes, steps in relay.yaml
   A:
     do: Mount the rail, the relay sockets and the Wago connectors, then fit a diode on each relay socket.
     text: >-
@@ -140,20 +191,15 @@ bom:
   spec: Classic APP (preferred) or APP Deluxe
 - id: rail
   group: Mounting
-  qty: 1 set
-  part: DIN rail + end stops
-  spec: TS35 × 7.5 · cut to 211 mm, 12.5 mm from a slot centre · 2 end stops
-- id: glands
-  group: Mounting
-  qty: '5'
-  part: Cable glands M12 × 1.5
-  spec: 3 × clamping 3–6.5 mm (valve Y1, Y2 · QPM11) · 2 × clamping 2–5 mm (sensors B0, B1)
+  qty: '1'
+  part: DIN rail
+  spec: TS35 × 7.5 · cut to 100 mm so that a slot centre is 12.5 mm from each end
 - id: hardware
   group: Mounting
   qty: 1 set
   part: Board and mounting hardware
-  spec: Plywood board ≥ 15 mm · 13 × M3 heat-set inserts (4.2 mm hole, ≤ 6 mm long) · 3 × M3×6 pan-head screws with
-    washers (rail) · 4 × M3×8 (lid) · 6 × M3×8 countersunk (console plate) · 4 × 4×16 countersunk
+  spec: Plywood board ≥ 15 mm · 6 × M3 heat-set inserts (4.2 mm hole, ≤ 6 mm long) · 2 × M3×6 pan-head screws with
+    washers (rail) · 4 × M3×8 (lid) · 4 × 4×16 countersunk
     wood screws for the box, only if you print the base with the wood-screw holes · wood screws for the press, cylinder pivot,
     valve and FRL bracket · cable ties
 - id: mechanism
@@ -222,6 +268,11 @@ bom:
   qty: '1'
   part: Air shut-off with exhaust
   spec: 3/2-way hand valve with exhaust, 6 mm tube connections · between the filter-regulator and the tee
+- id: plc
+  group: Electrical
+  qty: '1'
+  part: M5Stack StamPLC (K141)
+  spec: Controller with 4 relays (NC, COM, NO), 8 optically isolated inputs, display and 3 buttons · DIN rail clip · 24 V DC · programmed with PlatformIO over USB-C
 - id: psu
   group: Electrical
   qty: '1'
@@ -237,26 +288,11 @@ bom:
   qty: '1'
   part: Panel DC jack J1
   spec: 5.5 × 2.1 mm, 8 mm thread (DC-099 type) · ≥ 2 A · 8 mm panel hole
-- id: fuse
+- id: inlinefuse
   group: Electrical
   qty: '1'
-  part: Panel fuse holder F1 + fuse
-  spec: 5 × 20 mm · 12 mm thread, at most 28 mm behind the panel · fuse T 1 A (slow-blow) + spare
-- id: relays
-  group: Electrical
-  qty: '4'
-  part: HH52P-L / MY2NJ relays
-  spec: 24 V DC coil with LED · DPDT · K1–K4
-- id: sockets
-  group: Electrical
-  qty: '4'
-  part: PYF08A relay sockets
-  spec: Compatible with fitted relays · DIN mounting
-- id: timer
-  group: Electrical
-  qty: 1 set
-  part: DH48S-S timer + socket
-  spec: Jam timer T1 · SPDT, reset on 1–3 · 24 V AC/DC · 8-pin socket · for another timer see the jam timer step on the wiring page
+  part: Inline fuse holder FU1 + fuse
+  spec: 5 × 20 mm · fuse T 1 A (slow-blow) + spare · in the + lead from J1 to Q1
 - id: sensors
   group: Electrical
   qty: 2 sets
@@ -264,19 +300,19 @@ bom:
   spec: PNP, N/O · 2.5 m open cable end · SMBR-8-32 clamps
 - id: diodes
   group: Electrical
-  qty: '8'
+  qty: '2'
   part: 1N4007 diodes
-  spec: D1–D4 relay suppression · D5/D6 timer feed · D7/D8 in the valve plugs
+  spec: D7/D8 in the valve plugs
+- id: resistors
+  group: Electrical
+  qty: '2'
+  part: 4.7 kΩ resistors
+  spec: Only if a sensor input reads on with the sensor off, see the sensors step on the wiring page
 - id: stop
   group: Controls
   qty: '1'
   part: 22 mm emergency stop E-STOP
   spec: Red mushroom, latching, twist release · closed contact (marked 11 and 12) · S3 · sits on the printed yellow ring
-- id: buttons
-  group: Controls
-  qty: '3'
-  part: 22 mm momentary buttons
-  spec: STOP S2 black, closed contact (marked 11 and 12) · START S0 green and JOG S1 white, open contact (marked 23 and 24) · 1NO+1NC sets fit all three
 - id: switch
   group: Controls
   qty: '1'
@@ -286,32 +322,27 @@ bom:
   group: Wiring
   qty: '3'
   part: Wago 221-415 lever connectors, 5-way
-  spec: 'X-EN: control +24 V, live while POWER is on and E-STOP released · X-M1 and X-M2: Ground (0 V, minus)'
+  spec: 'X-24: +24 V after POWER · X-0V1 and X-0V2: Ground (0 V, minus), joined by one wire'
 - id: wago3
   group: Wiring
-  qty: '1'
-  part: Wago 221-413 lever connector, 3-way
-  spec: 'X-D: joins diodes D5 and D6 and feeds timer T1'
-- id: wago2
-  group: Wiring
   qty: '2'
-  part: Wago 221-412 lever connectors, 2-way
-  spec: 'One per joint: D5 plain leg + wire 37, D6 plain leg + wire 38'
+  part: Wago 221-413 lever connectors, 3-way
+  spec: 'X-S: after the E-STOP, feeds the pressure switch and StamPLC input 3 · X-V: valve rail after the pressure switch, feeds StamPLC input 4 and relay 1'
 - id: controlwire
   group: Wiring
-  qty: 10 m est.
+  qty: 5 m est.
   part: Hook-up wire, red + black
-  spec: Stranded, H05V-K · 0.5 mm² (AWG 20) · about 7 m red = +24 V, about 3 m black = Ground
+  spec: Stranded, H05V-K · 0.5 mm² (AWG 20) · about 3 m red = +24 V, about 2 m black = Ground
 - id: valvecable
   group: Wiring
   qty: 3 m est.
   part: 2-core cable, black sheath
-  spec: 3 runs out of the box (valve plugs Y1, Y2 and QPM11) · 2 × 0.5 mm² (AWG 20) · sheath to suit the M12 glands · the board shows red and black, on a valve cable mark the +24 V core red, on the QPM11 cable (switch in the +24 V feed, no polarity) mark both cores red
+  spec: 3 runs out of the box (valve plugs Y1, Y2 and QPM11) · 2 × 0.5 mm² (AWG 20) · all cables, sensors included, leave through the one oval exit, 30 × 14 mm · the board shows red and black, on a valve cable mark the +24 V core red, on the QPM11 cable (switch in the +24 V feed, no polarity) mark both cores red
 - id: terminations
   group: Wiring
   qty: 1 set
   part: Ferrules, receptacles and labels
-  spec: 50 ferrules 0.5 mm² · 12 twin ferrules 2 × 0.5 mm² · 5 insulated flat receptacles for the Q1 and F1 tabs · heat-shrink
+  spec: 30 ferrules 0.5 mm² · 3 insulated flat receptacles for the Q1 tabs · heat-shrink
     · wire labels
 - id: adapter
   group: 3D printed
@@ -324,6 +355,57 @@ bom:
   group: 3D printed
   qty: '1'
   part: Control box
+  spec: 3D printed in PETG or ASA, 15–20 % infill · base, lid, E-STOP ring (yellow) and USB-C plug · the front of the StamPLC sits flush in the lid, so display, buttons and terminals stay reachable · DIN rail, Wago rack, POWER rocker and DC jack in the box · one oval cable exit at the back · no mains inside
+  makerworld:
+- id: glands
+  group: Relay edition only (deprecated)
+  qty: '5'
+  part: Cable glands M12 × 1.5
+  spec: 3 × clamping 3–6.5 mm (valve Y1, Y2 · QPM11) · 2 × clamping 2–5 mm (sensors B0, B1)
+- id: fuse
+  group: Relay edition only (deprecated)
+  qty: '1'
+  part: Panel fuse holder F1 + fuse
+  spec: 5 × 20 mm · 12 mm thread, at most 28 mm behind the panel · fuse T 1 A (slow-blow) + spare
+- id: relays
+  group: Relay edition only (deprecated)
+  qty: '4'
+  part: HH52P-L / MY2NJ relays
+  spec: 24 V DC coil with LED · DPDT · K1–K4
+- id: sockets
+  group: Relay edition only (deprecated)
+  qty: '4'
+  part: PYF08A relay sockets
+  spec: Compatible with fitted relays · DIN mounting
+- id: timer
+  group: Relay edition only (deprecated)
+  qty: 1 set
+  part: DH48S-S timer + socket
+  spec: Jam timer T1 · SPDT, reset on 1–3 · 24 V AC/DC · 8-pin socket · for another timer see the jam timer step on the relay edition page
+- id: buttons
+  group: Relay edition only (deprecated)
+  qty: '3'
+  part: 22 mm momentary buttons
+  spec: STOP S2 black, closed contact (marked 11 and 12) · START S0 green and JOG S1 white, open contact (marked 23 and 24) · 1NO+1NC sets fit all three
+- id: wago2
+  group: Relay edition only (deprecated)
+  qty: '2'
+  part: Wago 221-412 lever connectors, 2-way
+  spec: 'One per joint: D5 plain leg + wire 37, D6 plain leg + wire 38'
+- id: relayrail
+  group: Relay edition only (deprecated)
+  qty: '1'
+  part: DIN rail for the relay box
+  spec: TS35 × 7.5 · cut to 211 mm, 12.5 mm from a slot centre · 2 end stops
+- id: relayparts
+  group: Relay edition only (deprecated)
+  qty: 1 set
+  part: Relay box extras
+  spec: 6 × 1N4007 more (D1–D6; 8 in all with D7/D8) · 1 × Wago 221-413 (X-D) · 3 × M3×6 rail screws with washers and 13 × M3 heat-set inserts instead of the 2 and 6 above · 6 × M3×8 countersunk (console plate) · 12 twin ferrules, 50 ferrules, 5 receptacles instead of the set above · 10 m hook-up wire
+- id: relaybox
+  group: Relay edition only (deprecated)
+  qty: '1'
+  part: Relay control box
   spec: 3D printed in PETG or ASA, 15–20 % infill · relays, timer, buttons, a clip rack for the lever connectors and the 24 V entry in one box, no mains inside · buttons on a separate console plate, wired on the bench · cable entries at the back, or glands on the left · base, lid and plate fit a 256 mm bed · labels in a second colour · E-STOP ring in yellow
   image: boxes/control_box.png
   makerworld:
