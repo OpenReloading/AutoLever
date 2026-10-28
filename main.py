@@ -17,7 +17,7 @@ WAGO = {"X-EN": "+24 V while on", "X-M1": "Ground", "X-M2": "Ground", "X-D": "di
         "X-24": "+24 V after POWER", "X-0V1": "Ground", "X-0V2": "Ground", "X-S": "rail after the E-STOP", "X-V": "valve rail"}
 # StamPLC terminals: the power and COM terminals, inputs 1 to 8 on one edge, relays 1 to 4 (NC, COM, NO) on the other
 PLC_POWER = {"+": ("+", " (+24 V in)"), "-": ("\u2212", " (Ground)"), "C": ("C", " (input common, Ground)")}
-PLC_INPUT = {"1": "home sensor B0", "2": "front sensor B1", "3": "valve rail after the E-STOP", "4": "valve rail after the pressure switch"}
+PLC_INPUT = {"1": "home sensor B0", "2": "front sensor B1", "3": "rail after the E-STOP (X-S)", "4": "valve rail after the pressure switch (X-V)"}
 PLC_POLE = {"NC": ("NC", " (closed at rest)"), "C": ("COM", " (common)"), "NO": ("NO", " (closed when the relay is on)")}
 # marks on a button's contact block: terminals 1, 2 are the closed contact, 3, 4 the open contact
 MARK = {"1": "11", "2": "12", "3": "23", "4": "24"}

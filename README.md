@@ -4,7 +4,7 @@
 
 [![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.gg/hUCSjDYNaa)
 
-An air cylinder works the lever of your Lee APP reloading press for sizing and decapping. START cycles it until STOP, and JOG cycles it only while you hold the button.
+An air cylinder works the lever of your Lee APP reloading press for sizing and decapping. START cycles it until you press START again, and JOG cycles it only while you hold the button.
 
 **Pre-release, October 2026.** Nothing has been built yet, the printed parts are not on MakerWorld yet, details will change.
 

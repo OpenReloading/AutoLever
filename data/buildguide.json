@@ -950,7 +950,7 @@
        "b": "PLC:3",
        "color": "red",
        "la": "Wago X-S (rail after the E-STOP) slot 3",
-       "lb": "StamPLC input 3 (valve rail after the E-STOP)",
+       "lb": "StamPLC input 3 (rail after the E-STOP (X-S))",
        "cable": "Stranded wire, red or black",
        "size": "0.5 mm² · AWG 20"
       },
@@ -960,7 +960,7 @@
        "b": "PLC:4",
        "color": "red",
        "la": "Wago X-V (valve rail) slot 2",
-       "lb": "StamPLC input 4 (valve rail after the pressure switch)",
+       "lb": "StamPLC input 4 (valve rail after the pressure switch (X-V))",
        "cable": "Stranded wire, red or black",
        "size": "0.5 mm² · AWG 20"
       }

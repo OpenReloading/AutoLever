@@ -59,7 +59,7 @@ def test_a_wire_with_an_unknown_end_names_its_number_and_end(wire, message):
     ("PLC:+", "StamPLC + (+24 V in)"),
     ("PLC:-", "StamPLC \u2212 (Ground)"),
     ("PLC:C", "StamPLC C (input common, Ground)"),
-    ("PLC:3", "StamPLC input 3 (valve rail after the E-STOP)"),
+    ("PLC:3", "StamPLC input 3 (rail after the E-STOP (X-S))"),
     ("PLC:8", "StamPLC input 8"),
     ("PLC:1NC", "StamPLC relay 1 NC (closed at rest)"),
     ("PLC:2C", "StamPLC relay 2 COM (common)"),
