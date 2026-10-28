@@ -393,6 +393,158 @@ button:focus-visible {
   }
 }
 
+/* Home page sections, found by their heading ids: 24 px titles 48 px apart on a phone, 36 px and 96 px from 1280 px; the second safety panel opens the "Build it" section */
+.md-content__inner > p:has(> .md-button--primary) ~ h2,
+.md-content__inner > p:has(> .md-button--primary) ~ .change-it > h2 {
+  margin: 48px 0 20px;
+  font-size: 24px;
+  line-height: 1.2;
+}
+
+.md-content__inner > p:has(> .md-button--primary) ~ .admonition.danger {
+  margin-top: 48px;
+}
+
+.md-content__inner > p:has(> .md-button--primary) ~ .admonition.danger + h2 {
+  margin-top: 24px;
+}
+
+.md-content__inner > p:has(> .md-button--primary) ~ h2#at-the-controls + p {
+  max-width: 640px;
+  color: var(--muted);
+}
+
+/* "What it does" and "Build it": the list items as cards with an orange monospace number */
+.md-content__inner > p:has(> .md-button--primary) ~ :is(h2#what-it-does + ul, h2#build-it + ol) {
+  display: grid;
+  gap: 12px;
+  max-width: none;
+  padding: 0;
+  list-style: none;
+  counter-reset: card;
+}
+
+.md-content__inner > p:has(> .md-button--primary) ~ :is(h2#what-it-does + ul, h2#build-it + ol) > li {
+  margin: 0;
+  padding: 28px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background-color: var(--surface);
+  counter-increment: card;
+}
+
+.md-content__inner > p:has(> .md-button--primary) ~ :is(h2#what-it-does + ul, h2#build-it + ol) > li::before {
+  display: block;
+  margin-bottom: 12px;
+  color: var(--accent);
+  font-family: var(--md-code-font-family);
+  font-weight: 700;
+}
+
+.md-content__inner > p:has(> .md-button--primary) ~ h2#what-it-does + ul > li {
+  color: var(--muted);
+}
+
+.md-content__inner > p:has(> .md-button--primary) ~ h2#what-it-does + ul > li::before {
+  content: counter(card, decimal-leading-zero);
+  font-size: 13px;
+}
+
+.md-content__inner > p:has(> .md-button--primary) ~ h2#what-it-does + ul strong {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--ink);
+  font-size: 21px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.md-content__inner > p:has(> .md-button--primary) ~ h2#build-it + ol > li::before {
+  content: counter(card);
+  font-size: 32px;
+  line-height: 1;
+}
+
+@media screen and (min-width: 720px) {
+  .md-content__inner > p:has(> .md-button--primary) ~ :is(h2#what-it-does + ul, h2#build-it + ol) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+  }
+}
+
+/* From 1280 px: three "What it does" columns, four "Build it" cards, the controls as a row of four cards with arrows, and "Change it" in two columns with the commands on the right */
+@media screen and (min-width: 1280px) {
+  .md-content__inner > p:has(> .md-button--primary) ~ h2,
+.md-content__inner > p:has(> .md-button--primary) ~ .change-it > h2 {
+    margin-top: 96px;
+    font-size: 36px;
+  }
+
+  .md-content__inner > p:has(> .md-button--primary) ~ .admonition.danger {
+    margin-top: 96px;
+  }
+
+  .md-content__inner > p:has(> .md-button--primary) ~ .admonition.danger + h2 {
+    margin-top: 24px;
+  }
+
+  .md-content__inner > p:has(> .md-button--primary) ~ h2#what-it-does + ul {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .md-content__inner > p:has(> .md-button--primary) ~ h2#build-it + ol {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .md-content__inner > p:has(> .md-button--primary) ~ h2#at-the-controls + p + ol {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 40px;
+    max-width: none;
+    padding: 0;
+    list-style: none;
+  }
+
+  .md-content__inner > p:has(> .md-button--primary) ~ h2#at-the-controls + p + ol > li {
+    position: relative;
+    margin: 0;
+    padding: 28px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background-color: var(--surface);
+  }
+
+  .md-content__inner > p:has(> .md-button--primary) ~ h2#at-the-controls + p + ol > li + li::before {
+    content: "→" / "";
+    position: absolute;
+    top: 50%;
+    left: -30px;
+    color: var(--muted);
+    transform: translateY(-50%);
+  }
+
+  .md-content__inner > p:has(> .md-button--primary) ~ h2#at-the-controls + p + ol strong {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--accent);
+    font-family: var(--md-code-font-family);
+    font-size: 21px;
+  }
+
+  .md-content__inner > p:has(> .md-button--primary) ~ .change-it {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 20px;
+    align-items: end;
+  }
+
+  .md-content__inner > p:has(> .md-button--primary) ~ .change-it > pre {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    margin: 0 0 1em;
+  }
+}
+
 /* Boards: the canvas is as tall as the drawing at its width, so no empty bands remain above and below it (ratios are the board sizes in data/buildguide.json, checked by tests/test_main.py; BuildGuide#97 asks for them on the element). Fullscreen keeps BuildGuide's flex height. */
 .ag-guide[data-board="wiring"] {
   --board-ratio: 1360 / 860;
