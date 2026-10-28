@@ -23,7 +23,7 @@ def card_html() -> str:
     return f"""<body style="margin:0;width:1200px;height:630px;background:{token["page"]};font:38px/1.4 system-ui,sans-serif;color:{token["ink"]}">
 <div style="position:absolute;left:80px;top:90px;width:560px">{logo}</div>
 <p style="position:absolute;left:80px;top:330px;width:1040px;margin:0">{html.escape(config["site_description"])}</p>
-<div style="position:absolute;left:0;bottom:0;width:1200px;height:24px;background:{token["header-bg"]}"></div></body>"""
+<div style="position:absolute;left:0;bottom:0;width:1200px;height:24px;background:{token["accent"]}"></div></body>"""
 
 
 if __name__ == "__main__":

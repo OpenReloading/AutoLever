@@ -13,7 +13,7 @@ theme:
   name: material
   custom_dir: overrides   # partials/source.html: header facts rendered at build time
   font: false   # system fonts: no requests to Google Fonts
-  logo: assets/autolever-white.svg   # white on the green and dark headers
+  logo: assets/autolever-white.svg   # white on the dark header, drawn black on the light one (extra.css)
   favicon: assets/favicon.svg
   features:
     - navigation.footer   # previous and next page links, no third-party request

@@ -319,7 +319,7 @@ with sync_playwright() as p:
         assert page.evaluate("[...document.querySelectorAll('.joint-paper')].every(e=>e.getBoundingClientRect().right<=innerWidth)"),'board cut off in print: '+slug
         for hidden in ['.ag-progress','.ag-status','.ag-result-count','.ag-connection-detail','.ag-board-toolbar']:
             expect(page.locator(hidden)).to_be_hidden()
-        expect(page.locator('main h1')).to_have_css('color','rgb(36, 52, 46)')
+        expect(page.locator('main h1')).to_have_css('color','rgb(22, 35, 58)')
         expect(page.locator('main h1 + .admonition.danger')).to_be_visible()
     page.emulate_media(media='null',color_scheme='null')
     # Self-hosted search under the base path: opens, finds a word of the introduction, links stay under the prefix; on a phone and on a desktop, light and dark, the controls are 24 px or more with text contrast of 4.5:1 or more.
