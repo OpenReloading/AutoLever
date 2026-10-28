@@ -6,6 +6,8 @@
 using namespace autolever;
 
 // Input channels (0 to 7) and relays (0 to 3) as wired in the control box.
+// The inputs are opto-isolated with anti-parallel LEDs (EL3H4), so either polarity works, and the expander reads
+// true while an input is driven. All eight share COM (terminal C): connect it to 0 V for PNP sensors.
 constexpr uint8_t IN_HOME = 0, IN_FRONT = 1, IN_ESTOP_OK = 2, IN_PRESSURE_OK = 3;
 constexpr uint8_t RELAY_EXTEND = 0, RELAY_RETRACT = 1;
 

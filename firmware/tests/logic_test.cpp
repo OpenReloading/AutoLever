@@ -1,6 +1,7 @@
 // Native test of the press logic; built and run by tests/test_firmware.py.
 #include <cstdio>
 #include <cstdlib>
+#include <initializer_list>
 
 #include "../src/logic.h"
 
@@ -34,6 +35,59 @@ struct Rig {
     void run(int n) { while (n--) tick(); }
     void press_start() { in.start = true; tick(); in.start = false; tick(); }
 };
+
+
+// Random operation: whatever the inputs do, the safety rules of the press hold on every step.
+static void random_run(uint32_t seed, uint32_t jam_ms) {
+    uint32_t rng = seed;
+    auto rnd = [&rng](uint32_t n) {   // xorshift32
+        rng ^= rng << 13; rng ^= rng >> 17; rng ^= rng << 5;
+        return rng % n;
+    };
+    Controller c;
+    c.jam_ms = jam_ms;
+    Inputs in{true, false, true, true, false, false};
+    int pos = 0;
+    uint32_t now = 1000, same_since = 0;
+    Outputs prev{};
+    bool released = false;   // JOG seen released since the press last left Idle
+    State prev_state = State::Idle;
+    int stuck = 0;
+    for (int i = 0; i < 400000; ++i) {
+        in.start = rnd(40) == 0;
+        if (rnd(60) == 0) in.jog = !in.jog;
+        if (rnd(400) == 0) in.estop_ok = !in.estop_ok;
+        if (rnd(700) == 0) in.pressure_ok = !in.pressure_ok;
+        if (stuck == 0 && rnd(2000) == 0) stuck = 1 + (int)rnd(3000);   // rod jams for a while
+        in.home = pos <= 0;
+        in.front = pos >= 100;
+        if (rnd(300) == 0) in.home = !in.home;     // sensor glitch
+        if (rnd(500) == 0) in.front = !in.front;
+        Outputs out = c.step(in, now);
+
+        CHECK(!(out.extend && out.retract));
+        if (!in.estop_ok || !in.pressure_ok) CHECK(!out.extend && !out.retract && c.state() == State::Fault);
+        if (c.state() == State::Idle || c.state() == State::Fault) CHECK(!out.extend && !out.retract);
+        if (c.state() == State::Fault) CHECK(c.fault() != Fault::None);
+        if (c.state() == State::Jog) CHECK(in.jog);                                   // jog moves only while held
+        if (prev_state != State::Jog && c.state() == State::Jog) CHECK(released);      // never starts from a held JOG
+        // one direction never runs longer than the jam timeout, plus the step
+        bool on = out.extend || out.retract;
+        if (!on || out.extend != prev.extend || out.retract != prev.retract) same_since = now;
+        CHECK(!on || now - same_since <= jam_ms);
+
+        if (c.state() != State::Idle) released = false;
+        if (!in.jog) released = true;
+        prev_state = c.state();
+        prev = out;
+        if (stuck > 0) --stuck;
+        else {
+            if (out.extend && pos < 100) ++pos;
+            if (out.retract && pos > 0) --pos;
+        }
+        now += 10;
+    }
+}
 
 int main() {
     {  // auto cycle runs out and back, repeatedly, and counts
@@ -143,6 +197,7 @@ int main() {
         r.press_start();
         CHECK(r.out.retract && !r.out.extend);
     }
+    for (uint32_t seed : {1u, 2u, 3u, 12345u}) random_run(seed, 800);
     std::puts("ok");
     return 0;
 }
