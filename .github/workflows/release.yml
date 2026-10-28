@@ -28,6 +28,7 @@ jobs:
       contents: write
       pull-requests: write
       issues: write
+      actions: write
     steps:
       - id: app-token
         if: ${{ vars.RELEASE_APP_CLIENT_ID != '' }}
@@ -38,8 +39,13 @@ jobs:
           permission-contents: write
           permission-pull-requests: write
           permission-issues: write
-      - uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5.0.0
+      - id: release
+        uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5.0.0
         with:
           token: ${{ steps.app-token.outputs.token || secrets.GITHUB_TOKEN }}
           # simple: version in version.txt and CHANGELOG.md; use node, python and so on to bump a manifest as well.
           release-type: simple
+      - if: ${{ steps.release.outputs.release_created == 'true' && vars.RELEASE_APP_CLIENT_ID == '' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh workflow run pages.yml --repo "$GITHUB_REPOSITORY"
