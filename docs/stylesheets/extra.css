@@ -373,7 +373,7 @@ button:focus-visible {
   }
 }
 
-/* Footer: a line above, muted text; the links underlined so they do not rely on colour, 44 px high and 28 px apart; the "Previous" and "Next" labels keep full opacity for contrast */
+/* Footer: a line above, muted text; the links underlined so they do not rely on colour, 44 px high and 28 px apart; the "Previous" and "Next" links and labels keep full opacity for contrast, also on focus and hover */
 .md-footer {
   border-top: 1px solid var(--line);
 }
@@ -392,7 +392,8 @@ button:focus-visible {
   text-decoration: underline;
 }
 
-.md-footer__direction {
+.md-footer__direction,
+.md-footer .md-footer__link:is(:focus, :hover) {
   opacity: 1;
 }
 
