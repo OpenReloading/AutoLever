@@ -1,7 +1,9 @@
 ---
 title: Introduction
-hide: [navigation]
+hide: [navigation, toc]
 ---
+
+<div class="hero-label">Pre-release, October 2026</div>
 
 # AutoLever: pneumatic drive for the Lee APP
 
@@ -9,23 +11,24 @@ hide: [navigation]
 
     --8<-- "safety.md"
 
-!!! warning "Pre-release, October 2026"
-
-    Nothing has been built yet, the printed parts are not on MakerWorld yet, details will change. The StamPLC firmware and wiring have passed their automated tests only; the bench check on the real unit is still open.
-
 Give your Lee APP an air-powered upgrade. AutoLever takes over the lever work for sizing and decapping. Press START and a Festo cylinder keeps it cycling, stroke after stroke. Press START again when you’re done.
 
-[Start with the BOM](bom.md){ .md-button .md-button--primary }
+[Start with the BOM](bom.md){ .md-button .md-button--primary } [Wiring](wiring.md){ .md-button }
 
-- **One controller, two sensors.** An M5Stack StamPLC runs the sequence.
-- **Open firmware.** Flash it once over USB-C with PlatformIO; later updates go over Wi-Fi.
-- **Free plans.** Bring your press and build your own.
+!!! warning "Status"
 
-Built by reloaders for reloaders, with AI as a tool.
+    Nothing has been built yet, the printed parts are not on MakerWorld yet, details will change. The StamPLC firmware and wiring have passed their automated tests only; the bench check on the real unit is still open.
 
 !!! note "Relay edition (deprecated prototype)"
 
     The first prototype used four relays and a timer. Its guide stays as the [relay edition](relay.md) until the parts are removed; do not start a new build from it.
+
+- **One controller, two sensors.** An M5Stack StamPLC runs the sequence.
+- **Open firmware.** Flash it once over USB-C with PlatformIO; later updates go over Wi-Fi.
+- **Free plans.** Bring your press and build your own.
+- **7 to 10 bar** compressed-air supply
+
+Built by reloaders for reloaders, with AI as a tool.
 
 ## What it does
 
