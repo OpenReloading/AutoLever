@@ -44,7 +44,13 @@ static String esc(const String& in) {
     return out;
 }
 
+// Settings posts only from this device's own page: the browser sends saved Basic credentials with a form from any site.
 static bool authed() {
+    String from = server.hasHeader("Origin") ? server.header("Origin") : server.header("Referer");
+    if (!same_origin(from.c_str(), server.hostHeader().c_str())) {
+        server.send(403, "text/plain", "Changes only from this device's own page");
+        return false;
+    }
     if (server.authenticate("admin", ap_pass.c_str())) return true;
     server.requestAuthentication();
     return false;
@@ -124,6 +130,8 @@ void web_begin(Controller& c, Preferences& p) {
     server.on("/settings", HTTP_POST, handle_settings);
     server.on("/counter", HTTP_POST, handle_counter);
     server.on("/wifi", HTTP_POST, handle_wifi);
+    static const char* headers[] = {"Origin", "Referer"};
+    server.collectHeaders(headers, 2);
     server.begin();
 
     ArduinoOTA.setHostname("autolever");

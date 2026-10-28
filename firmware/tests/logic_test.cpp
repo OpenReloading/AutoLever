@@ -197,6 +197,17 @@ int main() {
         r.press_start();
         CHECK(r.out.retract && !r.out.extend);
     }
+    {  // settings posts: only from the page's own host, or without Origin and Referer
+        CHECK(same_origin("", "192.168.4.1"));
+        CHECK(same_origin("http://192.168.4.1", "192.168.4.1"));
+        CHECK(same_origin("http://AutoLever.local/", "autolever.local"));
+        CHECK(same_origin("http://192.168.1.20:80/settings", "192.168.1.20:80"));
+        CHECK(!same_origin("https://evil.example", "192.168.4.1"));
+        CHECK(!same_origin("http://192.168.4.10", "192.168.4.1"));
+        CHECK(!same_origin("http://192.168.4.1", "192.168.4.10"));
+        CHECK(!same_origin("null", "192.168.4.1"));
+        CHECK(!same_origin("http://autolever.local", ""));
+    }
     for (uint32_t seed : {1u, 2u, 3u, 12345u}) random_run(seed, 800);
     CHECK(jam_ms_from_seconds(0) == 2000 && jam_ms_from_seconds(-5) == 2000);
     CHECK(jam_ms_from_seconds(15) == 15000 && jam_ms_from_seconds(500) == 120000);
