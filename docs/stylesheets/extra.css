@@ -140,8 +140,9 @@ button:focus-visible {
   filter: brightness(0);
 }
 
-/* The safety admonition: the amber panel, no title slab or icon, the title in small monospace capitals, text at 16 px so it stays short on a phone */
-.md-typeset .admonition.danger {
+/* The safety admonition and the status band of the home page: the amber panel, no title slab or icon, the title in small monospace capitals, text at 16 px so it stays short on a phone */
+.md-typeset .admonition.danger,
+.md-typeset .hero-label ~ .admonition.warning {
   border: 1px solid var(--warn-border);
   border-radius: 14px;
   box-shadow: none;
@@ -151,7 +152,8 @@ button:focus-visible {
   padding: 0 0.8rem 0.1rem;
 }
 
-.md-typeset .danger > .admonition-title {
+.md-typeset .danger > .admonition-title,
+.md-typeset .hero-label ~ .warning > .admonition-title {
   margin: 0;
   padding: 0.6rem 0 0;
   background: none;
@@ -163,11 +165,13 @@ button:focus-visible {
   text-transform: uppercase;
 }
 
-.md-typeset .danger > .admonition-title::before {
+.md-typeset .danger > .admonition-title::before,
+.md-typeset .hero-label ~ .warning > .admonition-title::before {
   display: none;
 }
 
-.md-typeset .danger > p {
+.md-typeset .danger > p,
+.md-typeset .hero-label ~ .warning > p {
   margin: 0.2em 0 0.7em;
 }
 
@@ -236,24 +240,70 @@ button:focus-visible {
   border-bottom-color: var(--accent);
 }
 
-/* Home page: lead paragraph, call to action and the three cards, the list after the button (docs/index.md) */
-.md-content__inner > .admonition + p {
-  max-width: 47ch;   /* 56ch at the 16 px of the admonition above */
-  font-size: 0.95rem;
-  line-height: 1.5;
+/* Home page (docs/index.md): the paragraph with the primary button scopes these rules to it, so they hold when the pre-release label and status band are gone. Hero: amber label, title, safety panel, muted lead and two buttons. */
+.md-typeset .hero-label {
+  display: inline-block;
+  padding: 4px 12px;
+  border: 1px solid var(--warn-border);
+  border-radius: 999px;
+  background-color: var(--warn-fill);
+  color: var(--warn-text);
+  font-family: var(--md-code-font-family);
+  font-size: 13px;
+  font-weight: 700;
 }
 
-.md-typeset .md-button--primary {
-  min-height: 2.2rem;
-  padding: 0.5em 1.4em;
-  background-color: var(--accent);
-  border: 1px solid var(--accent);
-  border-radius: 0.2rem;
-  color: var(--on-accent);
+.md-content__inner > h1:has(~ p > .md-button--primary) {
+  margin: 16px 0 24px;
+  font-size: 34px;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.md-content__inner > .admonition.danger + p:has(~ p > .md-button--primary) {
+  max-width: 620px;
+  color: var(--muted);
+  font-size: 21px;
+  line-height: 1.55;
+}
+
+/* The status band takes the full width */
+.md-typeset .hero-label ~ .admonition.warning {
+  max-width: none;
+}
+
+/* The buttons: stacked at full width and 48 px high on a phone, in a row and 52 px high from 720 px; the second one is outlined */
+.md-content__inner > p:has(> .md-button--primary) {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.md-typeset .md-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0 28px;
+  border: 1px solid var(--control-line);
+  border-radius: 10px;
+  color: var(--ink);
   font-weight: 600;
 }
 
-.md-typeset .md-button--primary:is(:hover, :focus-visible) {
+.md-typeset .md-button:is(:focus, :hover) {
+  background-color: var(--surface-alt);
+  border-color: var(--ink);
+  color: var(--ink);
+}
+
+.md-typeset .md-button--primary {
+  background-color: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
+}
+
+.md-typeset .md-button--primary:is(:focus, :hover) {
   background-color: var(--accent-hover);
   border-color: var(--accent-hover);
   color: var(--on-accent);
@@ -264,34 +314,82 @@ button:focus-visible {
   outline-offset: 2px;
 }
 
-.md-content__inner > p:has(> .md-button--primary) + ul {
+/* Fact strip, the list after the notes: two cells per row with 1 px dividers, the bold lead as the figure in monospace, the rest muted */
+.md-content__inner > p:has(> .md-button--primary) ~ ul:first-of-type {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
-  gap: 0.6rem;
-  max-width: 48rem;
-  margin: 1rem 0;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  max-width: none;
+  margin: 24px 0;
   padding: 0;
+  background-color: var(--line);
   list-style: none;
 }
 
-.md-content__inner > p:has(> .md-button--primary) + ul > li {
+.md-content__inner > p:has(> .md-button--primary) ~ ul:first-of-type > li {
   margin: 0;
-  padding: 0.6rem 0.8rem;
-  background-color: var(--surface);
-  border: 1px solid var(--control-line);
-  border-radius: 0.2rem;
+  padding: 16px;
+  background-color: var(--page);
+  color: var(--muted);
 }
 
-.md-content__inner > p:has(> .md-button--primary) + ul strong {
+.md-content__inner > p:has(> .md-button--primary) ~ ul:first-of-type strong {
   display: block;
+  margin-bottom: 8px;
   color: var(--ink);
+  font-family: var(--md-code-font-family);
+  font-size: 21px;   /* at 24 px "controller," is wider than a half cell at 390 px */
+  font-weight: 600;
+  line-height: 1.2;
 }
 
-/* Forced colours replace the fills: keep a visible edge on the button and the cards */
+@media screen and (min-width: 720px) {
+  .md-content__inner > p:has(> .md-button--primary) {
+    flex-direction: row;
+  }
+
+  .md-typeset .md-button {
+    min-height: 52px;
+  }
+
+  .md-content__inner > p:has(> .md-button--primary) ~ ul:first-of-type strong {
+    font-size: 34px;
+  }
+}
+
+/* From 1280 px: the 60 px title, the status label beside its text and four facts in one row */
+@media screen and (min-width: 1280px) {
+  .md-content__inner > h1:has(~ p > .md-button--primary) {
+    font-size: 60px;
+  }
+
+  .md-typeset .hero-label ~ .admonition.warning {
+    display: flex;
+    align-items: baseline;
+    column-gap: 24px;
+  }
+
+  .md-typeset .hero-label ~ .warning > .admonition-title {
+    flex: none;
+  }
+
+  .md-content__inner > p:has(> .md-button--primary) ~ ul:first-of-type {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .md-content__inner > p:has(> .md-button--primary) ~ ul:first-of-type > li {
+    padding: 20px;
+  }
+}
+
+/* Forced colours replace the fills and the divider colour: keep a visible edge on the buttons and the fact cells */
 @media (forced-colors: active) {
-  .md-typeset .md-button--primary,
-  .md-content__inner > p:has(> .md-button--primary) + ul > li {
+  .md-typeset .md-button {
     border-color: ButtonText;
+  }
+
+  .md-content__inner > p:has(> .md-button--primary) ~ ul:first-of-type > li {
+    outline: 1px solid CanvasText;
   }
 }
 
