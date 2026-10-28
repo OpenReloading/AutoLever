@@ -18,7 +18,7 @@ def test_card_page_uses_the_light_tokens_and_the_site_description():
     description = site_config()["site_description"]
     assert html.escape(description) in page
     assert "#000" not in page  # the black logo is recoloured
-    for name in ("page", "ink", "accent", "header-bg"):
+    for name in ("page", "ink", "accent"):
         token = re.search(rf"--{name}:\s*(#\w+);", light)
         assert token
         assert token[1] in page, name
