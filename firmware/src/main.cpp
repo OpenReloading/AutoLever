@@ -16,6 +16,7 @@ static Controller press;
 static Preferences prefs;
 static State shown_state = State::Fault;
 static Fault shown_fault = Fault::None;
+static bool shown_stopping = false;
 static uint32_t shown_cycles = UINT32_MAX;
 static bool info_screen = false;
 static bool redraw = true;
@@ -74,10 +75,11 @@ void loop() {
         shown_cycles = press.cycles();
         redraw = true;
     }
-    if (press.state() != shown_state || press.fault() != shown_fault) {
+    if (press.state() != shown_state || press.fault() != shown_fault || press.stopping() != shown_stopping) {
         if (press.state() == State::Fault) M5StamPLC.tone(2000, 200);
         shown_state = press.state();
         shown_fault = press.fault();
+        shown_stopping = press.stopping();
         redraw = true;
     }
     static uint32_t last_info = 0;   // the home address arrives some seconds after power-up
