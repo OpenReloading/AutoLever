@@ -43,13 +43,13 @@ parts:
   X-0V1: {name: "", sub: "X-0V1 · Ground", kind: wago, at: [480, 330], size: [122, 30], ports: *wago5}
   X-0V2: {name: "", sub: "X-0V2 · Ground", kind: wago, at: [630, 330], size: [122, 30], ports: *wago5}
   X-S:   {name: "", sub: "X-S · E-STOP", kind: wago, at: [800, 330], size: [78, 30], ports: *wago3}
-  X-V:   {name: "", sub: "X-V · valves", kind: wago, at: [900, 330], size: [78, 30], ports: *wago3}
+  X-V:   {name: "", sub: "X-V · valves", kind: wago, at: [1120, 470], size: [78, 30], ports: *wago3}
   PLC: {name: "StamPLC", sub: "front face, as printed", kind: box, at: [330, 520], size: [700, 120],
         ports: {top: ["+", "-", "C", "1", "2", "3", "4", "5", "6", "7", "8"],
                 bottom: ["1NC", "1C", "1NO", "2NC", "2C", "2NO", "3NC", "3C", "3NO", "4NC", "4C", "4NO"]}}
   QPM11: {name: "QPM11 pressure switch", kind: box, at: [770, 95], size: [140, 90], ports: {bottom: ["1", "2"]}}
-  Y1: {name: "Y1 · extend", kind: plug, at: [1150, 400], size: [140, 70], ports: *plug}
-  Y2: {name: "Y2 · retract", kind: plug, at: [1150, 540], size: [140, 70], ports: *plug}
+  Y1: {name: "Y1 · extend", kind: plug, at: [1120, 650], size: [140, 70], ports: *plug}
+  Y2: {name: "Y2 · retract", kind: plug, at: [1120, 760], size: [140, 70], ports: *plug}
   B0: {name: "B0 · home sensor", kind: sensor, at: [1000, 150], size: [72, 34], ports: *sensor}
   B1: {name: "B1 · front sensor", kind: sensor, at: [1220, 150], size: [72, 34], ports: *sensor}
 
