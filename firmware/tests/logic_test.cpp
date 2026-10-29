@@ -191,6 +191,43 @@ int main() {
         r.out = r.c.step(r.in, r.now + 10);
         CHECK(r.c.state() == State::Idle);
     }
+    {  // a jam stays latched under an E-STOP and still needs button A after the release
+        Rig r;
+        r.c.jam_ms = 500;
+        r.press_start();
+        for (int i = 0; i < 100; ++i) {  // valve on, rod does not leave home
+            r.in.home = true;
+            r.in.front = false;
+            r.out = r.c.step(r.in, r.now);
+            r.now += 10;
+        }
+        CHECK(r.c.fault() == Fault::Jam);
+        r.in.estop_ok = false;
+        r.run(5);
+        CHECK(r.c.state() == State::Fault && r.c.fault() == Fault::EStop);
+        r.in.estop_ok = true;
+        r.run(5);
+        CHECK(r.c.state() == State::Fault && r.c.fault() == Fault::Jam && !r.out.extend && !r.out.retract);
+        r.press_start();  // acknowledge, stays idle
+        CHECK(r.c.state() == State::Idle && r.c.fault() == Fault::None);
+        r.press_start();
+        CHECK(r.c.state() == State::Auto);
+    }
+    {  // a sensor fault stays latched under a pressure loss and still needs button A after recovery
+        Rig r;
+        r.in.home = r.in.front = true;
+        r.out = r.c.step(r.in, r.now);
+        CHECK(r.c.fault() == Fault::Sensor);
+        r.in.front = false;
+        r.in.pressure_ok = false;
+        r.run(5);
+        CHECK(r.c.state() == State::Fault && r.c.fault() == Fault::Pressure);
+        r.in.pressure_ok = true;
+        r.run(5);
+        CHECK(r.c.state() == State::Fault && r.c.fault() == Fault::Sensor && !r.out.extend && !r.out.retract);
+        r.press_start();
+        CHECK(r.c.state() == State::Idle && r.c.fault() == Fault::None);
+    }
     {  // starting mid-stroke retracts first
         Rig r;
         r.pos = 50;

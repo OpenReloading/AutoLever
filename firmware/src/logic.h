@@ -52,6 +52,7 @@ private:
 
     State state_ = State::Idle;
     Fault fault_ = Fault::None;
+    Fault latched_ = Fault::None;  // jam or sensor fault under a supply fault, shown again once the rail is back
     Phase phase_ = Phase::Extend;
     uint32_t phase_since_ = 0;
     uint32_t cycles_ = 0;
