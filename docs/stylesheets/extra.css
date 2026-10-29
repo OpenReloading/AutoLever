@@ -662,6 +662,18 @@ button:focus-visible {
   aspect-ratio: var(--board-ratio);
 }
 
+/* Whole pixels: at a fractional height (the wiring board at 714 px is 451.5 px tall) a zoomed board that a pinch or the zoom buttons left at its bottom edge keeps the next swipe instead of handing it to the page */
+@supports (height: round(down, 1cqw, 1px)) {
+  [data-md-color-scheme] .ag-guide:not(.ag-expanded) .ag-full-board {
+    container-type: inline-size;
+  }
+
+  [data-md-color-scheme] .ag-guide:not(.ag-expanded) .ag-board-canvas {
+    aspect-ratio: auto;
+    height: round(down, 100cqw / (var(--board-ratio)), 1px);
+  }
+}
+
 /* Touch targets of at least 24 px: the tick boxes in the connection list, the detail and the BOM (BuildGuide sets 17 px, see OpenReloading/BuildGuide#69) */
 [data-md-color-scheme] .ag-guide input[type="checkbox"] {
   width: 24px;
@@ -721,7 +733,7 @@ button:focus-visible {
   }
 
   /* 44 px touch targets for every button and the scope menu, the board controls 44 x 44 (the tick boxes stay at 24 px) */
-  .ag-guide :is(.ag-primary, .ag-quiet, .ag-board-controls button, .ag-board-toolbar select, .ag-wire-row button) {
+  .ag-guide :is(.ag-primary, .ag-quiet, .ag-board-controls button, .ag-board-toolbar select, .ag-wire-row button, .ag-bom-tools select, .ag-progress-tools button) {
     min-height: 44px;
   }
 

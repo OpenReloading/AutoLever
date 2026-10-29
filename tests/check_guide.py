@@ -211,7 +211,7 @@ with sync_playwright() as p:
         page.locator('.ag-verify input').check()
     page.reload(wait_until='domcontentloaded')
     tubes=len(tubing)
-    expect(page.locator('.ag-progress')).to_have_text(f'{tubes} / {tubes} checked')
+    expect(page.locator('.ag-progress')).to_have_text('All connections checked')
     expect(page.locator('[data-action=next-wire]')).to_be_disabled()
     page.locator('[data-role=scope]').select_option('all');ready()  # noqa: E702
     expect(page.locator('[data-connection]')).to_have_count(tubes)
@@ -270,7 +270,7 @@ with sync_playwright() as p:
     with tempfile.TemporaryDirectory() as temp:
         target=Path(temp)/'bom.csv';download.value.save_as(target)  # noqa: E702
         rows=list(csv.DictReader(io.StringIO(target.read_text(encoding='utf-8-sig'))))
-        assert list(rows[0])==['Group','Component','Specification','Quantity','MakerWorld']
+        assert list(rows[0])==['Group','Component','Specification','Quantity','MakerWorld','Done']
         assert [r['Quantity'] for r in rows]==['3','2','2','1']
         assert download.value.suggested_filename=='autolever-bom.csv'
     page.locator('[data-role=search]').fill('does-not-exist')
@@ -279,7 +279,7 @@ with sync_playwright() as p:
     expect(page.locator('tbody tr:not(.ag-group)')).to_have_count(len(bom))
     # Printed parts are grouped, marked as 3D printed and link to MakerWorld.
     page.locator('[data-role=search]').fill('3D printed')
-    expect(page.locator('tr.ag-group')).to_have_text(['3D printed','Relay edition only (deprecated)'])
+    expect(page.locator('tr.ag-group')).to_contain_text(['3D printed','Relay edition only (deprecated)'])
     expect(page.locator('tbody a', has_text='MakerWorld')).to_have_count(sum('link' in row for row in bom))
     page.locator('[data-role=search]').fill('')
     main_page=page
@@ -299,8 +299,20 @@ with sync_playwright() as p:
             small=page.evaluate(TARGETS)
             assert not small,(path,width,scheme,'tap target under 44 px',small)
         page.context.close()
-    for scheme in ('light','dark'):
-        page=open_page(viewport={'width':390,'height':844},color_scheme=scheme)
+    # Touch points from offsets to the board centre, moved in steps as a finger moves.
+    def swipe(cdp,board,start,end,steps=10):
+        def send(kind,points):
+            cdp.send('Input.dispatchTouchEvent',{'type':kind,'touchPoints':[{'x':x,'y':y,'id':i} for i,(x,y) in enumerate(points)]})
+        box=board.bounding_box();x0,y0=box['x']+box['width']/2,box['y']+box['height']/2  # noqa: E702
+        send('touchStart',[(x0+x,y0+y) for x,y in start])
+        for s in range(1,steps+1):
+            send('touchMove',[(x0+a+(c-a)*s/steps,y0+b+(d-b)*s/steps) for (a,b),(c,d) in zip(start,end,strict=True)])
+        send('touchEnd',[])
+    def page_scrolls(cdp,board,start,end,down):
+        before=page.evaluate('scrollY');swipe(cdp,board,start,end)  # noqa: E702
+        page.wait_for_function('([before,down])=>down?scrollY>before+30:scrollY<before-30',arg=[before,down])
+    for width,scheme in [(390,'light'),(390,'dark'),(820,'light'),(820,'dark')]:
+        page=open_page(viewport={'width':width,'height':844},color_scheme=scheme,has_touch=True)
         for path in ['', 'bom/', 'wiring/', 'tubing/', 'relay/']:
             go(path);scheme_is(scheme)  # noqa: E702
             # Phones: every control is at least 24 px and every button 44 px high, the board controls 44 x 44 on a toolbar without a sideways scroll, in both schemes; the canvas is as tall as its drawing, with Fullscreen above it in the first screen.
@@ -308,8 +320,10 @@ with sync_playwright() as p:
             assert page.evaluate("[...document.querySelectorAll('.ag-guide button, .ag-guide select')].every(e=>{const r=e.getBoundingClientRect();return !r.width||r.height>=43.9})"),path+': button under 44 px'
             if path in ('wiring/','tubing/','relay/'):
                 ready()
+                page.locator('[data-action=zoom-fit]').click()   # phones open at a readable zoom that pans; Fit shows the whole drawing
                 canvas,drawing,fullscreen=page.evaluate("['.ag-board-canvas','.ag-board-canvas > div','[data-action=fullscreen]'].map(s=>{const r=document.querySelector(s).getBoundingClientRect();return {y:r.y,height:r.height}})")
                 assert abs(canvas['height']-drawing['height'])<=2,f"{path}: canvas {canvas['height']} px, drawing {drawing['height']} px"
+                assert canvas['height']==int(canvas['height']),f"{path} at {width} px: canvas {canvas['height']} px, a fractional height keeps the swipe at the board edge"
                 assert page.evaluate("[...document.querySelectorAll('.ag-board-controls button')].every(e=>{const r=e.getBoundingClientRect();return r.width>=43.9&&r.height>=43.9})"),path+': board control under 44 x 44 px'
                 assert page.evaluate("[...document.querySelectorAll('.ag-board-toolbar, .ag-board-controls')].every(e=>e.scrollWidth<=e.clientWidth&&e.getBoundingClientRect().right<=innerWidth)"),path+': board toolbar overflows'
                 assert fullscreen['y']+fullscreen['height']<=844,path+': Fullscreen below the first screen'
@@ -319,6 +333,25 @@ with sync_playwright() as p:
                 assert page.evaluate("document.querySelector('[data-action=zoom-in]').getBoundingClientRect().right<=innerWidth"),path+': zoom controls outside the fullscreen view'
                 page.locator('[data-action=fullscreen]').click()
                 expect(page.locator('.ag-guide')).not_to_have_class(re.compile('ag-expanded'))
+            if path in ('wiring/','tubing/'):
+                # Touch: one finger scrolls the page over a fit board, two fingers zoom, one finger pans the zoomed board and hands the swipe to the page at its top and bottom edge, Fit resets.
+                board=page.locator('.ag-board-canvas');cdp=page.context.new_cdp_session(page)  # noqa: E702
+                fitted='e=>e.scrollWidth<=e.clientWidth+1&&e.scrollHeight<=e.clientHeight+1'
+                board.scroll_into_view_if_needed();page.evaluate('scrollBy(0,-100)')  # noqa: E702
+                assert board.evaluate(fitted),f'{path} at {width} px: Fit leaves the board zoomed'
+                page_scrolls(cdp,board,[(0,0)],[(0,-120)],True)
+                swipe(cdp,board,[(-30,0),(30,0)],[(-130,0),(130,0)])
+                page.wait_for_function('e=>e.scrollWidth>e.clientWidth*1.5',arg=board.element_handle())
+                left,before=board.evaluate('e=>e.scrollLeft'),page.evaluate('scrollY')
+                swipe(cdp,board,[(60,0)],[(-40,0)])
+                page.wait_for_function('([e,left])=>e.scrollLeft!=left',arg=[board.element_handle(),left])
+                assert abs(page.evaluate('scrollY')-before)<5,f'{path} at {width} px: panning the zoomed board scrolls the page'
+                board.evaluate('e=>e.scrollTop=e.scrollHeight')
+                page_scrolls(cdp,board,[(0,0)],[(0,-120)],True)
+                board.evaluate('e=>e.scrollTop=0')
+                page_scrolls(cdp,board,[(0,0)],[(0,120)],False)
+                page.locator('[data-action=zoom-fit]').click()
+                page.wait_for_function(fitted,arg=board.element_handle())
             if path=='bom/':   # every specification on screen, not hidden in a sideways scroller
                 assert page.evaluate("[...document.querySelectorAll('tbody tr:not(.ag-group) td:nth-child(3)')].every(td=>{const r=td.getBoundingClientRect();return r.width>0&&r.left>=0&&r.right<=innerWidth})"),'BOM specification off screen'
         page.context.close()
@@ -404,4 +437,4 @@ with sync_playwright() as p:
     assert 'This guide needs JavaScript.' in fallback.content()
     browser.close()
     wires=[w for s in wiring for w in s['connections']]
-    print(f"PASS: five Markdown pages with BuildGuide components; {len(wires)} connections ({sum(w['color']=='DIODE' for w in wires)} diodes), {len(tubing)} tubing steps, grouped BOM with 3D printed parts, safety admonition on every page (full on introduction and BOM, short with link on wiring and tubing); matching layouts, zoom, fullscreen, scrolling, persistence, CSV and mobile; no sideways scroll at 390 px and 44 px tap targets in the header, footer, home buttons and card links; link preview meta and card on every page; self-hosted search at 390 and 1440 px in light and dark; no JS errors, missing assets or third-party requests.")
+    print(f"PASS: five Markdown pages with BuildGuide components; {len(wires)} connections ({sum(w['color']=='DIODE' for w in wires)} diodes), {len(tubing)} tubing steps, grouped BOM with 3D printed parts, safety admonition on every page (full on introduction and BOM, short with link on wiring and tubing); matching layouts, zoom, fullscreen, scrolling, persistence, CSV and mobile; pinch zoom, one-finger pan and hand-over to the page at 390 and 820 px; no sideways scroll at 390 px and 44 px tap targets in the header, footer, home buttons and card links; link preview meta and card on every page; self-hosted search at 390 and 1440 px in light and dark; no JS errors, missing assets or third-party requests.")
