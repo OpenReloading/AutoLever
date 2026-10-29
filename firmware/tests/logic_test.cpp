@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <initializer_list>
+#include <string>
 
 #include "../src/logic.h"
 
@@ -318,6 +319,10 @@ int main() {
         CHECK(!jam_ms_from_text("1.5", ms) && ms == 7000);
         CHECK(jam_ms_from_text("15", ms) && ms == 15000);
         CHECK(jam_ms_from_text("0", ms) && ms == 2000 && jam_ms_from_text("500", ms) && ms == 120000);
+    }
+    {  // Wi-Fi form password: empty keeps the stored one, else a WPA2 passphrase length
+        CHECK(wifi_pass_ok("") && wifi_pass_ok("12345678") && wifi_pass_ok(std::string(63, 'a').c_str()));
+        CHECK(!wifi_pass_ok("1") && !wifi_pass_ok("1234567") && !wifi_pass_ok(std::string(64, 'a').c_str()));
     }
     std::puts("ok");
     return 0;

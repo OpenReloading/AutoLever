@@ -132,4 +132,9 @@ bool jam_ms_from_text(const char* text, uint32_t& ms) {
     return true;
 }
 
+bool wifi_pass_ok(const char* pass) {
+    size_t n = std::strlen(pass);
+    return n == 0 || (n >= 8 && n <= 63);
+}
+
 }  // namespace autolever

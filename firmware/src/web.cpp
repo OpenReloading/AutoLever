@@ -101,6 +101,10 @@ static void handle_wifi() {
         server.send(400, "text/plain", "Network name must be 1 to 32 characters");
         return;
     }
+    if (!wifi_pass_ok(server.arg("pass").c_str())) {
+        server.send(400, "text/plain", "Password must be 8 to 63 characters");
+        return;
+    }
     prefs->putString("ssid", ssid);
     if (server.arg("pass").length()) prefs->putString("wpass", server.arg("pass"));   // empty keeps the stored password
     WiFi.disconnect(false);
