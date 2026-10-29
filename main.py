@@ -107,7 +107,7 @@ def label(end):
     return f"{cap(PLAIN.get(part, part))} {terminal(part, pin)}{detail(part, pin)}"
 
 
-def cable_of(w, a, b, col):  # noqa: ARG001
+def cable_of(a, b, col):
     """Which kind of cable a wire is: see `cables:` in data/wiring.yaml and data/relay.yaml."""
     parts = {a.split(":")[0], b.split(":")[0]}
     if col == "DIODE":
@@ -130,7 +130,7 @@ def connection(w, shared, no, a, b, col):  # noqa: PLR0913
         """Two wires on one screw go into one twin ferrule: name the partner."""
         return "".join(f" · one twin ferrule with wire {n}" for n in shared.get(end, []) if n != no)
 
-    cable = w["cables"][cable_of(w, a, b, col)]
+    cable = w["cables"][cable_of(a, b, col)]
     c = {"no": no, "a": a, "b": b, "color": col,
          # a diode leg is not a wire: no twin ferrule hint on the diode rows
          "la": label(a) + ("" if col == "DIODE" else twin(a)), "lb": label(b) + ("" if col == "DIODE" else twin(b))}

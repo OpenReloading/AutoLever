@@ -10,7 +10,11 @@ class _Loader(yaml.SafeLoader):
     pass
 
 
-_Loader.add_constructor("!ENV", lambda loader, node: loader.construct_sequence(node)[-1])
+def _env_default(loader: _Loader, node: yaml.SequenceNode):
+    return loader.construct_sequence(node)[-1]
+
+
+_Loader.add_constructor("!ENV", _env_default)
 
 
 def site_config() -> dict:

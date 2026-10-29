@@ -21,7 +21,7 @@ max-statements = 50
 # "standard" is the type checker of Pyright. "recommended" adds the Unknown* and missing-annotation reports.
 typeCheckingMode = "standard"
 # Folders to check; the baseline lives in .basedpyright/baseline.json.
-include = ["main.py", "hooks", "tests"]
+include = ["main.py", "hooks", "tests", "tools"]
 # the tests import the MkDocs hook as a top-level module (pytest pythonpath below)
 extraPaths = ["hooks"]
 
