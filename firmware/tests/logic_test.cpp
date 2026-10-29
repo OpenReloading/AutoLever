@@ -1,6 +1,7 @@
 // Native test of the press logic; built and run by tests/test_firmware.py.
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
 #include <initializer_list>
 
 #include "../src/logic.h"
@@ -246,6 +247,13 @@ int main() {
         CHECK(!same_origin("http://autolever.local", ""));
     }
     for (uint32_t seed : {1u, 2u, 3u, 12345u}) random_run(seed, 800);
+    {  // names on the display and the status page
+        CHECK(!std::strcmp(state_name(State::Idle), "IDLE") && !std::strcmp(state_name(State::Auto), "AUTO"));
+        CHECK(!std::strcmp(state_name(State::Jog), "JOG") && !std::strcmp(state_name(State::Fault), "FAULT"));
+        CHECK(!std::strcmp(fault_name(Fault::None), "") && !std::strcmp(fault_name(Fault::EStop), "E-STOP"));
+        CHECK(!std::strcmp(fault_name(Fault::Pressure), "PRESSURE") && !std::strcmp(fault_name(Fault::Sensor), "SENSOR"));
+        CHECK(!std::strcmp(fault_name(Fault::Jam), "JAM"));
+    }
     CHECK(jam_ms_from_seconds(0) == 2000 && jam_ms_from_seconds(-5) == 2000);
     CHECK(jam_ms_from_seconds(15) == 15000 && jam_ms_from_seconds(500) == 120000);
     CHECK(jam_ms_from_seconds(UINT32_MAX / 1000) == 120000);   // a corrupt stored value at boot
