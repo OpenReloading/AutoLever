@@ -45,13 +45,20 @@ return (Math.max(a,b)+0.05)/(Math.min(a,b)+0.05)}"""
 BASE=(sys.argv[1] if len(sys.argv)>1 else 'http://127.0.0.1:8000').rstrip('/')
 with sync_playwright() as p:
     browser=p.chromium.launch(headless=True,args=['--no-sandbox'])
-    context=browser.new_context(viewport={'width':1440,'height':1000},accept_downloads=True)
-    context.route('**/*',lambda r:r.continue_() if r.request.url.startswith(BASE) else r.abort())
-    page=context.new_page();errors=[];missing=[];external=[]  # noqa: E702
-    page.on('pageerror',lambda e:errors.append(str(e)))
-    page.on('response',lambda r:missing.append(r.url) if r.status>=400 else None)
-    # no third-party requests (fonts, CDNs): the route below would only hide them
-    page.on('request',lambda r:external.append(r.url) if r.url.startswith(('http://','https://')) and not r.url.startswith(BASE) else None)
+    errors=[];missing=[];external=[]  # noqa: E702
+    # Material keeps the palette it saved in a context, so a colour scheme under test gets a fresh context.
+    def open_page(**options):
+        context=browser.new_context(**{'viewport':{'width':1440,'height':1000},**options})
+        context.route('**/*',lambda r:r.continue_() if r.request.url.startswith(BASE) else r.abort())
+        page=context.new_page()
+        page.on('pageerror',lambda e:errors.append(str(e)))
+        page.on('response',lambda r:missing.append(r.url) if r.status>=400 else None)
+        # no third-party requests (fonts, CDNs): the route above would only hide them
+        page.on('request',lambda r:external.append(r.url) if r.url.startswith(('http://','https://')) and not r.url.startswith(BASE) else None)
+        return page
+    def scheme_is(scheme):
+        expect(page.locator('body')).to_have_attribute('data-md-color-scheme','slate' if scheme=='dark' else 'default')
+    page=open_page(accept_downloads=True)
     def go(path=''):
         page.goto(BASE+'/'+path,wait_until='domcontentloaded')
         expect(page.locator('.ag-guide' if path else 'main h1')).to_be_visible()
@@ -62,13 +69,13 @@ with sync_playwright() as p:
     origin=urlparse(config['site_url'])
     card=f'{origin.scheme}://{origin.netloc}'+urlparse(BASE).path+'/assets/social-card.png'
     for path in ['','bom/','wiring/','tubing/','relay/','404.html']:
-        tags=dict(re.findall(r'<meta (?:property|name)="((?:og|twitter):[\w:]+)" content="([^"]*)"',context.request.get(BASE+'/'+path).text()))
+        tags=dict(re.findall(r'<meta (?:property|name)="((?:og|twitter):[\w:]+)" content="([^"]*)"',page.request.get(BASE+'/'+path).text()))
         assert tags['og:image']==tags['twitter:image']==card,path
         assert tags['og:description']==tags['twitter:description']==config['site_description'],path
         assert tags['og:title']==tags['twitter:title'],path
         assert tags['og:title'].endswith(config['site_name']),path
         assert (tags['og:image:width'],tags['og:image:height'],tags['twitter:card'])==('1200','630','summary_large_image'),path
-    image=context.request.get(BASE+'/assets/social-card.png')
+    image=page.request.get(BASE+'/assets/social-card.png')
     assert image.status==200
     assert image.body()[:8]==b'\x89PNG\r\n\x1a\n'
     assert struct.unpack('>II',image.body()[16:24])==(1200,630)
@@ -275,11 +282,11 @@ with sync_playwright() as p:
     expect(page.locator('tr.ag-group')).to_have_text(['3D printed','Relay edition only (deprecated)'])
     expect(page.locator('tbody a', has_text='MakerWorld')).to_have_count(sum('link' in row for row in bom))
     page.locator('[data-role=search]').fill('')
-    page.set_viewport_size({'width':390,'height':844})
+    main_page=page
     for scheme in ('light','dark'):
-        page.emulate_media(color_scheme=scheme)
+        page=open_page(viewport={'width':390,'height':844},color_scheme=scheme)
         for path in ['', 'bom/', 'wiring/', 'tubing/', 'relay/']:
-            go(path)
+            go(path);scheme_is(scheme)  # noqa: E702
             assert page.evaluate('document.body.scrollWidth<=innerWidth'),path
             # Phones: every control is at least 24 px and every button 44 px high, the board controls 44 x 44 on a toolbar without a sideways scroll, in both schemes; the canvas is as tall as its drawing, with Fullscreen above it in the first screen.
             assert page.evaluate("[...document.querySelectorAll('.ag-guide button, .ag-guide select, .ag-guide input')].every(e=>{const r=e.getBoundingClientRect();return !r.width||(r.width>=23.9&&r.height>=23.9)})"),path+': control under 24 px'
@@ -299,7 +306,8 @@ with sync_playwright() as p:
                 expect(page.locator('.ag-guide')).not_to_have_class(re.compile('ag-expanded'))
             if path=='bom/':   # every specification on screen, not hidden in a sideways scroller
                 assert page.evaluate("[...document.querySelectorAll('tbody tr:not(.ag-group) td:nth-child(3)')].every(td=>{const r=td.getBoundingClientRect();return r.width>0&&r.left>=0&&r.right<=innerWidth})"),'BOM specification off screen'
-    page.emulate_media(color_scheme='null')
+        page.context.close()
+    page=main_page
     # The next action stays on screen across step lengths and viewport changes.
     for width,height in [(1440,900),(1280,720),(390,844),(375,667),(844,390)]:
         page.set_viewport_size({'width':width,'height':height})
@@ -321,10 +329,10 @@ with sync_playwright() as p:
     go('wiring/#wiring='+first);ready()  # noqa: E702
     assert page.locator('.ag-board-canvas').evaluate('e=>e.clientHeight')>=300,'board too small at 1024x768'
     # Print on A4 (718 px between 10 mm margins), also from the dark scheme: the boards fit the width BuildGuide prints them at (700 px), the controls and counters are hidden and the text is dark on white paper.
-    page.set_viewport_size({'width':718,'height':1123})
-    page.emulate_media(media='print',color_scheme='dark')
+    page=open_page(viewport={'width':718,'height':1123},color_scheme='dark')
+    page.emulate_media(media='print')
     for slug in ['bom','wiring','tubing','relay']:
-        go(slug+'/')
+        go(slug+'/');scheme_is('dark')  # noqa: E702
         if slug!='bom':
             ready()
         expect(page.locator('.joint-paper')).to_have_count(0 if slug=='bom' else 1)  # an empty list would pass the bounds check below
@@ -334,13 +342,12 @@ with sync_playwright() as p:
             expect(page.locator(hidden)).to_be_hidden()
         expect(page.locator('main h1')).to_have_css('color','rgb(22, 35, 58)')
         expect(page.locator('main h1 + .admonition.danger')).to_be_visible()
-    page.emulate_media(media='null',color_scheme='null')
+    page.context.close()
     # Self-hosted search under the base path: opens, finds a word of the introduction, links stay under the prefix; on a phone and on a desktop, light and dark, the controls are 24 px or more with text contrast of 4.5:1 or more.
     views:list[tuple[int,Literal['light','dark']]]=[(390,'light'),(390,'dark'),(1440,'light'),(1440,'dark')]
     for width,scheme in views:
-        page.set_viewport_size({'width':width,'height':844})
-        page.emulate_media(color_scheme=scheme)
-        go('bom/' if width==390 else '')  # a nested page checks the relative base of the search files
+        page=open_page(viewport={'width':width,'height':844},color_scheme=scheme)
+        go('bom/' if width==390 else '');scheme_is(scheme)  # a nested page checks the relative base of the search files  # noqa: E702
         if width==390:   # component text: the step label, the counter and the primary button
             for selector in ['.step-label','.ag-progress','.ag-primary']:
                 ratio=page.evaluate(CONTRAST,[selector,None])
@@ -351,9 +358,10 @@ with sync_playwright() as p:
             assert toggle.evaluate('e=>e.offsetWidth>=24&&e.offsetHeight>=24'),(width,scheme)
             assert page.evaluate(CONTRAST,['label.md-header__button[for=__search]',None])>=4.5,(width,scheme,'toggle')
             toggle.click()
+        # before the click (on a desktop Material fades the placeholder out once the search is open), after its colour transition from the page load
+        page.wait_for_function(f"({CONTRAST})(['.md-search__input','::placeholder'])>=4.5",timeout=2000)
         field=page.locator('.md-search__input')
         field.click()
-        assert page.evaluate(CONTRAST,['.md-search__input','::placeholder'])>=4.5,(width,scheme,'placeholder')
         field.press_sequentially('relay')  # the search listens to key events, fill() sends none
         link=page.locator('.md-search-result__link').first
         expect(link).to_be_visible()
@@ -365,8 +373,8 @@ with sync_playwright() as p:
             assert ratio>=4.5,(width,scheme,selector,ratio)
         link.click()
         expect(page.locator('main h1')).to_be_visible()
-    page.set_viewport_size({'width':1440,'height':1000})
-    page.emulate_media(color_scheme='null')
+        page.context.close()
+    page=main_page
     assert not errors,errors
     assert not missing,missing
     assert not external,sorted(set(external))
