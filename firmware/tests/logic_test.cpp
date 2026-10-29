@@ -229,6 +229,46 @@ int main() {
         r.press_start();
         CHECK(r.c.state() == State::Idle && r.c.fault() == Fault::None);
     }
+    {  // A during a supply fault does not acknowledge a latched jam; it survives E-STOP and pressure loss stacked
+        Rig r;
+        r.c.jam_ms = 500;
+        r.press_start();
+        for (int i = 0; i < 100; ++i) {  // valve on, rod does not leave home
+            r.out = r.c.step(r.in, r.now);
+            r.now += 10;
+        }
+        CHECK(r.c.fault() == Fault::Jam);
+        r.in.estop_ok = false;
+        r.tick();
+        r.press_start();
+        r.in.pressure_ok = false;
+        r.run(5);
+        r.in.estop_ok = true;
+        r.run(5);
+        CHECK(r.c.fault() == Fault::Pressure);
+        r.in.pressure_ok = true;
+        r.run(5);
+        CHECK(r.c.state() == State::Fault && r.c.fault() == Fault::Jam && !r.out.extend && !r.out.retract);
+        r.press_start();
+        CHECK(r.c.state() == State::Idle);
+    }
+    {  // JOG held through an E-STOP does not move the press after the release
+        Rig r;
+        r.tick();
+        r.in.jog = true;
+        r.run(30);
+        CHECK(r.c.state() == State::Jog);
+        r.in.estop_ok = false;
+        r.tick();
+        r.in.estop_ok = true;
+        r.run(20);
+        CHECK(r.c.state() == State::Idle && !r.out.extend && !r.out.retract);
+        r.in.jog = false;
+        r.tick();
+        r.in.jog = true;
+        r.tick();
+        CHECK(r.c.state() == State::Jog && r.out.retract);   // mid-stroke: back home first
+    }
     {  // starting mid-stroke retracts first
         Rig r;
         r.pos = 50;
