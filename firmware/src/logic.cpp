@@ -115,8 +115,10 @@ Outputs Controller::step(const Inputs& in, uint32_t now_ms) {
     return {phase_ == Phase::Extend, phase_ == Phase::Retract};
 }
 
+// The String::c_str() these get is nullptr for a String without a buffer, so nullptr counts as empty.
 bool same_origin(const char* source, const char* host) {
-    if (!*source) return true;
+    if (!source || !*source) return true;
+    if (!host) host = "";
     const char* sep = std::strstr(source, "://");
     if (sep) source = sep + 3;
     for (; *source && *source != '/'; ++source, ++host)
@@ -125,11 +127,17 @@ bool same_origin(const char* source, const char* host) {
 }
 
 bool jam_ms_from_text(const char* text, uint32_t& ms) {
+    if (!text) return false;
     char* end;
     long s = std::strtol(text, &end, 10);
     if (end == text || *end) return false;
     ms = jam_ms_from_seconds(s);
     return true;
+}
+
+bool wifi_pass_ok(const char* pass) {
+    size_t n = pass ? std::strlen(pass) : 0;
+    return n == 0 || (n >= 8 && n <= 63);
 }
 
 }  // namespace autolever

@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <initializer_list>
+#include <string>
 
 #include "../src/logic.h"
 
@@ -300,6 +301,8 @@ int main() {
         CHECK(!same_origin("http://192.168.4.1", "192.168.4.10"));
         CHECK(!same_origin("null", "192.168.4.1"));
         CHECK(!same_origin("http://autolever.local", ""));
+        CHECK(same_origin(nullptr, "192.168.4.1") && same_origin(nullptr, nullptr));
+        CHECK(!same_origin("http://autolever.local", nullptr));
     }
     for (uint32_t seed : {1u, 2u, 3u, 12345u}) random_run(seed, 800);
     {  // names on the display and the status page
@@ -315,9 +318,13 @@ int main() {
     {  // settings form field: empty or non-numeric leaves the value unchanged
         uint32_t ms = 7000;
         CHECK(!jam_ms_from_text("", ms) && !jam_ms_from_text("abc", ms) && !jam_ms_from_text("15s", ms));
-        CHECK(!jam_ms_from_text("1.5", ms) && ms == 7000);
+        CHECK(!jam_ms_from_text("1.5", ms) && !jam_ms_from_text(nullptr, ms) && ms == 7000);
         CHECK(jam_ms_from_text("15", ms) && ms == 15000);
         CHECK(jam_ms_from_text("0", ms) && ms == 2000 && jam_ms_from_text("500", ms) && ms == 120000);
+    }
+    {  // Wi-Fi form password: empty keeps the stored one, else a WPA2 passphrase length
+        CHECK(wifi_pass_ok(nullptr) && wifi_pass_ok("") && wifi_pass_ok("12345678") && wifi_pass_ok(std::string(63, 'a').c_str()));
+        CHECK(!wifi_pass_ok("1") && !wifi_pass_ok("1234567") && !wifi_pass_ok(std::string(64, 'a').c_str()));
     }
     std::puts("ok");
     return 0;

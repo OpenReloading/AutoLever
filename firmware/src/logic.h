@@ -34,6 +34,9 @@ bool jam_ms_from_text(const char* text, uint32_t& ms);
 // empty or names that host (scheme and path ignored, case-insensitive).
 bool same_origin(const char* source, const char* host);
 
+// Wi-Fi form password: true when empty (keeps the stored one) or 8 to 63 characters (WPA2 passphrase).
+bool wifi_pass_ok(const char* pass);
+
 class Controller {
 public:
     // Longest time for one stroke (out or back); longer is a jam.
