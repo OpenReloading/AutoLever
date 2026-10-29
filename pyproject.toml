@@ -30,7 +30,6 @@ testpaths = ["tests"]
 # main.py is in the root, the MkDocs hook in hooks/
 pythonpath = [".", "hooks"]
 
-# Floor (percent) a little below the measured value, lines and branches together; raise it when coverage rises.
 [tool.coverage.run]
 # hooks/ has no __init__.py, so it is listed to count its files even when no test imports them
 source_dirs = [".", "hooks"]
@@ -38,8 +37,9 @@ branch = true
 # tests are not measured; the browser check runs against the built site in its own CI step
 omit = ["tests/*", ".venv/*"]
 
+# Floor (percent) a little below the measured value, lines and branches together; raise it when coverage rises.
 [tool.coverage.report]
-fail_under = 95
+fail_under = 99
 show_missing = true
 # thin entry point: main.py writes the file, build() is what the tests cover
 exclude_also = ["if __name__ == .__main__.:"]
