@@ -81,7 +81,7 @@ def test_label_names_the_terminal_in_words(end, text):
     ("K1:9", "X-M1:1", "red", "core"),
 ])
 def test_cable_of_picks_the_cable_kind(a, b, col, kind):
-    assert main.cable_of({}, a, b, col) == kind
+    assert main.cable_of(a, b, col) == kind
 
 
 def test_cable_text_skips_an_empty_awg():
