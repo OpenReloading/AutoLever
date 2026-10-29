@@ -283,11 +283,26 @@ with sync_playwright() as p:
     expect(page.locator('tbody a', has_text='MakerWorld')).to_have_count(sum('link' in row for row in bom))
     page.locator('[data-role=search]').fill('')
     main_page=page
+    # No sideways scroll at 390 px, and every tap target a user can reach in the header, the tabs, the footer, the home buttons and the card links is 44 px high, on a phone and on a desktop, light and dark.
+    views:list[tuple[int,Literal['light','dark']]]=[(390,'light'),(390,'dark'),(1440,'light'),(1440,'dark')]
+    TARGETS="""[...document.querySelectorAll('.md-header :is(a, button, label, input), .md-tabs a, .md-footer a, .md-typeset .md-button, :is(h2#what-it-does + ul, h2#build-it + ol) a')]
+        .filter(e=>{const r=e.getBoundingClientRect();return r.width&&r.height&&getComputedStyle(e).pointerEvents!='none'&&e.checkVisibility({opacityProperty:true,visibilityProperty:true})})
+        .map(e=>[e.tagName,e.className||e.textContent.trim(),Math.round(e.getBoundingClientRect().height)]).filter(t=>t[2]<44)"""
+    for width,scheme in views:
+        page=open_page(viewport={'width':width,'height':844},color_scheme=scheme)
+        for path in ['','bom/','wiring/','tubing/','relay/','404.html']:
+            page.goto(BASE+'/'+path,wait_until='load');scheme_is(scheme)  # noqa: E702
+            if path in ('wiring/','tubing/','relay/'):
+                ready()
+            if width==390:
+                assert page.evaluate('document.documentElement.scrollWidth<=innerWidth'),(path,scheme,'horizontal scroll')
+            small=page.evaluate(TARGETS)
+            assert not small,(path,width,scheme,'tap target under 44 px',small)
+        page.context.close()
     for scheme in ('light','dark'):
         page=open_page(viewport={'width':390,'height':844},color_scheme=scheme)
         for path in ['', 'bom/', 'wiring/', 'tubing/', 'relay/']:
             go(path);scheme_is(scheme)  # noqa: E702
-            assert page.evaluate('document.body.scrollWidth<=innerWidth'),path
             # Phones: every control is at least 24 px and every button 44 px high, the board controls 44 x 44 on a toolbar without a sideways scroll, in both schemes; the canvas is as tall as its drawing, with Fullscreen above it in the first screen.
             assert page.evaluate("[...document.querySelectorAll('.ag-guide button, .ag-guide select, .ag-guide input')].every(e=>{const r=e.getBoundingClientRect();return !r.width||(r.width>=23.9&&r.height>=23.9)})"),path+': control under 24 px'
             assert page.evaluate("[...document.querySelectorAll('.ag-guide button, .ag-guide select')].every(e=>{const r=e.getBoundingClientRect();return !r.width||r.height>=43.9})"),path+': button under 44 px'
@@ -344,7 +359,6 @@ with sync_playwright() as p:
         expect(page.locator('main h1 + .admonition.danger')).to_be_visible()
     page.context.close()
     # Self-hosted search under the base path: opens, finds a word of the introduction, links stay under the prefix; on a phone and on a desktop, light and dark, the controls are 24 px or more with text contrast of 4.5:1 or more.
-    views:list[tuple[int,Literal['light','dark']]]=[(390,'light'),(390,'dark'),(1440,'light'),(1440,'dark')]
     for width,scheme in views:
         page=open_page(viewport={'width':width,'height':844},color_scheme=scheme)
         go('bom/' if width==390 else '');scheme_is(scheme)  # a nested page checks the relative base of the search files  # noqa: E702
@@ -390,4 +404,4 @@ with sync_playwright() as p:
     assert 'This guide needs JavaScript.' in fallback.content()
     browser.close()
     wires=[w for s in wiring for w in s['connections']]
-    print(f"PASS: five Markdown pages with BuildGuide components; {len(wires)} connections ({sum(w['color']=='DIODE' for w in wires)} diodes), {len(tubing)} tubing steps, grouped BOM with 3D printed parts, safety admonition on every page (full on introduction and BOM, short with link on wiring and tubing); matching layouts, zoom, fullscreen, scrolling, persistence, CSV and mobile; link preview meta and card on every page; self-hosted search at 390 and 1440 px in light and dark; no JS errors, missing assets or third-party requests.")
+    print(f"PASS: five Markdown pages with BuildGuide components; {len(wires)} connections ({sum(w['color']=='DIODE' for w in wires)} diodes), {len(tubing)} tubing steps, grouped BOM with 3D printed parts, safety admonition on every page (full on introduction and BOM, short with link on wiring and tubing); matching layouts, zoom, fullscreen, scrolling, persistence, CSV and mobile; no sideways scroll at 390 px and 44 px tap targets in the header, footer, home buttons and card links; link preview meta and card on every page; self-hosted search at 390 and 1440 px in light and dark; no JS errors, missing assets or third-party requests.")

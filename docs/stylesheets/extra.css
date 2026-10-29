@@ -99,6 +99,31 @@ button:focus-visible {
   font-weight: 600;
 }
 
+/* 44 px icon buttons (drawer, logo, palette, search) and, from 960 px, a 44 px search field; both keep Material's 48 px header row */
+[data-md-color-scheme] .md-header__button {
+  margin: 2px;
+  padding: 10px;
+}
+
+@media screen and (min-width: 960px) {
+  .md-search {
+    padding-block: 2px;
+  }
+
+  .md-search__inner {
+    padding-block: 0;
+  }
+
+  .md-search__form {
+    height: 44px;
+  }
+
+  .md-search__icon[for="__search"],
+  .md-search__options {
+    top: 10px;
+  }
+}
+
 @media screen and (min-width: 1280px) {
   .md-header__inner {
     padding-block: 20px;
@@ -526,6 +551,11 @@ button:focus-visible {
   font-size: 21px;
   font-weight: 600;
   line-height: 1.3;
+}
+
+/* The page links in the "Build it" cards: 14 px above and below the 17 px text make a 44 px target without changing the line height */
+.md-content__inner > p:has(> .md-button--primary) ~ h2#build-it + ol a {
+  padding-block: 14px;
 }
 
 .md-content__inner > p:has(> .md-button--primary) ~ h2#build-it + ol > li::before {
