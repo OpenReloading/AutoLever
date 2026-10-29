@@ -427,4 +427,5 @@ else if (part == "rack_test") {
 else if (part == "estop_ring")  estop_ring();   // print in yellow, flat
 else if (part == "labels_lid")  translate([0, D, Hz + lid_t]) rotate([180, 0, 0]) labels_lid();
 else if (part == "exploded")    { body_colored(); plate_colored(60); lid_colored(70); }
-else                            { body_colored(); plate_colored(0); lid_colored(0); %ghosts(); }
+else if (part == "assembly")    { body_colored(); plate_colored(0); lid_colored(0); %ghosts(); }
+else                            assert(false, str("unknown part: ", part));

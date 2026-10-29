@@ -239,12 +239,14 @@ if (part == "assembly") {
     translate([0, 0, -(zs + clamp_gap/2)]) half_top();
 } else if (part == "bottom") {
     translate([0, 0, zs - clamp_gap/2]) rotate([180, 0, 0]) half_bottom();
-} else {
-    // print_plate: both halves side by side, parting plane down
+} else if (part == "print_plate") {
+    // both halves side by side, parting plane down
     translate([0, 0, -(zs + clamp_gap/2)]) half_top();
     // the bottom half starts 10 mm past the X extent of the top half (clamp plus eye); the old
     // spacing stays as the minimum so the default plate does not move
     x_min = min(0, arm_x * L - eye_r);
     x_max = max(L, arm_x * L + eye_r);
     translate([max(L + 2 * eye_r, x_max - x_min) + 10, 0, zs - clamp_gap/2]) rotate([180, 0, 0]) half_bottom();
+} else {
+    assert(false, str("unknown part: ", part));
 }

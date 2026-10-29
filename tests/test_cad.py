@@ -1,4 +1,5 @@
-"""Render checks of cad/lee_app_handle_adapter.scad: the parameter guards and the print_plate spacing.
+"""Render checks of cad/lee_app_handle_adapter.scad (the parameter guards and the print_plate spacing),
+one body of cad/control_box.scad and the unknown part guard of every cad/*.scad.
 
 Needs OpenSCAD (installed in the dev container); skipped where it is missing.
 """
@@ -10,15 +11,16 @@ from pathlib import Path
 
 import pytest
 
-SCAD = Path(__file__).resolve().parent.parent / "cad" / "lee_app_handle_adapter.scad"
+CAD = Path(__file__).resolve().parent.parent / "cad"
+SCAD = CAD / "lee_app_handle_adapter.scad"
 
 pytestmark = pytest.mark.skipif(shutil.which("openscad") is None, reason="openscad not installed")
 
 
-def render(out: Path, **params) -> subprocess.CompletedProcess:
+def render(out: Path, scad: Path = SCAD, **params) -> subprocess.CompletedProcess:
     define = [f"-D{k}={v}" for k, v in params.items()]
     return subprocess.run(
-        ["openscad", "-o", str(out), *define, str(SCAD)],
+        ["openscad", "-o", str(out), *define, str(scad)],
         capture_output=True, text=True, timeout=600, check=False,
     )
 
@@ -84,3 +86,16 @@ def test_print_plate_with_arm_beyond_a_long_clamp_is_two_bodies(tmp_path, arm_x)
     result = render(tmp_path / "out.stl", arm_x=arm_x, gap_wide=60)
     assert result.returncode == 0, result.stderr
     assert bodies(tmp_path / "out.stl") == 2
+
+
+def test_control_box_estop_ring_is_one_body(tmp_path):
+    result = render(tmp_path / "out.stl", CAD / "control_box.scad", part='"estop_ring"')
+    assert result.returncode == 0, result.stderr
+    assert bodies(tmp_path / "out.stl") == 1
+
+
+@pytest.mark.parametrize("scad", sorted(CAD.glob("*.scad")), ids=lambda p: p.name)
+def test_unknown_part_is_rejected(tmp_path, scad):
+    result = render(tmp_path / "out.stl", scad, part='"nope"')
+    assert result.returncode != 0
+    assert "unknown part: nope" in result.stderr

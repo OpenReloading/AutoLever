@@ -227,4 +227,5 @@ else if (part == "lid")        translate([0, D, Hz]) rotate([180, 0, 0]) lid(); 
 else if (part == "estop_ring") estop_ring();                                       // print in yellow, flat
 else if (part == "usb_plug")   usb_plug();
 else if (part == "exploded")   { body_colored(); lid_colored(30); }
-else                           { body_colored(); lid_colored(); %ghosts(); }
+else if (part == "assembly")   { body_colored(); lid_colored(); %ghosts(); }
+else                           assert(false, str("unknown part: ", part));
