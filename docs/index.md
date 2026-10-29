@@ -81,6 +81,8 @@ Later updates go over Wi-Fi, once the press firmware is on the StamPLC (the benc
 
     PLATFORMIO_UPLOAD_FLAGS=--auth=PASSWORD pio run -e stamplc -t upload --upload-port autolever.local
 
+This form is for Linux and macOS shells. In PowerShell, run `$env:PLATFORMIO_UPLOAD_FLAGS="--auth=PASSWORD"` once in the session, then the same `pio` command without the prefix.
+
 PlatformIO warns that it switched to `espota`; that is expected. If `autolever.local` is not found, use the address on the **Home** line; when Home shows `-`, join the StamPLC's own Wi-Fi (the **Wi-Fi** line) and use `192.168.4.1`. The StamPLC connects back to your computer during the upload, so allow it if a firewall asks. USB-C stays the recovery path: if an update fails or the press does not start, flash it as in step 4.
 
 <div class="change-it" markdown>
