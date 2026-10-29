@@ -35,7 +35,7 @@ Built by reloaders for reloaders, with AI as a tool.
 - **Automatic cycling.** Press START once for continuous out-and-back strokes. Press it again to stop after the current stroke.
 - **JOG control.** With automatic mode off, hold JOG to cycle. Release it to stop.
 - **Free at rest.** The cylinder vents when the valve is off, so you can move the lever by hand.
-- **Cycle monitoring.** A stroke that takes longer than the jam time (15 s, set between 2 and 120 s on the web page) ends automatic mode. Both sensors on at once is a sensor fault.
+- **Cycle monitoring.** A stroke that takes longer than the jam time (15 s, set between 2 and 120 s on the web page) stops the press, in automatic mode and in JOG, until you press A. Both sensors on at once is a sensor fault.
 - **Pressure trip.** The pressure switch cuts power to the valves at 6 bar.
 - **Cycle counter.** The display and the web page show the cycles, kept across power-off.
 - **Web page.** The StamPLC opens its own Wi-Fi and joins your home network; the page shows the state and sets the jam time. Password and address are on the info screen.
