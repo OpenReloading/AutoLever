@@ -71,6 +71,11 @@
   --md-admonition-bg-color: var(--page);
 }
 
+/* Links in running text are underlined, so they do not rely on colour against the text around them */
+.md-typeset :is(p, li, td) > a:not(.md-button) {
+  text-decoration: underline;
+}
+
 .md-typeset a:focus-visible,
 .md-nav__link:focus-visible,
 .md-header a:focus-visible,
