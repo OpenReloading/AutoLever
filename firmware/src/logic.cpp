@@ -1,6 +1,7 @@
 #include "logic.h"
 
 #include <cctype>
+#include <cstdlib>
 #include <cstring>
 
 namespace autolever {
@@ -121,6 +122,14 @@ bool same_origin(const char* source, const char* host) {
     for (; *source && *source != '/'; ++source, ++host)
         if (std::tolower((unsigned char)*source) != std::tolower((unsigned char)*host)) return false;
     return !*host;
+}
+
+bool jam_ms_from_text(const char* text, uint32_t& ms) {
+    char* end;
+    long s = std::strtol(text, &end, 10);
+    if (end == text || *end) return false;
+    ms = jam_ms_from_seconds(s);
+    return true;
 }
 
 }  // namespace autolever

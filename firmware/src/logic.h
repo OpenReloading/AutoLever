@@ -27,6 +27,9 @@ const char* fault_name(Fault f);   // empty for Fault::None
 // Settings page value in seconds to the jam timeout, kept between 2 and 120 s.
 inline uint32_t jam_ms_from_seconds(long s) { return (uint32_t)(s < 2 ? 2 : s > 120 ? 120 : s) * 1000u; }
 
+// Settings form field to the jam timeout through jam_ms_from_seconds; false for an empty or non-numeric field.
+bool jam_ms_from_text(const char* text, uint32_t& ms);
+
 // Origin or Referer header of a settings post against the Host header: true when the source is
 // empty or names that host (scheme and path ignored, case-insensitive).
 bool same_origin(const char* source, const char* host);
