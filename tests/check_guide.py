@@ -296,6 +296,10 @@ with sync_playwright() as p:
                 ready()
             if width==390:
                 assert page.evaluate('document.documentElement.scrollWidth<=innerWidth'),(path,scheme,'horizontal scroll')
+            if path in ('bom/','wiring/','tubing/','relay/'):   # Export, Import and Reset progress: 12 px text, 44 px high at every width
+                tools=page.evaluate("[...document.querySelectorAll('.ag-progress-tools button')].map(e=>[e.textContent.trim(),e.getBoundingClientRect().height,parseFloat(getComputedStyle(e).fontSize)])")
+                assert tools,(path,'no progress buttons')
+                assert all(h>=43.9 and size>=12 for _,h,size in tools),(path,width,scheme,tools)
             small=page.evaluate(TARGETS)
             assert not small,(path,width,scheme,'tap target under 44 px',small)
         page.context.close()
@@ -437,4 +441,4 @@ with sync_playwright() as p:
     assert 'This guide needs JavaScript.' in fallback.content()
     browser.close()
     wires=[w for s in wiring for w in s['connections']]
-    print(f"PASS: five Markdown pages with BuildGuide components; {len(wires)} connections ({sum(w['color']=='DIODE' for w in wires)} diodes), {len(tubing)} tubing steps, grouped BOM with 3D printed parts, safety admonition on every page (full on introduction and BOM, short with link on wiring and tubing); matching layouts, zoom, fullscreen, scrolling, persistence, CSV and mobile; pinch zoom, one-finger pan and hand-over to the page at 390 and 820 px; no sideways scroll at 390 px and 44 px tap targets in the header, footer, home buttons and card links; link preview meta and card on every page; self-hosted search at 390 and 1440 px in light and dark; no JS errors, missing assets or third-party requests.")
+    print(f"PASS: five Markdown pages with BuildGuide components; {len(wires)} connections ({sum(w['color']=='DIODE' for w in wires)} diodes), {len(tubing)} tubing steps, grouped BOM with 3D printed parts, safety admonition on every page (full on introduction and BOM, short with link on wiring and tubing); matching layouts, zoom, fullscreen, scrolling, persistence, CSV and mobile; pinch zoom, one-finger pan and hand-over to the page at 390 and 820 px; no sideways scroll at 390 px and 44 px tap targets in the header, footer, home buttons, card links and progress buttons; link preview meta and card on every page; self-hosted search at 390 and 1440 px in light and dark; no JS errors, missing assets or third-party requests.")
