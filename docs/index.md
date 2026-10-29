@@ -50,7 +50,7 @@ The three buttons under the display:
 3. **B** jogs while held
 4. **C** shows the info screen
 
-E-STOP cuts the power to the valves (the StamPLC stays on and shows the fault); twist to release. A supply fault clears itself when the power is back; after a jam or a sensor fault, press A. Release JOG after any stop or trip. A held JOG never starts the press; release it and press it again.
+E-STOP cuts the power to the valves (the StamPLC stays on and shows the fault); twist to release. A supply fault clears itself when the power is back; after a jam or a sensor fault, press A, also when E-STOP or the pressure switch tripped in between. Release JOG after any stop or trip. A held JOG never starts the press; release it and press it again.
 
 Check the printed handle adapter for cracks before each session.
 

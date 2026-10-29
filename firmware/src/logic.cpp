@@ -49,17 +49,27 @@ Outputs Controller::step(const Inputs& in, uint32_t now_ms) {
               : !in.pressure_ok  ? Fault::Pressure
               : (in.home && in.front) ? Fault::Sensor
                                   : Fault::None;
+    // Supply faults (E-STOP, pressure) clear themselves once the rail is back; a jam or a sensor fault
+    // waits for button A. A supply fault on top of a jam or a sensor fault does not acknowledge it: the
+    // display shows the supply fault while it lasts, then the jam or sensor fault again until A.
     if (f != Fault::None) {
+        bool supply = f == Fault::EStop || f == Fault::Pressure;
+        if (supply && state_ == State::Fault && (fault_ == Fault::Jam || fault_ == Fault::Sensor)) latched_ = fault_;
         enter_fault(f);
         return {};
     }
 
     if (state_ == State::Fault) {
-        // Supply faults clear themselves once the rail is back; a jam or a sensor fault waits for button A.
         bool supply = fault_ == Fault::EStop || fault_ == Fault::Pressure;
+        if (supply && latched_ != Fault::None) {
+            fault_ = latched_;
+            latched_ = Fault::None;
+            return {};
+        }
         if (!supply && !start_edge) return {};
         state_ = State::Idle;
         fault_ = Fault::None;
+        latched_ = Fault::None;
         start_edge = false;
     }
 
