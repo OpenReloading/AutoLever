@@ -227,8 +227,13 @@ button:focus-visible {
 }
 
 /* BuildGuide sets 9 to 11 px on labels, table heads and legends (issue #69 in OpenReloading/BuildGuide); 12 px is the floor here. The SVG drawing text scales with the board and is out of reach of CSS (OpenReloading/BuildGuide#97). */
-[data-md-color-scheme] .ag-guide :is(.ag-steps small, .ag-board-toolbar label, .ag-board-legend, .ag-connection-detail small, .ag-wire-navigation, .ag-wire-row button, .ag-row-color, .ag-bom-table th, .ag-part-cell small, .ag-source-link, .ag-result-count, .ag-status, .ag-primary) {
+[data-md-color-scheme] .ag-guide :is(.ag-steps small, .ag-board-toolbar label, .ag-board-legend, .ag-connection-detail small, .ag-wire-navigation, .ag-wire-row button, .ag-row-color, .ag-bom-table th, .ag-part-cell small, .ag-source-link, .ag-result-count, .ag-status, .ag-primary, .ag-progress-tools button) {
   font-size: 12px;
+}
+
+/* Export, Import and Reset progress are 44 px high at every width, not only on phones */
+[data-md-color-scheme] .ag-guide .ag-progress-tools button {
+  min-height: 44px;
 }
 
 .md-source__fact {
@@ -738,7 +743,7 @@ button:focus-visible {
   }
 
   /* 44 px touch targets for every button and the scope menu, the board controls 44 x 44 (the tick boxes stay at 24 px) */
-  .ag-guide :is(.ag-primary, .ag-quiet, .ag-board-controls button, .ag-board-toolbar select, .ag-wire-row button, .ag-bom-tools select, .ag-progress-tools button) {
+  .ag-guide :is(.ag-primary, .ag-quiet, .ag-board-controls button, .ag-board-toolbar select, .ag-wire-row button, .ag-bom-tools select) {
     min-height: 44px;
   }
 
