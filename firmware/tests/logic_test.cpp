@@ -182,6 +182,21 @@ int main() {
         }
         CHECK(r.c.fault() == Fault::Jam);
     }
+    {  // the jam timer holds across the 32-bit millis wrap
+        Rig r;
+        r.c.jam_ms = 500;
+        r.now = UINT32_MAX - 300;
+        const uint32_t start = r.now;
+        r.press_start();  // the stroke starts at `start`
+        while (r.now - start <= r.c.jam_ms) {  // the rod sticks
+            r.out = r.c.step(r.in, r.now);
+            CHECK(r.c.state() == State::Auto && r.out.extend);
+            r.now += 10;
+        }
+        CHECK(r.now < start);  // the counter wrapped before the timeout
+        r.out = r.c.step(r.in, r.now);
+        CHECK(r.c.fault() == Fault::Jam && !r.out.extend && !r.out.retract);
+    }
     {  // both end sensors on is a sensor fault; clears on button A once they are sane
         Rig r;
         r.in.home = r.in.front = true;
