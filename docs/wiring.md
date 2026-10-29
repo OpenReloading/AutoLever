@@ -2,6 +2,8 @@
 hide: [navigation, toc]
 ---
 
+<div class="step-label">Build step 3 of 4</div>
+
 # Wiring
 
 !!! danger "Safety"
