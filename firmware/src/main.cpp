@@ -41,6 +41,10 @@ static void draw() {
     d.print("START/STOP   JOG    INFO");
 }
 
+static void set_relay(uint8_t relay, bool on) {
+    if (M5StamPLC.readPlcRelay(relay) != on) M5StamPLC.writePlcRelay(relay, on);
+}
+
 void setup() {
     M5StamPLC.begin();
     M5StamPLC.writePlcAllRelay(0);
@@ -52,7 +56,6 @@ void setup() {
 
 void loop() {
     M5StamPLC.update();
-    web_loop(press.state() == State::Idle);
     if (M5StamPLC.BtnC().wasPressed()) {
         info_screen = !info_screen;
         redraw = true;
@@ -67,8 +70,16 @@ void loop() {
         M5StamPLC.BtnB().isPressed(),
     };
     Outputs out = press.step(in, millis());
-    if (M5StamPLC.readPlcRelay(RELAY_EXTEND) != out.extend) M5StamPLC.writePlcRelay(RELAY_EXTEND, out.extend);
-    if (M5StamPLC.readPlcRelay(RELAY_RETRACT) != out.retract) M5StamPLC.writePlcRelay(RELAY_RETRACT, out.retract);
+    // The relay that turns off is written first, so extend and retract are never on together.
+    if (out.extend) {
+        set_relay(RELAY_RETRACT, out.retract);
+        set_relay(RELAY_EXTEND, true);
+    } else {
+        set_relay(RELAY_EXTEND, false);
+        set_relay(RELAY_RETRACT, out.retract);
+    }
+    // After the relays: a stalled web client must not delay them.
+    web_loop(press.state() == State::Idle);
 
     if (press.cycles() != shown_cycles) {
         if (shown_cycles != UINT32_MAX) prefs.putUInt("cycles", press.cycles());   // also after a reset from the page
