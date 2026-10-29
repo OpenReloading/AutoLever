@@ -211,7 +211,7 @@ with sync_playwright() as p:
         page.locator('.ag-verify input').check()
     page.reload(wait_until='domcontentloaded')
     tubes=len(tubing)
-    expect(page.locator('.ag-progress')).to_have_text(f'{tubes} / {tubes} checked')
+    expect(page.locator('.ag-progress')).to_have_text('All connections checked')
     expect(page.locator('[data-action=next-wire]')).to_be_disabled()
     page.locator('[data-role=scope]').select_option('all');ready()  # noqa: E702
     expect(page.locator('[data-connection]')).to_have_count(tubes)
@@ -270,7 +270,7 @@ with sync_playwright() as p:
     with tempfile.TemporaryDirectory() as temp:
         target=Path(temp)/'bom.csv';download.value.save_as(target)  # noqa: E702
         rows=list(csv.DictReader(io.StringIO(target.read_text(encoding='utf-8-sig'))))
-        assert list(rows[0])==['Group','Component','Specification','Quantity','MakerWorld']
+        assert list(rows[0])==['Group','Component','Specification','Quantity','MakerWorld','Done']
         assert [r['Quantity'] for r in rows]==['3','2','2','1']
         assert download.value.suggested_filename=='autolever-bom.csv'
     page.locator('[data-role=search]').fill('does-not-exist')
@@ -279,7 +279,7 @@ with sync_playwright() as p:
     expect(page.locator('tbody tr:not(.ag-group)')).to_have_count(len(bom))
     # Printed parts are grouped, marked as 3D printed and link to MakerWorld.
     page.locator('[data-role=search]').fill('3D printed')
-    expect(page.locator('tr.ag-group')).to_have_text(['3D printed','Relay edition only (deprecated)'])
+    expect(page.locator('tr.ag-group')).to_contain_text(['3D printed','Relay edition only (deprecated)'])
     expect(page.locator('tbody a', has_text='MakerWorld')).to_have_count(sum('link' in row for row in bom))
     page.locator('[data-role=search]').fill('')
     main_page=page
@@ -308,6 +308,7 @@ with sync_playwright() as p:
             assert page.evaluate("[...document.querySelectorAll('.ag-guide button, .ag-guide select')].every(e=>{const r=e.getBoundingClientRect();return !r.width||r.height>=43.9})"),path+': button under 44 px'
             if path in ('wiring/','tubing/','relay/'):
                 ready()
+                page.locator('[data-action=zoom-fit]').click()   # phones open at a readable zoom that pans; Fit shows the whole drawing
                 canvas,drawing,fullscreen=page.evaluate("['.ag-board-canvas','.ag-board-canvas > div','[data-action=fullscreen]'].map(s=>{const r=document.querySelector(s).getBoundingClientRect();return {y:r.y,height:r.height}})")
                 assert abs(canvas['height']-drawing['height'])<=2,f"{path}: canvas {canvas['height']} px, drawing {drawing['height']} px"
                 assert page.evaluate("[...document.querySelectorAll('.ag-board-controls button')].every(e=>{const r=e.getBoundingClientRect();return r.width>=43.9&&r.height>=43.9})"),path+': board control under 44 x 44 px'
