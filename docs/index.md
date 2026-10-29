@@ -75,6 +75,14 @@ PETG or ASA. Handle adapter: 6 walls and 40% infill. Control box: 15–20% infil
 3. Follow the [Wiring](wiring.md) and [Tubing](tubing.md) guides to connect everything.
 4. Flash the bench image (`pio run -e bench -t upload` in `firmware/`): it shows all eight inputs live and toggles the relays. Set the sensors with air disconnected: POWER on, move the rod by hand. Then flash the press firmware (`pio run -e stamplc -t upload`) and test with air at 2 bar using JOG before trying START.
 
+## Update it
+
+Later updates go over Wi-Fi, once the press firmware is on the StamPLC (the bench image has none). The display must show IDLE: the update is closed while the press runs, jogs or shows a fault. Press C and run in `firmware/`, with the password from the **Pass** line:
+
+    PLATFORMIO_UPLOAD_FLAGS=--auth=PASSWORD pio run -e stamplc -t upload --upload-port autolever.local
+
+PlatformIO warns that it switched to `espota`; that is expected. If `autolever.local` is not found, use the address on the **Home** line; when Home shows `-`, join the StamPLC's own Wi-Fi (the **Wi-Fi** line) and use `192.168.4.1`. The StamPLC connects back to your computer during the upload, so allow it if a firewall asks. USB-C stays the recovery path: if an update fails or the press does not start, flash it as in step 4.
+
 <div class="change-it" markdown>
 
 ## Change it
