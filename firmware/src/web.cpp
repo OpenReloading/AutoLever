@@ -78,7 +78,12 @@ static void handle_status() {
 
 static void handle_settings() {
     if (!authed()) return;
-    press->jam_ms = jam_ms_from_seconds(server.arg("jam").toInt());
+    uint32_t ms;
+    if (!jam_ms_from_text(server.arg("jam").c_str(), ms)) {
+        server.send(400, "text/plain", "Jam timeout must be a whole number of seconds");
+        return;
+    }
+    press->jam_ms = ms;
     prefs->putUInt("jam_ms", press->jam_ms);
     see_other();
 }
@@ -97,9 +102,9 @@ static void handle_wifi() {
         return;
     }
     prefs->putString("ssid", ssid);
-    prefs->putString("wpass", server.arg("pass"));
+    if (server.arg("pass").length()) prefs->putString("wpass", server.arg("pass"));   // empty keeps the stored password
     WiFi.disconnect(false);
-    WiFi.begin(ssid.c_str(), server.arg("pass").c_str());
+    WiFi.begin(ssid.c_str(), prefs->getString("wpass", "").c_str());
     see_other();
 }
 

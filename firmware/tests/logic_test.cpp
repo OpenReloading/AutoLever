@@ -248,6 +248,14 @@ int main() {
     for (uint32_t seed : {1u, 2u, 3u, 12345u}) random_run(seed, 800);
     CHECK(jam_ms_from_seconds(0) == 2000 && jam_ms_from_seconds(-5) == 2000);
     CHECK(jam_ms_from_seconds(15) == 15000 && jam_ms_from_seconds(500) == 120000);
+    CHECK(jam_ms_from_seconds(UINT32_MAX / 1000) == 120000);   // a corrupt stored value at boot
+    {  // settings form field: empty or non-numeric leaves the value unchanged
+        uint32_t ms = 7000;
+        CHECK(!jam_ms_from_text("", ms) && !jam_ms_from_text("abc", ms) && !jam_ms_from_text("15s", ms));
+        CHECK(!jam_ms_from_text("1.5", ms) && ms == 7000);
+        CHECK(jam_ms_from_text("15", ms) && ms == 15000);
+        CHECK(jam_ms_from_text("0", ms) && ms == 2000 && jam_ms_from_text("500", ms) && ms == 120000);
+    }
     std::puts("ok");
     return 0;
 }

@@ -50,7 +50,7 @@ void setup() {
     M5StamPLC.writePlcAllRelay(0);
     prefs.begin("autolever");
     press.set_cycles(prefs.getUInt("cycles", 0));
-    press.jam_ms = prefs.getUInt("jam_ms", press.jam_ms);
+    press.jam_ms = jam_ms_from_seconds(prefs.getUInt("jam_ms", press.jam_ms) / 1000);
     web_begin(press, prefs);
 }
 
