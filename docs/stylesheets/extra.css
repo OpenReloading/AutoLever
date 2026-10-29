@@ -593,10 +593,6 @@ button:focus-visible {
     margin-top: 96px;
   }
 
-  .md-content__inner > p:has(> .md-button--primary) ~ .admonition.danger + h2 {
-    margin-top: 24px;
-  }
-
   .md-content__inner > p:has(> .md-button--primary) ~ h2#what-it-does + ul {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
@@ -721,15 +717,12 @@ button:focus-visible {
   .ag-guide:not(.ag-expanded) .ag-board-toolbar {
     order: 1;
     margin: 8px 0;
+    flex-direction: column;
+    align-items: stretch;
   }
 
   .ag-guide:not(.ag-expanded) .ag-full-board {
     order: 2;
-  }
-
-  .ag-guide:not(.ag-expanded) .ag-board-toolbar {
-    flex-direction: column;
-    align-items: stretch;
   }
 
   .ag-guide:not(.ag-expanded) .ag-board-controls {

@@ -45,7 +45,7 @@ plugins:
 
 markdown_extensions:
   - admonition
-  - attr_list   # CSS classes on the home page call to action and cards
+  - attr_list   # CSS classes on the home page buttons (its sections are styled by heading id)
   - md_in_html   # the two columns of "Change it" on the home page
   # the safety text is written once in snippets/ and included on the pages
   # sources: https://www.hse.gov.uk/work-equipment-machinery/maintenance.htm (safety guidance),

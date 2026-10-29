@@ -43,12 +43,12 @@ Built by reloaders for reloaders, with AI as a tool.
 
 ## At the controls
 
-The three buttons under the display:
+POWER and the three buttons under the display:
 
 1. **POWER** on.
-2. **A** starts and stops automatic cycling
-3. **B** jogs while held
-4. **C** shows the info screen
+2. **A** starts and stops automatic cycling.
+3. **B** jogs while held.
+4. **C** shows the info screen.
 
 E-STOP cuts the power to the valves (the StamPLC stays on and shows the fault); twist to release. A supply fault clears itself when the power is back; after a jam or a sensor fault, press A, also when E-STOP or the pressure switch tripped in between. Release JOG after any stop or trip. A held JOG never starts the press; release it and press it again.
 
@@ -57,7 +57,7 @@ Check the printed handle adapter for cracks before each session.
 ## What you’ll need
 
 - A Lee APP (Classic preferred; Deluxe also works).
-- A compressed-air supply at 7–10 bar.
+- A compressed-air supply at 7 to 10 bar.
 - The BOM parts, plus a printed handle adapter, control box and yellow E-STOP ring, and a computer with [PlatformIO](https://platformio.org/) to flash the StamPLC (project folder `firmware/` in the repository).
 
 ## Print it
