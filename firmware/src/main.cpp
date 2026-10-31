@@ -16,7 +16,7 @@ constexpr uint8_t RELAY_EXTEND = 0, RELAY_RETRACT = 1;
 
 static Controller press;
 static Preferences prefs;
-static std::mutex press_lock;   // press and prefs, shared with the web task
+static std::mutex press_lock;   // press, shared with the web task
 static State shown_state = State::Fault;
 static Fault shown_fault = Fault::None;
 static bool shown_stopping = false;

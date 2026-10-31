@@ -62,14 +62,15 @@ static void see_other() {
     server.send(303);
 }
 
-// Handlers hold the lock only around the press and the preferences: a send can wait seconds on a slow client.
+// Handlers hold the lock only around the press: a send can wait seconds on a slow client, and a flash write tens of
+// milliseconds. The preferences need no lock, the flash storage API takes its own.
 static void handle_root() {
     String page = FPSTR(PAGE);
     {
         std::lock_guard<std::mutex> hold(*lock);
         page.replace("%JAM%", String(press->jam_ms / 1000));
-        page.replace("%SSID%", esc(prefs->getString("ssid", "")));
     }
+    page.replace("%SSID%", esc(prefs->getString("ssid", "")));
     server.send(200, "text/html", page);
 }
 
@@ -93,8 +94,8 @@ static void handle_settings() {
     {
         std::lock_guard<std::mutex> hold(*lock);
         press->jam_ms = ms;
-        prefs->putUInt("jam_ms", press->jam_ms);
     }
+    prefs->putUInt("jam_ms", ms);
     see_other();
 }
 
@@ -119,12 +120,9 @@ static void handle_wifi() {
         return;
     }
     String pass = server.arg("pass");
-    {
-        std::lock_guard<std::mutex> hold(*lock);
-        prefs->putString("ssid", ssid);
-        if (pass.length()) prefs->putString("wpass", pass);   // empty keeps the stored password
-        else pass = prefs->getString("wpass", "");
-    }
+    prefs->putString("ssid", ssid);
+    if (pass.length()) prefs->putString("wpass", pass);   // empty keeps the stored password
+    else pass = prefs->getString("wpass", "");
     WiFi.disconnect(false);
     WiFi.begin(ssid.c_str(), pass.c_str());
     see_other();
