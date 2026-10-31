@@ -3,7 +3,7 @@
 ## Commands
 
 - Agents run on the host; file edits and Git stay there. Start the container with `devcontainer up --docker-path podman --workspace-folder .` (creates `.venv` with `requirements.txt`); run project commands with the prefix `devcontainer exec --docker-path podman --workspace-folder .`.
-- Install: `python -m venv .venv && .venv/bin/pip install -r requirements.txt`. `requirements.txt` is compiled with hashes from `requirements.in` on Python 3.13: `pip-compile --generate-hashes --output-file=requirements.txt requirements.in`
+- Install (Python 3.12 or later): `python -m venv .venv && .venv/bin/pip install -r requirements.txt`. `requirements.txt` is compiled with hashes from `requirements.in` on Python 3.13: `pip-compile --generate-hashes --output-file=requirements.txt requirements.in`
 - Lint (as CI): `.venv/bin/pip install --only-binary :all: --require-hashes -r requirements-dev.txt`, then `.venv/bin/ruff check .` and `.venv/bin/basedpyright --pythonpath .venv/bin/python`. `requirements-dev.txt` is compiled from `requirements-dev.in` on Python 3.13: `pip-compile --generate-hashes --output-file=requirements-dev.txt requirements-dev.in`
 - Build (as CI): `.venv/bin/mkdocs build --strict`
 - Serve: `.venv/bin/mkdocs serve -a 0.0.0.0:8000`
