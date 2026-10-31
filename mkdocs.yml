@@ -55,10 +55,8 @@ markdown_extensions:
       base_path: snippets
       check_paths: true
 
-# agent instruction files in docs/ are not pages
+# agent docs in docs/ are not pages
 exclude_docs: |
-  AGENTS.md
-  CLAUDE.md
   agents/
 
 nav:
