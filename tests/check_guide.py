@@ -1,5 +1,5 @@
 """Browser checks for the Markdown pages and their BuildGuide components. Requires Playwright + Chromium.
-Run against the built site served under /AutoLever/ (AGENTS.md): python tests/check_guide.py http://127.0.0.1:8000/AutoLever
+Run against the built site served under /AutoLever/: python tests/check_guide.py http://127.0.0.1:8000/AutoLever
 """
 import csv  # noqa: I001
 import io
