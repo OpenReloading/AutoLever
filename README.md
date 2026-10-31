@@ -14,7 +14,7 @@ For Lee APP owners (Classic or Deluxe) with compressed air at 7 to 10 bar and a 
 
 ## Build it
 
-The [build guide](https://openreloading.github.io/AutoLever/) has the parts list and interactive [wiring](https://openreloading.github.io/AutoLever/wiring/) and [tubing](https://openreloading.github.io/AutoLever/tubing/) boards. To run it locally:
+The [build guide](https://openreloading.github.io/AutoLever/) has the parts list and interactive [wiring](https://openreloading.github.io/AutoLever/wiring/) and [tubing](https://openreloading.github.io/AutoLever/tubing/) boards. To run it locally (Python 3.12 or later):
 
 ```sh
 python -m venv .venv && .venv/bin/pip install -r requirements.txt

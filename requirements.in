@@ -1,0 +1,5 @@
+mkdocs==1.6.1
+mkdocs-material==9.7.7
+mkdocs-buildguide @ https://github.com/OpenReloading/BuildGuide/releases/download/mkdocs-v0.1.4/mkdocs_buildguide-0.1.4-py3-none-any.whl#sha256=9e278ddf470f08d6f24befdc2122fa8fc29da48158fd4bb25b3702143c72e20f
+pyyaml==6.0.3
+playwright==1.64.0
