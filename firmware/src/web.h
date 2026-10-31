@@ -3,10 +3,14 @@
 #include <Arduino.h>
 #include <Preferences.h>
 
+#include <mutex>
+
 #include "logic.h"
 
-void web_begin(autolever::Controller& press, Preferences& prefs);
-void web_loop(bool idle);   // OTA is open only while the press is idle
+// The page is served in its own task, so a slow or stalled client never holds up loop(). The page reads and
+// changes the press and the preferences only while it holds lock; loop() takes it for the same.
+void web_begin(autolever::Controller& press, Preferences& prefs, std::mutex& lock);
+void web_loop(bool idle);   // OTA, open only while the press is idle
 
 String web_ap_ssid();
 String web_ap_password();

@@ -10,6 +10,7 @@ using namespace autolever;
 static WebServer server(80);
 static Controller* press = nullptr;
 static Preferences* prefs = nullptr;
+static std::mutex* lock = nullptr;
 static String ap_ssid, ap_pass;
 static bool ota_open = false;
 
@@ -61,18 +62,24 @@ static void see_other() {
     server.send(303);
 }
 
+// Handlers hold the lock only around the press and the preferences: a send can wait seconds on a slow client.
 static void handle_root() {
     String page = FPSTR(PAGE);
-    page.replace("%JAM%", String(press->jam_ms / 1000));
-    page.replace("%SSID%", esc(prefs->getString("ssid", "")));
+    {
+        std::lock_guard<std::mutex> hold(*lock);
+        page.replace("%JAM%", String(press->jam_ms / 1000));
+        page.replace("%SSID%", esc(prefs->getString("ssid", "")));
+    }
     server.send(200, "text/html", page);
 }
 
 static void handle_status() {
     char json[128];
+    std::unique_lock<std::mutex> hold(*lock);
     snprintf(json, sizeof json, "{\"state\":\"%s\",\"fault\":\"%s\",\"cycles\":%lu,\"jam_s\":%lu}",
              state_name(press->state()), fault_name(press->fault()), (unsigned long)press->cycles(),
              (unsigned long)(press->jam_ms / 1000));
+    hold.unlock();
     server.send(200, "application/json", json);
 }
 
@@ -83,14 +90,20 @@ static void handle_settings() {
         server.send(400, "text/plain", "Jam timeout must be a whole number of seconds");
         return;
     }
-    press->jam_ms = ms;
-    prefs->putUInt("jam_ms", press->jam_ms);
+    {
+        std::lock_guard<std::mutex> hold(*lock);
+        press->jam_ms = ms;
+        prefs->putUInt("jam_ms", press->jam_ms);
+    }
     see_other();
 }
 
 static void handle_counter() {
     if (!authed()) return;
-    press->set_cycles(0);   // main.cpp saves a changed count
+    {
+        std::lock_guard<std::mutex> hold(*lock);
+        press->set_cycles(0);   // main.cpp saves a changed count
+    }
     see_other();
 }
 
@@ -105,16 +118,29 @@ static void handle_wifi() {
         server.send(400, "text/plain", "Password must be 8 to 63 characters");
         return;
     }
-    prefs->putString("ssid", ssid);
-    if (server.arg("pass").length()) prefs->putString("wpass", server.arg("pass"));   // empty keeps the stored password
+    String pass = server.arg("pass");
+    {
+        std::lock_guard<std::mutex> hold(*lock);
+        prefs->putString("ssid", ssid);
+        if (pass.length()) prefs->putString("wpass", pass);   // empty keeps the stored password
+        else pass = prefs->getString("wpass", "");
+    }
     WiFi.disconnect(false);
-    WiFi.begin(ssid.c_str(), prefs->getString("wpass", "").c_str());
+    WiFi.begin(ssid.c_str(), pass.c_str());
     see_other();
 }
 
-void web_begin(Controller& c, Preferences& p) {
+static void serve(void*) {
+    for (;;) {
+        server.handleClient();
+        delay(1);
+    }
+}
+
+void web_begin(Controller& c, Preferences& p, std::mutex& l) {
     press = &c;
     prefs = &p;
+    lock = &l;
 
     WiFi.mode(WIFI_AP_STA);   // before the MAC is read
     ap_ssid = "AutoLever-" + WiFi.macAddress().substring(12);
@@ -142,13 +168,15 @@ void web_begin(Controller& c, Preferences& p) {
     static const char* headers[] = {"Origin", "Referer"};
     server.collectHeaders(headers, 2);
     server.begin();
+    // On the other core than loop(), at the idle priority: a request parse polls without yielding, and the idle task
+    // of that core must still run within the task watchdog timeout.
+    xTaskCreatePinnedToCore(serve, "web", 8192, nullptr, tskIDLE_PRIORITY, nullptr, 0);
 
     ArduinoOTA.setHostname("autolever");
     ArduinoOTA.setPassword(ap_pass.c_str());
 }
 
 void web_loop(bool idle) {
-    server.handleClient();
     if (idle != ota_open) {
         if (idle) ArduinoOTA.begin();
         else ArduinoOTA.end();
