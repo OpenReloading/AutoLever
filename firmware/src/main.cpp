@@ -1,6 +1,8 @@
 #include <M5StamPLC.h>
 #include <Preferences.h>
 
+#include <mutex>
+
 #include "logic.h"
 #include "web.h"
 
@@ -14,6 +16,7 @@ constexpr uint8_t RELAY_EXTEND = 0, RELAY_RETRACT = 1;
 
 static Controller press;
 static Preferences prefs;
+static std::mutex press_lock;   // press, shared with the web task
 static State shown_state = State::Fault;
 static Fault shown_fault = Fault::None;
 static bool shown_stopping = false;
@@ -22,6 +25,7 @@ static bool info_screen = false;
 static bool redraw = true;
 
 static void draw() {
+    std::lock_guard<std::mutex> hold(press_lock);
     auto& d = M5StamPLC.Display();
     d.fillScreen(TFT_BLACK);
     d.setTextColor(TFT_WHITE);
@@ -51,7 +55,7 @@ void setup() {
     prefs.begin("autolever");
     press.set_cycles(prefs.getUInt("cycles", 0));
     press.jam_ms = jam_ms_from_seconds(prefs.getUInt("jam_ms", press.jam_ms) / 1000);
-    web_begin(press, prefs);
+    web_begin(press, prefs, press_lock);
 }
 
 void loop() {
@@ -69,7 +73,9 @@ void loop() {
         M5StamPLC.BtnA().isPressed(),
         M5StamPLC.BtnB().isPressed(),
     };
+    std::unique_lock<std::mutex> hold(press_lock);
     Outputs out = press.step(in, millis());
+    hold.unlock();
     // The relay that turns off is written first, so extend and retract are never on together.
     if (out.extend) {
         set_relay(RELAY_RETRACT, out.retract);
@@ -78,9 +84,8 @@ void loop() {
         set_relay(RELAY_EXTEND, false);
         set_relay(RELAY_RETRACT, out.retract);
     }
-    // After the relays: a stalled web client must not delay them.
-    web_loop(press.state() == State::Idle);
 
+    hold.lock();
     if (press.cycles() != shown_cycles) {
         if (shown_cycles != UINT32_MAX) prefs.putUInt("cycles", press.cycles());   // also after a reset from the page
         shown_cycles = press.cycles();
@@ -93,6 +98,9 @@ void loop() {
         shown_stopping = press.stopping();
         redraw = true;
     }
+    hold.unlock();
+    web_loop(shown_state == State::Idle);   // after the relays: an OTA upload holds the loop
+
     static uint32_t last_info = 0;   // the home address arrives some seconds after power-up
     if (info_screen && millis() - last_info > 2000) {
         last_info = millis();
