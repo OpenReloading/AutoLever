@@ -1,4 +1,5 @@
 """The install retry wrapper of the CI workflow: one retry, a time limit per attempt."""
+import os
 import subprocess
 from pathlib import Path
 
@@ -6,7 +7,11 @@ SCRIPT = Path(__file__).resolve().parent.parent / ".github" / "scripts" / "retry
 
 
 def run(limit: str, *cmd: str) -> subprocess.CompletedProcess:
-    return subprocess.run([str(SCRIPT), limit, *cmd], capture_output=True, text=True, timeout=60, check=False)
+    return subprocess.run(
+        [str(SCRIPT), limit, *cmd],
+        capture_output=True, text=True, timeout=60, check=False,
+        env={**os.environ, "RETRY_PAUSE": "0"},
+    )
 
 
 def test_first_success_runs_once(tmp_path: Path):
