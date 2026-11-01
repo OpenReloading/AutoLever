@@ -36,6 +36,12 @@ struct Rig {
     }
     void run(int n) { while (n--) tick(); }
     void press_start() { in.start = true; tick(); in.start = false; tick(); }
+    // the rod sticks: the end sensors hold still while the controller runs n steps
+    void stick(int n, bool at_home) {
+        in.home = at_home;
+        in.front = false;
+        while (n--) { out = c.step(in, now); now += 10; }
+    }
 };
 
 
@@ -157,12 +163,7 @@ int main() {
         r.press_start();
         r.run(20);
         r.pos = 40;  // the rod sticks
-        for (int i = 0; i < 100; ++i) {
-            r.in.home = false;
-            r.in.front = false;
-            r.out = r.c.step(r.in, r.now);
-            r.now += 10;
-        }
+        r.stick(100, false);
         CHECK(r.c.state() == State::Fault && r.c.fault() == Fault::Jam && !r.out.extend && !r.out.retract);
         r.run(5);
         CHECK(r.c.state() == State::Fault);
@@ -175,12 +176,7 @@ int main() {
         Rig r;
         r.c.jam_ms = 500;
         r.press_start();
-        for (int i = 0; i < 100; ++i) {  // valve on, rod does not leave home
-            r.in.home = true;
-            r.in.front = false;
-            r.out = r.c.step(r.in, r.now);
-            r.now += 10;
-        }
+        r.stick(100, true);  // valve on, rod does not leave home
         CHECK(r.c.fault() == Fault::Jam);
     }
     {  // the jam timer holds across the 32-bit millis wrap
@@ -212,12 +208,7 @@ int main() {
         Rig r;
         r.c.jam_ms = 500;
         r.press_start();
-        for (int i = 0; i < 100; ++i) {  // valve on, rod does not leave home
-            r.in.home = true;
-            r.in.front = false;
-            r.out = r.c.step(r.in, r.now);
-            r.now += 10;
-        }
+        r.stick(100, true);  // valve on, rod does not leave home
         CHECK(r.c.fault() == Fault::Jam);
         r.in.estop_ok = false;
         r.run(5);
@@ -249,10 +240,7 @@ int main() {
         Rig r;
         r.c.jam_ms = 500;
         r.press_start();
-        for (int i = 0; i < 100; ++i) {  // valve on, rod does not leave home
-            r.out = r.c.step(r.in, r.now);
-            r.now += 10;
-        }
+        r.stick(100, false);  // valve on, the rod stops just off home
         CHECK(r.c.fault() == Fault::Jam);
         r.in.estop_ok = false;
         r.tick();
