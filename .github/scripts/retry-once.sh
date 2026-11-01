@@ -8,6 +8,7 @@ for attempt in 1 2; do
   timeout --kill-after=10 "$limit" "$@" && exit 0
   echo "::warning::attempt $attempt of '$*' failed or timed out (limit ${limit}s)"
   # A killed install can leave apt-get alive for a moment, still holding the dpkg lock.
-  [ "$attempt" = 1 ] && sleep 20
+  # RETRY_PAUSE lets the tests skip the pause; unset (as in CI) it is 20 s
+  [[ "$attempt" = 1 ]] && sleep "${RETRY_PAUSE:-20}"
 done
 exit 1
