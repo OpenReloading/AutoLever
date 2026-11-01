@@ -73,9 +73,12 @@ jobs:
           python-version: '3.13'
       - run: python -m venv .venv
       - run: '.venv/bin/pip install --only-binary :all: --require-hashes -r requirements-pio.txt'
+      # .pio-core holds the platform and toolchain, firmware/.pio/libdeps the lib_deps of each environment
       - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
-          path: .pio-core
+          path: |
+            .pio-core
+            firmware/.pio/libdeps
           key: pio-${{ hashFiles('firmware/platformio.ini') }}
       - run: ../.venv/bin/pio run -e stamplc -e bench
         working-directory: firmware
