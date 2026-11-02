@@ -21,18 +21,15 @@ max-statements = 50
 # "standard" is the type checker of Pyright. "recommended" adds the Unknown* and missing-annotation reports.
 typeCheckingMode = "standard"
 # Folders to check; the baseline lives in .basedpyright/baseline.json.
-include = ["main.py", "hooks", "tests", "tools"]
-# the tests import the MkDocs hook as a top-level module (pytest pythonpath below)
-extraPaths = ["hooks"]
+include = ["main.py", "tests", "tools"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-# main.py is in the root, the MkDocs hook in hooks/
-pythonpath = [".", "hooks"]
+# main.py and tools/ are in the root
+pythonpath = ["."]
 
 [tool.coverage.run]
-# hooks/ has no __init__.py, so it is listed to count its files even when no test imports them
-source_dirs = [".", "hooks"]
+source_dirs = ["."]
 branch = true
 # tests are not measured; the browser check runs against the built site in its own CI step
 omit = ["tests/*", ".venv/*"]

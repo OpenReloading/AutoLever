@@ -1,4 +1,4 @@
-<p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/assets/autolever-logo-dark.svg"><img src="docs/assets/autolever-logo.svg" width="320" alt="AutoLever"></picture></p>
+<p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="site/static/assets/autolever-logo-dark.svg"><img src="site/static/assets/autolever-logo.svg" width="320" alt="AutoLever"></picture></p>
 
 # AutoLever
 
@@ -14,16 +14,27 @@ For Lee APP owners (Classic or Deluxe) with compressed air at 7 to 10 bar and a 
 
 ## Build it
 
-The [build guide](https://openreloading.github.io/AutoLever/) has the parts list and interactive [wiring](https://openreloading.github.io/AutoLever/wiring/) and [tubing](https://openreloading.github.io/AutoLever/tubing/) boards. To run it locally (Python 3.12 or later):
+The [build guide](https://openreloading.github.io/AutoLever/) has the parts list and interactive [wiring](https://openreloading.github.io/AutoLever/wiring/) and [tubing](https://openreloading.github.io/AutoLever/tubing/) boards. To run it locally (Node 26, see `site/.nvmrc`):
 
 ```sh
-python -m venv .venv && .venv/bin/pip install -r requirements.txt
-.venv/bin/mkdocs serve
+cd site && npm ci && npm start
 ```
+
+Search needs the built site served as plain files (`npm run serve` redirects Pagefind's index request, so the search stays empty):
+
+```sh
+npm run build && mkdir -p /tmp/www && ln -sfn "$PWD/build" /tmp/www/AutoLever && python3 -m http.server -d /tmp/www 3000
+```
+
+Then open `http://localhost:3000/AutoLever/`.
 
 ## Change it
 
-Edit `data/*.yaml`, run `.venv/bin/python main.py` and commit `data/buildguide.json`. Printable parts are in `cad/`.
+Edit `data/*.yaml`, run `.venv/bin/python main.py` and commit `data/buildguide.json`. Printable parts are in `cad/`. The Python environment (3.12 or later):
+
+```sh
+python -m venv .venv && .venv/bin/pip install -r requirements.txt
+```
 
 ## Community and licence
 

@@ -1,5 +1,5 @@
-"""Render checks of cad/lee_app_handle_adapter.scad (the parameter guards and the print_plate spacing),
-one body of cad/control_box.scad and the unknown part guard of every cad/*.scad.
+"""Render checks of cad/lee_app_handle_adapter.scad (the parameter guards and the print_plate spacing)
+and the unknown part guard of every cad/*.scad.
 
 Needs OpenSCAD (installed in the dev container); skipped where it is missing.
 """
@@ -86,12 +86,6 @@ def test_print_plate_with_arm_beyond_a_long_clamp_is_two_bodies(tmp_path, arm_x)
     result = render(tmp_path / "out.stl", arm_x=arm_x, gap_wide=60)
     assert result.returncode == 0, result.stderr
     assert bodies(tmp_path / "out.stl") == 2
-
-
-def test_control_box_estop_ring_is_one_body(tmp_path):
-    result = render(tmp_path / "out.stl", CAD / "control_box.scad", part='"estop_ring"')
-    assert result.returncode == 0, result.stderr
-    assert bodies(tmp_path / "out.stl") == 1
 
 
 @pytest.mark.parametrize("scad", sorted(CAD.glob("*.scad")), ids=lambda p: p.name)

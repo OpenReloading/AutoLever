@@ -1,4 +1,4 @@
-"""Writes data/buildguide.json (BuildGuide data format) from data/wiring.yaml (StamPLC edition), data/relay.yaml (relay edition, deprecated) and data/guide.yaml.
+"""Writes data/buildguide.json (BuildGuide data format) from data/wiring.yaml and data/guide.yaml.
 Run after editing data/: python main.py. The MkDocs plugin checks the result at build time; CI fails when the committed file is stale.
 """
 import itertools
@@ -9,29 +9,25 @@ import yaml
 
 ROOT = pathlib.Path(__file__).parent
 OUT = ROOT / "data/buildguide.json"
-PLAIN = {"S3": "E-STOP button", "S2": "STOP button", "S0": "START button", "S1": "JOG button",
-         "J1": "DC jack J1", "F1": "fuse holder F1", "FU1": "inline fuse holder FU1", "PLC": "StamPLC", "Q1": "power button Q1", "QPM11": "pressure switch QPM11", "B0": "home sensor B0",
-         "B1": "front sensor B1", "Y1": "valve plug Y1", "Y2": "valve plug Y2", "D5": "diode D5", "D6": "diode D6", "T1": "jam timer T1 (8-pin timer)"}
+PLAIN = {"S3": "E-STOP button", "J1": "DC jack J1", "FU1": "inline fuse holder FU1", "PLC": "StamPLC", "Q1": "power button Q1", "QPM11": "pressure switch QPM11",
+         "B0": "home sensor B0", "B1": "front sensor B1", "Y1": "valve plug Y1", "Y2": "valve plug Y2"}
 CORE = {"BN": "brown wire (+24 V)", "BU": "blue wire (Ground)", "BK": "black wire (signal)"}
-WAGO = {"X-EN": "+24 V while on", "X-M1": "Ground", "X-M2": "Ground", "X-D": "diode join",
-        "X-24": "+24 V after POWER", "X-0V1": "Ground", "X-0V2": "Ground", "X-S": "rail after the E-STOP", "X-V": "valve rail"}
+WAGO = {"X-24": "+24 V after POWER", "X-0V1": "Ground", "X-0V2": "Ground", "X-S": "rail after the E-STOP", "X-V": "valve rail"}
 # StamPLC terminals: the power and COM terminals, inputs 1 to 8 on one edge, relays 1 to 4 (NC, COM, NO) on the other
 PLC_POWER = {"+": ("+", " (+24 V in)"), "-": ("\u2212", " (Ground)"), "C": ("C", " (input common, Ground)")}
 PLC_INPUT = {"1": "home sensor B0", "2": "front sensor B1", "3": "rail after the E-STOP (X-S)", "4": "valve rail after the pressure switch (X-V)"}
 PLC_POLE = {"NC": ("NC", " (closed at rest)"), "C": ("COM", " (common)"), "NO": ("NO", " (closed when the relay is on)")}
-# marks on a button's contact block: terminals 1, 2 are the closed contact, 3, 4 the open contact
-MARK = {"1": "11", "2": "12", "3": "23", "4": "24"}
-CONNECTORS = ("J1", "F1", "FU1", "Q1", "S3", "S2", "S0", "S1", "QPM11", "Y1", "Y2", "PLC")  # parts that get a one-line connector list
+# marks on the E-STOP contact block: terminals 1, 2 are its closed contact
+MARK = {"1": "11", "2": "12"}
+CONNECTORS = ("J1", "FU1", "Q1", "S3", "QPM11", "Y1", "Y2", "PLC")  # parts that get a one-line connector list
 # board look: [line, outline] per wire colour, list swatch where it differs, and the part kinds
 WIRE = {"red": ["#dc2626", "#7f1d1d", "#dc2626"], "blue": ["#2563eb", "#1e3a8a", "#347bdc"], "brown": ["#92400e", "#451a03", "#956238"],
-        "black": ["#1f2937", "#000000", "#273039"], "grey": ["#9ca3af", "#4b5563", "#929ea9"], "DIODE": ["#d1d5db", "#111827", "#29363a"]}
+        "black": ["#1f2937", "#000000", "#273039"], "DIODE": ["#d1d5db", "#111827", "#29363a"]}
 KINDS = {
-    "socket": {"fill": "#1f2937", "stroke": "#1f2937", "inset": 17, "diodeLoop": "around"},
     "box": {"fill": "#f1f5f9", "stroke": "#17202a", "offset": {"bottom": -16}},
-    "diode": {"fill": "#111827", "stroke": "#111827", "band": True},
     "wago": {"fill": "#f1f5f9", "stroke": "#64748b"},
     "plug": {"fill": "#1f2937", "stroke": "#1f2937"},
-    "sensor": {"fill": "#e8f5ec", "stroke": "#15803d", "pins": {"BN": "#92400e", "BU": "#2563eb", "BK": "#111827"}},
+    "sensor": {"fill": "#eef0f6", "stroke": "#555a6d", "pins": {"BN": "#92400e", "BU": "#2563eb", "BK": "#111827"}},
     "button": {"round": True, "stroke": "#9ca3af"},
 }
 # tubing: the old schematic as a routed board, one connection per tube of guide.yaml (ends by tube id)
@@ -52,7 +48,7 @@ TUBING_PROPS = [{"name": "QPM11 on the branch", "at": [520, 150], "size": [160, 
 
 
 def screws(w):
-    """Wire numbers under each screw terminal. Wago slots and diode legs are not screws."""
+    """Wire numbers under each screw terminal. Wago slots are not screws, and a diode leg is not a wire."""
     ends = {}
     for step in w["steps"]:
         for no, a, b, col in step["wires"]:
@@ -65,7 +61,7 @@ def screws(w):
             if col == "DIODE":       # a diode leg shares the screw, it is not a wire
                 continue
             for end in (a, b):
-                if w["parts"][end.split(":")[0]]["kind"] not in ("wago", "diode"):
+                if w["parts"][end.split(":")[0]]["kind"] != "wago":
                     ends.setdefault(end, []).append(no)
     return ends
 
@@ -79,13 +75,13 @@ def terminal(part, pin):
     """The short terminal name: 'terminal 3', 'pin 1', 'IN'."""
     if part == "PLC":
         return PLC_POWER[pin][0] if pin in PLC_POWER else f"input {pin}" if pin.isdigit() else f"relay {pin[0]} {PLC_POLE[pin[1:]][0]}"
-    return {"F1": f"tab {pin}", "FU1": f"lead {pin}", "T1": f"pin {pin}", "Y1": f"pin {pin}", "Y2": f"pin {pin}", "Q1": pin, "J1": "+" if pin == "+" else "\u2212"}.get(part, f"terminal {pin}")
+    return {"FU1": f"lead {pin}", "Y1": f"pin {pin}", "Y2": f"pin {pin}", "Q1": pin, "J1": "+" if pin == "+" else "\u2212"}.get(part, f"terminal {pin}")
 
 
 def detail(part, pin):
     """What the terminal is, in words, where the short name does not say: the contact of a button, the pole of a plug."""
-    if part in ("S0", "S1", "S2", "S3"):   # E-STOP and STOP use their closed contact, the others their open contact
-        return f" ({'closed' if part in ('S2', 'S3') else 'open'} contact, marked {MARK[pin]})"
+    if part == "S3":
+        return f" (closed contact, marked {MARK[pin]})"
     if part in ("Y1", "Y2"):
         return " (+24 V)" if pin == "1" else " (Ground)"
     if part == "PLC":
@@ -94,21 +90,17 @@ def detail(part, pin):
 
 
 def label(end):
-    """'K1:9' → 'Relay K1 terminal 9' in words a first-timer can find on the part."""
+    """'PLC:1NC' → 'StamPLC relay 1 NC (closed at rest)' in words a first-timer can find on the part."""
     part, pin = end.split(":", 1)
-    if part[0] == "K":
-        return f"Relay {part} terminal {pin}"
     if part.startswith("X-"):
         return f"Wago {part} ({WAGO[part]}) slot {pin}"
     if part in ("B0", "B1"):
         return f"{cap(CORE[pin])} of the {PLAIN[part]}"
-    if part in ("D5", "D6"):
-        return f"{cap(PLAIN[part])}, " + ("plain leg, in its own 2-way Wago with this wire" if pin == "A" else "ring leg")
     return f"{cap(PLAIN.get(part, part))} {terminal(part, pin)}{detail(part, pin)}"
 
 
 def cable_of(a, b, col):
-    """Which kind of cable a wire is: see `cables:` in data/wiring.yaml and data/relay.yaml."""
+    """Which kind of cable a wire is: see `cables:` in data/wiring.yaml."""
     parts = {a.split(":")[0], b.split(":")[0]}
     if col == "DIODE":
         return "diode"
@@ -116,8 +108,6 @@ def cable_of(a, b, col):
         return "sensor"
     if parts & {"Y1", "Y2"}:
         return "valve"
-    if col == "grey":
-        return "leg"
     return "field" if "QPM11" in parts else "core"
 
 
@@ -180,7 +170,7 @@ def unset_makerworld(g):
 
 
 def wiring_board(w, notes, title, prefix, size):
-    """One wiring board from a wiring file (wiring.yaml, relay.yaml) and the notes of its steps in guide.yaml."""
+    """The wiring board from data/wiring.yaml and the notes of its steps in guide.yaml."""
     shared = screws(w)
     over = {k: v for k, v in shared.items() if len(v) > 2}
     assert not over, f"more than two wires under one screw: {over}"
@@ -191,7 +181,7 @@ def wiring_board(w, notes, title, prefix, size):
     assert set(notes) == ids, f"{title} notes and steps differ: notes only {sorted(set(notes) - ids)}, steps only {sorted(ids - set(notes))}"
     return {
         "title": title, "label": "Wiring board", "size": size, "prefix": prefix, "single": True,
-        "legend": ["Red = +24 V, black = Ground, sensor wires keep their own colours", {"key": "diode", "text": "Silver ring = cathode"}, "Green = selected connection"],
+        "legend": ["Red = +24 V, black = Ground, sensor wires keep their own colours", {"key": "diode", "text": "Silver ring = cathode"}, "Yellow = selected connection"],
         "colors": {k: {"line": line, "outline": outline, "swatch": swatch, **({"diode": True} if k == "DIODE" else {})}
                    for k, (line, outline, swatch) in WIRE.items()},
         "kinds": KINDS, "areas": w["areas"], "props": w["props"], "parts": w["parts"],
@@ -212,10 +202,9 @@ def build():
                 "items": bom_items(g)},
         "boards": {
             "wiring": wiring_board(load("wiring.yaml"), g["wiring_notes"], "Wiring", "plc", [1360, 860]),
-            "relay": wiring_board(load("relay.yaml"), g["relay_notes"], "Wiring (relay edition)", "wire", [1360, 860]),
             "tubing": {
                 "title": "Tubing", "label": "Pneumatic tubing diagram", "size": [1100, 530], "prefix": "tube", "scope": "all", "listAll": True, "listColor": False,
-                "legend": ["6 × 4 mm tube · schematic", "Green = selected connection"],  # noqa: RUF001
+                "legend": ["6 × 4 mm tube · schematic", "Yellow = selected connection"],  # noqa: RUF001
                 "colors": {"AIR": {"line": "#7694b2", "outline": "#3f5f7f"}},
                 "props": TUBING_PROPS, "parts": TUBING_PARTS,
                 "steps": [{"id": str(i), "title": t["title"], "note": f'{t["text"]} Check: {t["check"]}', "connections": [{"no": str(i), "a": a, "b": b, "color": "AIR", "la": t["from"], "lb": t["to"]}]}

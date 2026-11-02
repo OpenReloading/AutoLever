@@ -2,9 +2,9 @@ FROM mcr.microsoft.com/devcontainers/python:3.15-bookworm@sha256:25ac34e3c1a4c5b
 
 ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
 
-# Node 24 for the Playwright MCP server; each Playwright build installs its own Chromium.
-RUN curl -fsSLo /tmp/node.tar.xz https://nodejs.org/dist/v24.21.0/node-v24.21.0-linux-x64.tar.xz \
- && echo 'fd8e59d5a511510f6a298afb548f18c7d2b1be404d8b4a27d94fbe49f56cb2d6  /tmp/node.tar.xz' | sha256sum -c - \
+# Node 26 (site/.nvmrc) for the site and the Playwright MCP server; each Playwright build installs its own Chromium.
+RUN curl -fsSLo /tmp/node.tar.xz https://nodejs.org/dist/v26.13.0/node-v26.13.0-linux-x64.tar.xz \
+ && echo 'd28a96af6c38596f6d9d97c0ee531c13d238d757742387d1928de822d959e997  /tmp/node.tar.xz' | sha256sum -c - \
  && tar -xJf /tmp/node.tar.xz -C /usr/local --strip-components=1 --exclude='*.md' --exclude=LICENSE \
  && rm /tmp/node.tar.xz \
  && npm install -g @playwright/mcp@0.0.83 \

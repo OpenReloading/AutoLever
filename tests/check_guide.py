@@ -1,9 +1,8 @@
-"""Browser checks for the Markdown pages and their BuildGuide components. Requires Playwright + Chromium.
-Run against the built site served under /AutoLever/: python tests/check_guide.py http://127.0.0.1:8000/AutoLever
+"""Browser checks for the Docusaurus pages and their BuildGuide components. Requires Playwright + Chromium.
+Run against the built site (site/build, baseUrl /AutoLever/) served under /AutoLever/: python tests/check_guide.py http://127.0.0.1:8000/AutoLever
 """
 import csv  # noqa: I001
 import io
-import json
 import re
 import struct
 import sys
@@ -19,8 +18,8 @@ import main
 from tools.site_config import site_config
 
 # A wire with an unknown part or terminal fails with its number and end, not a bare KeyError.
-wiring_yaml=yaml.safe_load(Path(main.ROOT,'data/relay.yaml').read_text(encoding='utf-8'))
-for end,message in [('K9:1','wire 6, to end K9:1: unknown part K9'),('K1:99','wire 6, to end K1:99: part K1 has no terminal 99')]:
+wiring_yaml=yaml.safe_load(Path(main.ROOT,'data/wiring.yaml').read_text(encoding='utf-8'))
+for end,message in [('K9:1','wire 6, to end K9:1: unknown part K9'),('PLC:99','wire 6, to end PLC:99: part PLC has no terminal 99')]:
     broken=yaml.safe_load(yaml.safe_dump(wiring_yaml))
     wire=next(w for s in broken['steps'] for w in s['wires'] if w[0]=='6')
     wire[2]=end
@@ -46,7 +45,7 @@ BASE=(sys.argv[1] if len(sys.argv)>1 else 'http://127.0.0.1:8000').rstrip('/')
 with sync_playwright() as p:
     browser=p.chromium.launch(headless=True,args=['--no-sandbox'])
     errors=[];missing=[];external=[]  # noqa: E702
-    # Material keeps the palette it saved in a context, so a colour scheme under test gets a fresh context.
+    # Docusaurus keeps a colour mode chosen with its toggle in a context, so a colour scheme under test gets a fresh context.
     def open_page(**options):
         context=browser.new_context(**{'viewport':{'width':1440,'height':1000},**options})
         context.route('**/*',lambda r:r.continue_() if r.request.url.startswith(BASE) else r.abort())
@@ -57,46 +56,47 @@ with sync_playwright() as p:
         page.on('request',lambda r:external.append(r.url) if r.url.startswith(('http://','https://')) and not r.url.startswith(BASE) else None)
         return page
     def scheme_is(scheme):
-        expect(page.locator('body')).to_have_attribute('data-md-color-scheme','slate' if scheme=='dark' else 'default')
+        expect(page.locator('html')).to_have_attribute('data-theme',scheme)
     page=open_page(accept_downloads=True)
     def go(path=''):
         page.goto(BASE+'/'+path,wait_until='domcontentloaded')
         expect(page.locator('.ag-guide' if path else 'main h1')).to_be_visible()
     def ready():
         expect(page.locator('.ag-board-canvas')).to_have_attribute('data-ready','true')
-    # Link preview meta on every page, with the card URL built from site_url; the card is a 1200 x 630 PNG that says nothing beyond the site title and description.
+    # Link preview meta on every page, with the card URL built from the site address; the card is a 1200 x 630 PNG that says nothing beyond the site title and description.
+    # X reads og:title and og:description where twitter:title and twitter:description are missing.
     config=site_config()
-    origin=urlparse(config['site_url'])
-    card=f'{origin.scheme}://{origin.netloc}'+urlparse(BASE).path+'/assets/social-card.png'
-    for path in ['','bom/','wiring/','tubing/','relay/','404.html']:
-        tags=dict(re.findall(r'<meta (?:property|name)="((?:og|twitter):[\w:]+)" content="([^"]*)"',page.request.get(BASE+'/'+path).text()))
+    card=config['url']+urlparse(BASE).path+'/assets/social-card.png'
+    for path in ['','bom/','wiring/','tubing/','404.html']:
+        tags=dict(re.findall(r'<meta [^>]*?(?:property|name)="((?:og|twitter):[\w:]+)" content="([^"]*)"',page.request.get(BASE+'/'+path).text()))
         assert tags['og:image']==tags['twitter:image']==card,path
-        assert tags['og:description']==tags['twitter:description']==config['site_description'],path
-        assert tags['og:title']==tags['twitter:title'],path
-        assert tags['og:title'].endswith(config['site_name']),path
+        assert tags['og:description']==tags.get('twitter:description',tags['og:description'])==config['description'],path
+        assert tags['og:title']==tags.get('twitter:title',tags['og:title']),path
+        assert tags['og:title'].endswith(config['title']),path
         assert (tags['og:image:width'],tags['og:image:height'],tags['twitter:card'])==('1200','630','summary_large_image'),path
     image=page.request.get(BASE+'/assets/social-card.png')
     assert image.status==200
     assert image.body()[:8]==b'\x89PNG\r\n\x1a\n'
     assert struct.unpack('>II',image.body()[16:24])==(1200,630)
     go('wiring/')
-    data=json.loads(page.locator('#guide-data').text_content())
+    data=page.request.get(BASE+'/assets/buildguide/guide.json').json()   # the plugin's copy of data/buildguide.json
     wiring,tubing,bom=data['boards']['wiring']['steps'],data['boards']['tubing']['steps'],data['bom']['items']
     assert sorted(data)==['boards','bom','storage'],sorted(data)   # components only: no pages, intro, brand or warning
-    index=Path(__file__).parent.parent.joinpath('docs/index.md').read_text(encoding='utf-8')
-    # The introduction is plain Markdown: title, lead and sections of docs/index.md.
+    index=Path(__file__).parent.parent.joinpath('site/docs/index.mdx').read_text(encoding='utf-8')
+    # The introduction is plain Markdown: title, lead and sections of site/docs/index.mdx.
     go()
     expect(page.locator('main h1')).to_have_text(re.search(r'^# (.+)$',index,re.M)[1])
     expect(page.locator('main h2')).to_have_text(re.findall(r'^## (.+)$',index,re.M))
-    expect(page.locator('.md-content__inner > p').first).to_contain_text('Lee APP')
+    expect(page.locator('.markdown > p').first).to_contain_text('Lee APP')
     expect(page.locator('.ag-guide')).to_have_count(0)
-    expect(page.locator('.md-tabs__link')).to_have_text(['Introduction','BOM','Wiring','Tubing','Relay edition (deprecated prototype)'])
-    # The safety admonition sits under the title on every page, without exact figures: full text on the introduction and BOM, short with a link on wiring and tubing.
-    for path,full in [('',True),('bom/',True),('wiring/',False),('tubing/',False),('relay/',False)]:
+    tabs=page.locator('.navbar__items:not(.navbar__items--right)')
+    expect(tabs.locator('.navbar__link')).to_have_text(['Introduction','BOM','Wiring','Tubing'])
+    # The safety admonition sits under the title (Docusaurus wraps the first h1 in a header) on every page, without exact figures: full text on the introduction and BOM, short with a link on wiring and tubing.
+    for path,full in [('',True),('bom/',True),('wiring/',False),('tubing/',False)]:
         go(path)
-        warning=page.locator('main h1 + .admonition.danger')
+        warning=page.locator('main header:has(> h1) + .theme-admonition-danger')
         expect(warning).to_have_count(1)
-        expect(warning.locator('.admonition-title')).to_have_text('Safety')
+        expect(warning.locator(':scope > :first-child')).to_have_text('Safety')
         expect(warning).to_contain_text('E-STOP is not a safety-rated')
         expect(warning).not_to_contain_text(re.compile(r'\d+ ?(N|bar)\b'))
         if full:
@@ -104,9 +104,9 @@ with sync_playwright() as p:
             expect(warning.locator('a')).to_have_count(0)
         else:
             expect(warning).not_to_contain_text('Household electricity')
-            expect(warning.locator('a')).to_have_attribute('href','../')
+            expect(warning.locator('a')).to_have_attribute('href',urlparse(BASE).path+'/')
         # The build step pages carry the step label of the numbered steps on the introduction above the title.
-        label=page.locator('main .step-label + h1')
+        label=page.locator('main .step-label + header > h1')
         if path in ('bom/','wiring/','tubing/'):
             expect(label).to_have_count(1)
             expect(page.locator('main .step-label')).to_have_text(f"Build step {1 if path=='bom/' else 3} of 4")
@@ -114,21 +114,21 @@ with sync_playwright() as p:
             expect(label).to_have_count(0)
     # The header title is not cut off on a phone; every page ends with the repository, Discord and licence links and previous and next links.
     phone=browser.new_page(viewport={'width':390,'height':844})
-    pages=['','bom/','wiring/','tubing/','relay/']
-    names=['Introduction','BOM','Wiring','Tubing','Relay edition (deprecated prototype)']
+    pages=['','bom/','wiring/','tubing/']
+    names=['Introduction','BOM','Wiring','Tubing']
     for i,path in enumerate(pages):
         phone.goto(BASE+'/'+path,wait_until='domcontentloaded')
-        title=phone.locator('.md-header__title .md-ellipsis').first
+        title=phone.locator('.navbar__inner .navbar__title')
         assert title.evaluate('e=>e.scrollWidth<=e.clientWidth'),path
         assert title.inner_text().strip()=='AutoLever',path
         assert phone.title().endswith('AutoLever'),path
-        footer=phone.locator('.md-footer')
-        expect(footer.locator('.md-copyright a').first).to_have_attribute('href','https://github.com/OpenReloading/AutoLever')
-        expect(footer.locator('.md-copyright a')).to_have_text(['Repository','Discord','MIT licence','Material for MkDocs'])
+        footer=phone.locator('.footer')
+        expect(footer.locator('a').first).to_have_attribute('href','https://github.com/OpenReloading/AutoLever')
+        expect(footer.locator('a')).to_have_text(['Repository','Discord','MIT licence'])
         expect(footer.get_by_role('link',name='Discord')).to_have_attribute('href',re.compile(r'^https://discord\.gg/\w+$'))
         expect(footer.get_by_role('link',name='MIT licence')).to_have_attribute('href','https://github.com/OpenReloading/AutoLever/blob/main/LICENSE')
         for side,j in [('prev',i-1),('next',i+1)]:
-            link=footer.locator(f'.md-footer__link--{side} .md-footer__title')
+            link=phone.locator(f'.pagination-nav__link--{side} .pagination-nav__label')
             if 0<=j<len(names):
                 expect(link).to_contain_text(names[j])
             else:
@@ -136,17 +136,17 @@ with sync_playwright() as p:
     # The 404 has one sentence with links to the Introduction and the BOM, under the base path.
     phone.goto(BASE+'/404.html',wait_until='domcontentloaded')
     expect(phone.locator('main h1')).to_have_text('Page not found')
-    expect(phone.locator('main .md-content__inner > p')).to_have_count(1)
-    expect(phone.locator('main .md-content__inner > p a')).to_have_text(['Introduction','BOM'])
-    assert phone.locator('main .md-content__inner > p a').evaluate_all('l=>l.map(a=>new URL(a.href).pathname)')==[urlparse(BASE).path+'/',urlparse(BASE).path+'/bom/']
+    expect(phone.locator('main p')).to_have_count(1)
+    expect(phone.locator('main p a')).to_have_text(['Introduction','BOM'])
+    assert phone.locator('main p a').evaluate_all('l=>l.map(a=>new URL(a.href).pathname)')==[urlparse(BASE).path+'/',urlparse(BASE).path+'/bom/']
     phone.close()
     # Real page navigation, reload and browser back preserve the destination.
     for name,slug in [('BOM','bom'),('Wiring','wiring'),('Tubing','tubing')]:
-        page.locator('.md-tabs').get_by_role('link',name=name,exact=True).click()
+        tabs.get_by_role('link',name=name,exact=True).click()
         expect(page).to_have_url(BASE+'/'+slug+'/')
         page.reload(wait_until='domcontentloaded')
         expect(page.locator('main h1')).to_have_text(name)
-        expect(page.locator('.admonition.danger')).to_be_visible()
+        expect(page.locator('.theme-admonition-danger')).to_be_visible()
     page.go_back(wait_until='domcontentloaded')
     expect(page.locator('main h1')).to_have_text('Wiring')
     # Every board connection matches the validated source, with no extra diode wires.
@@ -157,15 +157,6 @@ with sync_playwright() as p:
             expect(page.locator('.ag-connection-detail')).to_contain_text(wire['lb'])
             expect(page.locator('[data-connection]')).to_have_count(len(step['connections']))
             expect(page.locator('[data-connection="'+wire['no']+'"]')).to_have_attribute('aria-label',wire['no']+': '+wire['la']+' to '+wire['lb']+('; ring at '+wire['la'] if wire['color']=='DIODE' else ''))
-    # The relay edition is marked as a deprecated prototype and keeps its own board, with the first and last wire of each step matching the source.
-    go('relay/')
-    expect(page.locator('main .admonition.warning')).to_contain_text('Deprecated prototype')
-    expect(page.locator('main h1')).to_have_text('Wiring (relay edition)')
-    for step in data['boards']['relay']['steps']:
-        for wire in (step['connections'][0],step['connections'][-1]):
-            go(f"relay/#relay={step['id']}/{wire['no']}");ready()  # noqa: E702
-            expect(page.locator('.ag-connection-detail')).to_contain_text(wire['la'])
-            expect(page.locator('.ag-connection-detail')).to_contain_text(wire['lb'])
     # Each wiring step shows its own note, and the note changes with the step.
     assert all(s['note'] for s in wiring)
     for step in wiring:
@@ -263,15 +254,15 @@ with sync_playwright() as p:
     expect(page.locator('.ag-progress')).to_have_text(f"3 / {len(bom)} checked")
     expect(page.locator('tbody tr:not(.ag-group)').nth(2).locator('input[type=checkbox]')).to_be_checked()
     assert all('status' not in row for row in bom)
-    page.locator('[data-role=search]').fill('lever connectors')   # the three Wago rows and the relay box
-    expect(page.locator('tbody tr:not(.ag-group)')).to_have_count(4)
+    page.locator('[data-role=search]').fill('lever connectors')   # the two Wago rows
+    expect(page.locator('tbody tr:not(.ag-group)')).to_have_count(2)
     with page.expect_download() as download:
         page.locator('[data-action=export]').click()
     with tempfile.TemporaryDirectory() as temp:
         target=Path(temp)/'bom.csv';download.value.save_as(target)  # noqa: E702
         rows=list(csv.DictReader(io.StringIO(target.read_text(encoding='utf-8-sig'))))
         assert list(rows[0])==['Group','Component','Specification','Quantity','MakerWorld','Done']
-        assert [r['Quantity'] for r in rows]==['3','2','2','1']
+        assert [r['Quantity'] for r in rows]==['3','2']
         assert download.value.suggested_filename=='autolever-bom.csv'
     page.locator('[data-role=search]').fill('does-not-exist')
     expect(page.locator('.ag-empty')).to_be_visible()
@@ -279,24 +270,24 @@ with sync_playwright() as p:
     expect(page.locator('tbody tr:not(.ag-group)')).to_have_count(len(bom))
     # Printed parts are grouped, marked as 3D printed and link to MakerWorld.
     page.locator('[data-role=search]').fill('3D printed')
-    expect(page.locator('tr.ag-group')).to_contain_text(['3D printed','Relay edition only (deprecated)'])
+    expect(page.locator('tr.ag-group')).to_contain_text(['3D printed'])
     expect(page.locator('tbody a', has_text='MakerWorld')).to_have_count(sum('link' in row for row in bom))
     page.locator('[data-role=search]').fill('')
     main_page=page
-    # No sideways scroll at 390 px, and every tap target a user can reach in the header, the tabs, the footer, the home buttons and the card links is 44 px high, on a phone and on a desktop, light and dark.
+    # No sideways scroll at 390 px, and every tap target a user can reach in the navbar, the footer, previous and next, the home buttons and the card links is 44 px high, on a phone and on a desktop, light and dark.
     views:list[tuple[int,Literal['light','dark']]]=[(390,'light'),(390,'dark'),(1440,'light'),(1440,'dark')]
-    TARGETS="""[...document.querySelectorAll('.md-header :is(a, button, label, input), .md-tabs a, .md-footer a, .md-typeset .md-button, :is(h2#what-it-does + ul, h2#build-it + ol) a')]
+    TARGETS="""[...document.querySelectorAll('.navbar :is(a, button, input), .footer a, .pagination-nav a, .hero-buttons .button, :is(h2#what-it-does + ul, h2#build-it + ol) a')]
         .filter(e=>{const r=e.getBoundingClientRect();return r.width&&r.height&&getComputedStyle(e).pointerEvents!='none'&&e.checkVisibility({opacityProperty:true,visibilityProperty:true})})
         .map(e=>[e.tagName,e.className||e.textContent.trim(),Math.round(e.getBoundingClientRect().height)]).filter(t=>t[2]<44)"""
     for width,scheme in views:
         page=open_page(viewport={'width':width,'height':844},color_scheme=scheme)
-        for path in ['','bom/','wiring/','tubing/','relay/','404.html']:
+        for path in ['','bom/','wiring/','tubing/','404.html']:
             page.goto(BASE+'/'+path,wait_until='load');scheme_is(scheme)  # noqa: E702
-            if path in ('wiring/','tubing/','relay/'):
+            if path in ('wiring/','tubing/'):
                 ready()
             if width==390:
                 assert page.evaluate('document.documentElement.scrollWidth<=innerWidth'),(path,scheme,'horizontal scroll')
-            if path in ('bom/','wiring/','tubing/','relay/'):   # Export, Import and Reset progress: 12 px text, 44 px high at every width
+            if path in ('bom/','wiring/','tubing/'):   # Export, Import and Reset progress: 12 px text, 44 px high at every width
                 tools=page.evaluate("[...document.querySelectorAll('.ag-progress-tools button')].map(e=>[e.textContent.trim(),e.getBoundingClientRect().height,parseFloat(getComputedStyle(e).fontSize)])")
                 assert tools,(path,'no progress buttons')
                 assert all(h>=43.9 and size>=12 for _,h,size in tools),(path,width,scheme,tools)
@@ -317,12 +308,12 @@ with sync_playwright() as p:
         page.wait_for_function('([before,down])=>down?scrollY>before+30:scrollY<before-30',arg=[before,down])
     for width,scheme in [(390,'light'),(390,'dark'),(820,'light'),(820,'dark')]:
         page=open_page(viewport={'width':width,'height':844},color_scheme=scheme,has_touch=True)
-        for path in ['', 'bom/', 'wiring/', 'tubing/', 'relay/']:
+        for path in ['', 'bom/', 'wiring/', 'tubing/']:
             go(path);scheme_is(scheme)  # noqa: E702
             # Phones: every control is at least 24 px and every button 44 px high, the board controls 44 x 44 on a toolbar without a sideways scroll, in both schemes; the canvas is as tall as its drawing, with Fullscreen above it in the first screen.
             assert page.evaluate("[...document.querySelectorAll('.ag-guide button, .ag-guide select, .ag-guide input')].every(e=>{const r=e.getBoundingClientRect();return !r.width||(r.width>=23.9&&r.height>=23.9)})"),path+': control under 24 px'
             assert page.evaluate("[...document.querySelectorAll('.ag-guide button, .ag-guide select')].every(e=>{const r=e.getBoundingClientRect();return !r.width||r.height>=43.9})"),path+': button under 44 px'
-            if path in ('wiring/','tubing/','relay/'):
+            if path in ('wiring/','tubing/'):
                 ready()
                 page.locator('[data-action=zoom-fit]').click()   # phones open at a readable zoom that pans; Fit shows the whole drawing
                 canvas,drawing,fullscreen=page.evaluate("['.ag-board-canvas','.ag-board-canvas > div','[data-action=fullscreen]'].map(s=>{const r=document.querySelector(s).getBoundingClientRect();return {y:r.y,height:r.height}})")
@@ -363,7 +354,7 @@ with sync_playwright() as p:
     # The next action stays on screen across step lengths and viewport changes.
     for width,height in [(1440,900),(1280,720),(390,844),(375,667),(844,390)]:
         page.set_viewport_size({'width':width,'height':height})
-        for slug in ['wiring','tubing','relay']:
+        for slug in ['wiring','tubing']:
             go(slug+'/');ready()  # noqa: E702
             steps=page.locator('.ag-steps button')
             for index in range(steps.count()):
@@ -380,10 +371,12 @@ with sync_playwright() as p:
     page.set_viewport_size({'width':1024,'height':768})
     go('wiring/#wiring='+first);ready()  # noqa: E702
     assert page.locator('.ag-board-canvas').evaluate('e=>e.clientHeight')>=300,'board too small at 1024x768'
-    # Print on A4 (718 px between 10 mm margins), also from the dark scheme: the boards fit the width BuildGuide prints them at (700 px), the controls and counters are hidden and the text is dark on white paper.
+    # Print on A4 (718 px between 10 mm margins), also from the dark scheme: the boards fit the width BuildGuide prints them at (700 px), the controls and counters are hidden and the text is in the light ink on white paper.
+    light=dict(re.findall(r'--([\w-]+):\s*#(\w{6});',Path(main.ROOT,'site/src/css/brand.css').read_text(encoding='utf-8').split('}',1)[0]))
+    ink='rgb({}, {}, {})'.format(*bytes.fromhex(light['ink']))
     page=open_page(viewport={'width':718,'height':1123},color_scheme='dark')
     page.emulate_media(media='print')
-    for slug in ['bom','wiring','tubing','relay']:
+    for slug in ['bom','wiring','tubing']:
         go(slug+'/');scheme_is('dark')  # noqa: E702
         if slug!='bom':
             ready()
@@ -392,8 +385,8 @@ with sync_playwright() as p:
         assert page.evaluate("[...document.querySelectorAll('.joint-paper')].every(e=>e.getBoundingClientRect().right<=innerWidth)"),'board cut off in print: '+slug
         for hidden in ['.ag-progress','.ag-status','.ag-result-count','.ag-connection-detail','.ag-board-toolbar']:
             expect(page.locator(hidden)).to_be_hidden()
-        expect(page.locator('main h1')).to_have_css('color','rgb(22, 35, 58)')
-        expect(page.locator('main h1 + .admonition.danger')).to_be_visible()
+        expect(page.locator('main h1')).to_have_css('color',ink)
+        expect(page.locator('main header:has(> h1) + .theme-admonition-danger')).to_be_visible()
     page.context.close()
     # Self-hosted search under the base path: opens, finds a word of the introduction, links stay under the prefix; on a phone and on a desktop, light and dark, the controls are 24 px or more with text contrast of 4.5:1 or more.
     for width,scheme in views:
@@ -403,23 +396,21 @@ with sync_playwright() as p:
             for selector in ['.step-label','.ag-progress','.ag-primary']:
                 ratio=page.evaluate(CONTRAST,[selector,None])
                 assert ratio>=4.5,(width,scheme,selector,ratio)
-        toggle=page.locator('label.md-header__button[for=__search]')
-        if width<500:
-            expect(toggle).to_be_visible()
-            assert toggle.evaluate('e=>e.offsetWidth>=24&&e.offsetHeight>=24'),(width,scheme)
-            assert page.evaluate(CONTRAST,['label.md-header__button[for=__search]',None])>=4.5,(width,scheme,'toggle')
-            toggle.click()
-        # before the click (on a desktop Material fades the placeholder out once the search is open), after its colour transition from the page load
-        page.wait_for_function(f"({CONTRAST})(['.md-search__input','::placeholder'])>=4.5",timeout=2000)
-        field=page.locator('.md-search__input')
-        field.click()
-        field.press_sequentially('relay')  # the search listens to key events, fill() sends none
-        link=page.locator('.md-search-result__link').first
+        # Pagefind's button opens the search dialog: the icon alone on a phone, a field-like button on a desktop
+        toggle=page.locator('pagefind-modal-trigger button')
+        expect(toggle).to_be_visible()
+        assert toggle.evaluate('e=>e.offsetWidth>=24&&e.offsetHeight>=24'),(width,scheme)
+        assert page.evaluate(CONTRAST,['pagefind-modal-trigger button',None])>=4.5,(width,scheme,'toggle')
+        toggle.click()
+        page.wait_for_function(f"({CONTRAST})(['.pf-input','::placeholder'])>=4.5",timeout=2000)
+        field=page.locator('.pf-input')
+        field.press_sequentially('relay')
+        link=page.locator('.pf-result-link').first
         expect(link).to_be_visible()
         assert link.evaluate('a=>a.pathname').startswith(urlparse(BASE).path+'/'),(width,scheme)
-        reset=page.locator('.md-search__options > button')
-        page.wait_for_function('e=>e.getBoundingClientRect().width>=24&&getComputedStyle(e).opacity==1',arg=reset.element_handle())  # the icon grows during its transition
-        for selector in ['.md-search__input','.md-search__options > button','.md-search-result__meta','.md-search-result__link','.md-search-result mark']:
+        reset=page.locator('.pf-input-clear')
+        page.wait_for_function('e=>e.getBoundingClientRect().width>=24&&getComputedStyle(e).opacity==1',arg=reset.element_handle())
+        for selector in ['.pf-input','.pf-input-clear','.pf-summary','.pf-result-link','.pf-result mark']:
             ratio=page.evaluate(CONTRAST,[selector,None])
             assert ratio>=4.5,(width,scheme,selector,ratio)
         link.click()
@@ -441,4 +432,4 @@ with sync_playwright() as p:
     assert 'This guide needs JavaScript.' in fallback.content()
     browser.close()
     wires=[w for s in wiring for w in s['connections']]
-    print(f"PASS: five Markdown pages with BuildGuide components; {len(wires)} connections ({sum(w['color']=='DIODE' for w in wires)} diodes), {len(tubing)} tubing steps, grouped BOM with 3D printed parts, safety admonition on every page (full on introduction and BOM, short with link on wiring and tubing); matching layouts, zoom, fullscreen, scrolling, persistence, CSV and mobile; pinch zoom, one-finger pan and hand-over to the page at 390 and 820 px; no sideways scroll at 390 px and 44 px tap targets in the header, footer, home buttons, card links and progress buttons; link preview meta and card on every page; self-hosted search at 390 and 1440 px in light and dark; no JS errors, missing assets or third-party requests.")
+    print(f"PASS: four Docusaurus pages with BuildGuide components; {len(wires)} connections ({sum(w['color']=='DIODE' for w in wires)} diodes), {len(tubing)} tubing steps, grouped BOM with 3D printed parts, safety admonition on every page (full on introduction and BOM, short with link on wiring and tubing); matching layouts, zoom, fullscreen, scrolling, persistence, CSV and mobile; pinch zoom, one-finger pan and hand-over to the page at 390 and 820 px; no sideways scroll at 390 px and 44 px tap targets in the navbar, footer, previous and next, home buttons, card links and progress buttons; link preview meta and card on every page; self-hosted search (Pagefind) at 390 and 1440 px in light and dark; no JS errors, missing assets or third-party requests.")

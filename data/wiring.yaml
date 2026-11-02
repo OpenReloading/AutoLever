@@ -1,7 +1,6 @@
 # Every wire of the pneumatic press control, StamPLC edition (24 V DC only, no mains in the box; the StamPLC runs
 # the press: START/STOP and JOG are its front buttons, E-STOP cuts the valve supply). Single source of truth:
 # the wiring page (interactive board + wire lists) and the build checks read this file.
-# The relay edition (deprecated prototype) is in relay.yaml.
 #
 # parts: at = [x, y] on the board picture, size = [w, h], ports = terminals per side
 #        (left/right/top/bottom, in drawing order). The picture is not to scale.
@@ -25,7 +24,7 @@ cables:
 # areas: a dashed frame with its title. One box; every cable that leaves it uses the one oval exit.
 areas:
   box:     {title: "Control box", at: [20, 270], size: [1320, 580], color: "#334155"}
-  air:     {title: "Air row", at: [330, 10], size: [600, 230], color: "#0f766e"}
+  air:     {title: "Air row", at: [330, 10], size: [600, 230], color: "#3f5f7f"}
   machine: {title: "Cylinder", at: [950, 10], size: [390, 230], color: "#475569"}
 
 button: &button {top: ["1", "2"]}      # E-STOP: the closed contact (marked 11, 12 on the block)

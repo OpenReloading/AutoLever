@@ -1,0 +1,788 @@
+/* AutoLever layout on the brand tokens of brand.css. The home page is the doc "index": Docusaurus puts
+   docs-doc-id-index on <html>, which scopes its rules. */
+
+/* Links in running text are underlined, so they do not rely on colour against the text around them */
+main :is(p, li, td) > a:not(.button) {
+  text-decoration: underline;
+}
+
+:is(.navbar, .markdown, .pagination-nav, .footer) :is(a, button):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+:is(.navbar, .footer) a:focus-visible {
+  outline-color: var(--header-ink);
+}
+
+/* Navbar: a page-coloured bar with a line under it; every control a 44 px target */
+.navbar {
+  border-bottom: 1px solid var(--line);
+}
+
+.navbar__brand {
+  min-height: 44px;
+  color: var(--header-ink);
+}
+
+.navbar__title {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.navbar {
+  --ifm-navbar-item-padding-vertical: 9px;
+}
+
+.navbar-sidebar .menu__link {
+  min-height: 44px;
+}
+
+.navbar .clean-btn {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+/* the page links as tabs: muted, ink on hover and when active, the active one underlined in the accent */
+.navbar__items:not(.navbar__items--right) .navbar__link--active {
+  box-shadow: inset 0 -2px var(--accent);
+}
+
+/* The repository link (src/components/RepoWidget.tsx) is an outlined button: icon, name, release, stars and forks */
+/* the widget is a navbar item: Infima hides those below 997 px, where the menu shows it */
+@media (min-width: 997px) {
+  .navbar__items .repo-widget {
+    display: flex;
+    min-height: 44px;
+  }
+}
+
+.repo-widget {
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 0;
+  max-width: 15rem;
+  padding: 4px 12px;
+  border: 1px solid var(--control-line);
+  border-radius: 8px;
+  color: var(--ink);
+  font-size: 0.8rem;
+  line-height: 1.2;
+}
+
+.repo-widget:hover {
+  color: var(--ink);
+  border-color: var(--ink);
+  text-decoration: none;
+}
+
+.navbar-sidebar .repo-widget {
+  margin: 8px 12px;
+}
+
+.repo-widget svg {
+  display: block;
+  fill: currentColor;
+}
+
+.repo-widget__icon svg {
+  width: 1.6rem;
+  height: 1.6rem;
+}
+
+.repo-widget__text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.repo-widget__name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: var(--ifm-font-weight-semibold);
+}
+
+.repo-widget__facts {
+  display: flex;
+  gap: 0.6rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--muted);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.repo-widget__facts li {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.repo-widget__facts svg {
+  width: 0.8rem;
+  height: 0.8rem;
+}
+
+/* spoken label of a fact: the icon is hidden from assistive technology, the count alone says nothing */
+.repo-widget__label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Search (src/theme/SearchBar.tsx): Pagefind's button and field 44 px high (its own rules outrank any selector, its
+   variables do not); the button on --surface like a field */
+:is(pagefind-modal-trigger, pagefind-modal) {
+  --pf-input-height: 44px;
+  --pf-border-radius: 10px;
+}
+
+pagefind-modal-trigger {
+  --pf-background: var(--surface);
+}
+
+/* The safety admonition and the status band of the home page: the amber panel, no icon, the title in small monospace
+   capitals, text at 16 px so it stays short on a phone */
+.theme-admonition-danger,
+.docs-doc-id-index .theme-admonition-warning {
+  --ifm-alert-background-color: var(--warn-fill);
+  --ifm-alert-background-color-highlight: var(--surface-alt);
+  --ifm-alert-border-color: var(--warn-border);
+  --ifm-alert-foreground-color: var(--warn-body);
+  --ifm-link-color: var(--link);
+  --ifm-link-hover-color: var(--link-hover);
+  padding: 0 16px 2px;
+  border: 1px solid var(--warn-border);
+  border-radius: 14px;
+  box-shadow: none;
+  font-size: 16px;
+}
+
+:is(.theme-admonition-danger, .docs-doc-id-index .theme-admonition-warning) > :first-child {
+  margin: 0;
+  padding: 12px 0 0;
+  color: var(--warn-text);
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+:is(.theme-admonition-danger, .docs-doc-id-index .theme-admonition-warning) > :first-child > span {
+  display: none;
+}
+
+:is(.theme-admonition-danger, .docs-doc-id-index .theme-admonition-warning) p {
+  margin: 0.2em 0 0.7em;
+}
+
+/* Air between the navbar and the page title */
+.theme-doc-markdown {
+  padding-top: 24px;
+}
+
+/* Reading measure: about 70 characters per line for paragraphs, lists and the safety admonition; the BuildGuide
+   components keep the full width */
+.markdown > :is(p, ul, ol, .theme-admonition) {
+  max-width: 56ch;
+}
+
+/* Heading scale: the h2 matches the 20 px h2 of the components, both at weight 600 */
+.markdown :is(h1, h2) {
+  color: var(--ink);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.markdown h1 {
+  --ifm-h1-font-size: 28px;
+}
+
+.markdown h2 {
+  --ifm-h2-font-size: 20px;
+}
+
+/* Build step pages (BOM, wiring, tubing): the step label as a blue-tinted pill above a 34 px title, 48 px from
+   720 px. The title is the page's first heading, which Docusaurus wraps in a header. */
+.step-label {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background-color: var(--accent-tint);
+  color: var(--link);
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.step-label + header > h1 {
+  margin: 8px 0 24px;
+  font-size: 34px;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+@media screen and (min-width: 720px) {
+  .step-label + header > h1 {
+    font-size: 48px;
+  }
+}
+
+/* Footer: a line above, muted text; the links underlined so they do not rely on colour, 44 px high and 28 px apart */
+.footer {
+  border-top: 1px solid var(--line);
+}
+
+.footer__links {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 28px;
+  margin-bottom: 0;
+  text-align: left;
+}
+
+.footer__link-item {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  text-decoration: underline;
+}
+
+.footer__link-separator,
+.footer__link-item svg {
+  display: none;
+}
+
+/* Previous and next: no box, the label in ink at full size */
+.pagination-nav__link {
+  border-color: var(--line);
+}
+
+.pagination-nav__link:hover {
+  border-color: var(--accent);
+}
+
+/* BuildGuide sets 9 to 11 px on labels, table heads and legends (issue #69 in OpenReloading/BuildGuide); 12 px is the
+   floor here. The SVG drawing text scales with the board and is out of reach of CSS (OpenReloading/BuildGuide#97). */
+html[data-theme] .ag-guide :is(.ag-steps small, .ag-board-toolbar label, .ag-board-legend, .ag-connection-detail small, .ag-wire-navigation, .ag-wire-row button, .ag-row-color, .ag-bom-table th, .ag-part-cell small, .ag-source-link, .ag-result-count, .ag-status, .ag-primary, .ag-progress-tools button) {
+  font-size: 12px;
+}
+
+/* Export, Import and Reset progress are 44 px high at every width, not only on phones */
+html[data-theme] .ag-guide .ag-progress-tools button {
+  min-height: 44px;
+}
+
+/* The board panel: a 16 px card on --surface, the drawing inside keeps its own colours; on paper no padding, so the
+   700 px print board fits A4 */
+@media screen {
+  html[data-theme] .ag-guide .ag-full-board {
+    padding: 24px;
+    border-radius: 16px;
+  }
+}
+
+/* Component buttons: 10 px corners; Next and Export CSV filled in the accent colour, Previous outlined like the board
+   controls */
+html[data-theme] .ag-guide :is(.ag-primary, .ag-quiet, .ag-steps button, .ag-board-controls button, .ag-board-toolbar select) {
+  border-radius: 10px;
+}
+
+html[data-theme] .ag-guide .ag-primary {
+  color: var(--on-accent);
+  font-weight: 600;
+}
+
+html[data-theme] .ag-guide .ag-quiet {
+  padding: 10px 15px;
+  border: 1px solid var(--control-line);
+  color: var(--ink);
+}
+
+/* Boards: the canvas is as tall as the drawing at its width, so no empty bands remain above and below it (ratios are
+   the board sizes in data/buildguide.json, checked by tests/test_main.py; the pages wrap each board in a div with
+   data-board). Fullscreen keeps BuildGuide's flex height. */
+[data-board="wiring"] {
+  --board-ratio: 1360 / 860;
+}
+
+[data-board="tubing"] {
+  --board-ratio: 1100 / 530;
+}
+
+html[data-theme] .ag-guide:not(.ag-expanded) .ag-board-canvas {
+  height: auto;
+  aspect-ratio: var(--board-ratio);
+}
+
+/* Whole pixels: at a fractional height (the wiring board at 714 px is 451.5 px tall) a zoomed board that a pinch or
+   the zoom buttons left at its bottom edge keeps the next swipe instead of handing it to the page */
+@supports (height: round(down, 1cqw, 1px)) {
+  html[data-theme] .ag-guide:not(.ag-expanded) .ag-full-board {
+    container-type: inline-size;
+  }
+
+  html[data-theme] .ag-guide:not(.ag-expanded) .ag-board-canvas {
+    aspect-ratio: auto;
+    height: round(down, 100cqw / (var(--board-ratio)), 1px);
+  }
+}
+
+/* Touch targets of at least 24 px: the tick boxes in the connection list, the detail and the BOM (BuildGuide sets
+   17 px, see OpenReloading/BuildGuide#69) */
+html[data-theme] .ag-guide input[type="checkbox"] {
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+}
+
+/* Fullscreen is the primary action of a board: filled in the accent colour, and on phones (component narrower than
+   900 px) first, above the drawing, on its own row */
+html[data-theme] .ag-guide .ag-board-controls .ag-fullscreen-button {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
+  font-weight: 600;
+}
+
+html[data-theme] .ag-guide .ag-board-controls .ag-fullscreen-button:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
+@container (max-width: 899px) {
+  .ag-guide:not(.ag-expanded) .ag-work {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .ag-guide:not(.ag-expanded) .ag-work > * {
+    order: 3;
+  }
+
+  .ag-guide:not(.ag-expanded) .ag-work-heading {
+    order: 0;
+  }
+
+  .ag-guide:not(.ag-expanded) .ag-board-toolbar {
+    order: 1;
+    margin: 8px 0;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .ag-guide:not(.ag-expanded) .ag-full-board {
+    order: 2;
+  }
+
+  .ag-guide:not(.ag-expanded) .ag-board-controls {
+    order: -1;
+    flex-wrap: wrap;
+  }
+
+  .ag-guide:not(.ag-expanded) .ag-board-controls .ag-fullscreen-button {
+    order: -1;
+    flex: 1 0 100%;
+  }
+
+  /* 44 px touch targets for every button and the scope menu, the board controls 44 x 44 (the tick boxes stay at 24 px) */
+  .ag-guide :is(.ag-primary, .ag-quiet, .ag-board-controls button, .ag-board-toolbar select, .ag-wire-row button, .ag-bom-tools select) {
+    min-height: 44px;
+  }
+
+  html[data-theme] .ag-guide .ag-board-controls button {
+    min-width: 44px;
+  }
+}
+
+/* Home page: a faint blueprint grid behind the hero, inside the content column (no sideways scroll), fading out at
+   the edges; decoration only, so it sits under the content and takes no pointer events */
+.docs-doc-id-index .markdown {
+  position: relative;
+  isolation: isolate;
+}
+
+.docs-doc-id-index .markdown::before {
+  content: "";
+  display: block;
+  position: absolute;
+  inset: -24px 0 auto;
+  z-index: -1;
+  height: 760px;
+  background-image:
+    linear-gradient(var(--line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line) 1px, transparent 1px);
+  background-size: 32px 32px;
+  background-position: center top;
+  mask-image: radial-gradient(ellipse 80% 100% at 30% 0, rgb(0 0 0 / 60%), transparent 75%);
+  pointer-events: none;
+}
+
+/* Home page hero: amber label, title, safety panel, muted lead and two buttons */
+.hero-label {
+  display: inline-block;
+  padding: 4px 12px;
+  border: 1px solid var(--warn-border);
+  border-radius: 999px;
+  background-color: var(--warn-fill);
+  color: var(--warn-text);
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.docs-doc-id-index .markdown > header > h1 {
+  margin: 16px 0 24px;
+  font-size: 34px;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.docs-doc-id-index .markdown > header + .theme-admonition-danger + p {
+  max-width: 620px;
+  color: var(--muted);
+  font-size: 21px;
+  line-height: 1.55;
+}
+
+/* The status band takes the full width */
+.docs-doc-id-index .theme-admonition-warning {
+  max-width: none;
+}
+
+/* The buttons: stacked at full width and 48 px high on a phone, in a row and 52 px high from 720 px; the second one
+   is outlined */
+.hero-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.hero-buttons .button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0 28px;
+  border: 1px solid var(--control-line);
+  border-radius: 10px;
+  background-color: transparent;
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.hero-buttons .button:is(:focus, :hover) {
+  background-color: var(--surface-alt);
+  border-color: var(--ink);
+  color: var(--ink);
+}
+
+.hero-buttons .button--primary {
+  background-color: var(--accent);
+  border-color: var(--accent);
+  box-shadow: 0 1px 2px rgb(16 18 27 / 12%), 0 4px 12px rgb(25 113 194 / 20%);
+  color: var(--on-accent);
+}
+
+.hero-buttons .button--primary:is(:focus, :hover) {
+  background-color: var(--accent-hover);
+  border-color: var(--accent-hover);
+  color: var(--on-accent);
+}
+
+.hero-buttons .button--primary:focus-visible {
+  outline-color: var(--ink);
+}
+
+/* Fact strip, the list after the status band: two cells per row with 1 px dividers, the bold lead as the figure,
+   the rest muted */
+.docs-doc-id-index .hero-buttons ~ ul:first-of-type {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  max-width: none;
+  margin: 24px 0;
+  padding: 0;
+  background-color: var(--line);
+  list-style: none;
+}
+
+.docs-doc-id-index .hero-buttons ~ ul:first-of-type > li {
+  margin: 0;
+  padding: 16px;
+  background-color: var(--page);
+  color: var(--muted);
+}
+
+.docs-doc-id-index .hero-buttons ~ ul:first-of-type strong {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--ink);
+  font-size: 21px;   /* at 24 px "controller," is wider than a half cell at 390 px */
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+@media screen and (min-width: 720px) {
+  .hero-buttons {
+    flex-direction: row;
+  }
+
+  .hero-buttons .button {
+    min-height: 52px;
+  }
+
+  .docs-doc-id-index .hero-buttons ~ ul:first-of-type strong {
+    font-size: 34px;
+  }
+}
+
+/* From 1280 px: the 60 px title, the status label beside its text and four facts in one row */
+@media screen and (min-width: 1280px) {
+  .docs-doc-id-index .markdown > header > h1 {
+    font-size: 60px;
+  }
+
+  .docs-doc-id-index .theme-admonition-warning {
+    display: flex;
+    align-items: baseline;
+    column-gap: 24px;
+  }
+
+  .docs-doc-id-index .theme-admonition-warning > :first-child {
+    flex: none;
+  }
+
+  .docs-doc-id-index .hero-buttons ~ ul:first-of-type {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .docs-doc-id-index .hero-buttons ~ ul:first-of-type > li {
+    padding: 20px;
+  }
+}
+
+/* Forced colours replace the fills and the divider colour: keep a visible edge on the buttons and the fact cells */
+@media (forced-colors: active) {
+  .hero-buttons .button {
+    border-color: ButtonText;
+  }
+
+  .docs-doc-id-index .hero-buttons ~ ul:first-of-type > li {
+    outline: 1px solid CanvasText;
+  }
+}
+
+/* Home page sections, found by their heading ids: 24 px titles 48 px apart on a phone, 36 px and 96 px from 1280 px;
+   the second safety panel opens the "Build it" section */
+.docs-doc-id-index .markdown :is(h2) {
+  margin: 48px 0 20px;
+  font-size: 24px;
+  line-height: 1.2;
+}
+
+.docs-doc-id-index .hero-buttons ~ .theme-admonition-danger {
+  margin-top: 48px;
+}
+
+.docs-doc-id-index .hero-buttons ~ .theme-admonition-danger + h2 {
+  margin-top: 24px;
+}
+
+.docs-doc-id-index h2#at-the-controls + p {
+  max-width: 640px;
+  color: var(--muted);
+}
+
+/* "What it does" and "Build it": the list items as cards with a monospace number in the accent */
+.docs-doc-id-index :is(h2#what-it-does + ul, h2#build-it + ol) {
+  display: grid;
+  gap: 12px;
+  max-width: none;
+  padding: 0;
+  list-style: none;
+  counter-reset: card;
+}
+
+.docs-doc-id-index :is(h2#what-it-does + ul, h2#build-it + ol) > li {
+  margin: 0;
+  padding: 28px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background-color: var(--surface);
+  counter-increment: card;
+}
+
+.docs-doc-id-index :is(h2#what-it-does + ul, h2#build-it + ol) > li::before {
+  display: block;
+  margin-bottom: 12px;
+  color: var(--accent);
+  font-family: var(--ifm-font-family-monospace);
+  font-weight: 700;
+}
+
+.docs-doc-id-index h2#what-it-does + ul > li {
+  color: var(--muted);
+}
+
+.docs-doc-id-index h2#what-it-does + ul > li::before {
+  content: counter(card, decimal-leading-zero);
+  font-size: 13px;
+}
+
+.docs-doc-id-index h2#what-it-does + ul strong {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--ink);
+  font-size: 21px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+/* The page links in the "Build it" cards: 14 px above and below the 16 px text make a 44 px target without changing
+   the line height */
+.docs-doc-id-index h2#build-it + ol a {
+  padding-block: 14px;
+}
+
+.docs-doc-id-index h2#build-it + ol > li::before {
+  content: counter(card);
+  font-size: 32px;
+  line-height: 1;
+}
+
+@media screen and (min-width: 720px) {
+  .docs-doc-id-index :is(h2#what-it-does + ul, h2#build-it + ol) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+  }
+}
+
+/* From 1280 px: three "What it does" columns, four "Build it" cards, the controls as a row of four cards with arrows,
+   and "Change it" in two columns with the commands on the right */
+@media screen and (min-width: 1280px) {
+  .docs-doc-id-index .markdown h2 {
+    margin-top: 96px;
+    font-size: 36px;
+  }
+
+  .docs-doc-id-index .hero-buttons ~ .theme-admonition-danger {
+    margin-top: 96px;
+  }
+
+  .docs-doc-id-index h2#what-it-does + ul {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .docs-doc-id-index h2#build-it + ol {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .docs-doc-id-index h2#at-the-controls + p + ol {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 40px;
+    max-width: none;
+    padding: 0;
+    list-style: none;
+  }
+
+  .docs-doc-id-index h2#at-the-controls + p + ol > li {
+    position: relative;
+    margin: 0;
+    padding: 28px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background-color: var(--surface);
+  }
+
+  .docs-doc-id-index h2#at-the-controls + p + ol > li + li::before {
+    content: "→" / "";
+    position: absolute;
+    top: 50%;
+    left: -30px;
+    color: var(--muted);
+    transform: translateY(-50%);
+  }
+
+  .docs-doc-id-index h2#at-the-controls + p + ol strong {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--accent);
+    font-family: var(--ifm-font-family-monospace);
+    font-size: 21px;
+  }
+
+  .docs-doc-id-index .change-it {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 20px;
+    align-items: end;
+  }
+
+  .docs-doc-id-index .change-it > :is(pre, .theme-code-block) {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    margin: 0 0 1em;
+  }
+}
+
+/* Print: Docusaurus hides the navbar, footer and pagination, the BuildGuide controls are hidden by the component.
+   BuildGuide scales the boards to 700 px before printing; a 10 mm page margin leaves 718 px on A4 and more on
+   Letter. */
+@page {
+  margin: 10mm;
+}
+
+@media print {
+  .docs-doc-id-index .markdown::before {
+    display: none;
+  }
+
+  /* The warn fill and the board drawing keep their colours when the browser would drop backgrounds */
+  .theme-admonition-danger,
+  .ag-guide .ag-board-canvas {
+    print-color-adjust: exact;
+  }
+
+  .markdown > :is(p, ul, ol, .theme-admonition) {
+    max-width: none;
+  }
+
+  .markdown :is(h1, h2, h3),
+  .ag-guide .ag-list-heading {
+    break-after: avoid;
+  }
+
+  .theme-admonition,
+  .ag-guide :is(.ag-full-board, .ag-wire-row) {
+    break-inside: avoid;
+  }
+
+  /* Controls: the home page buttons, the progress and result counters, the status line and the selected-connection
+     panel with its checkbox. The tick boxes of the BOM and the connection lists stay as a paper checklist. */
+  .hero-buttons,
+  html[data-theme] .ag-guide :is(.ag-progress, .ag-result-count, .ag-status, .ag-connection-detail) {
+    display: none;
+  }
+
+  /* Links are underlined and external ones print their address, so they work on paper */
+  .markdown a {
+    color: inherit;
+    text-decoration: underline;
+  }
+
+  .markdown a[href^="http"]::after,
+  .ag-guide a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    overflow-wrap: anywhere;
+  }
+}

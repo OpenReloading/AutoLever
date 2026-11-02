@@ -2,14 +2,6 @@
     "files": {
         "./tests/check_guide.py": [
             {
-                "code": "reportArgumentType",
-                "range": {
-                    "startColumn": 20,
-                    "endColumn": 62,
-                    "lineCount": 1
-                }
-            },
-            {
                 "code": "reportOptionalSubscript",
                 "range": {
                     "startColumn": 49,

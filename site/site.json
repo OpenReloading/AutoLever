@@ -1,0 +1,7 @@
+{
+  "title": "AutoLever",
+  "description": "An air cylinder works the lever of a Lee APP press, run by a 24 V StamPLC controller and two sensors. Parts, wiring and tubing.",
+  "url": "https://openreloading.github.io",
+  "baseUrl": "/AutoLever/",
+  "repo": "OpenReloading/AutoLever"
+}
