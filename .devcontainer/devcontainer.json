@@ -1,6 +1,6 @@
 {
   "name": "AutoLever",
-  "build": { "dockerfile": "Dockerfile" },
+  "build": { "dockerfile": "Dockerfile", "context": ".." },
   "runArgs": ["--userns=keep-id"],
   "remoteUser": "vscode",
   "updateRemoteUserUID": false,
