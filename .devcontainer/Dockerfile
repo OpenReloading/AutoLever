@@ -2,7 +2,7 @@ FROM mcr.microsoft.com/devcontainers/python:3.15-bookworm@sha256:25ac34e3c1a4c5b
 
 ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
 
-# The Playwright version below is the pin of requirements.in (build context: the repository root), which Dependabot updates.
+# The Python Playwright version below is the pin of requirements.in (build context: the repository root), which Dependabot updates.
 COPY requirements.in /tmp/requirements.in
 
 # Node 24 for the Playwright MCP server; each Playwright build installs its own Chromium.
