@@ -62,10 +62,21 @@ private:
     Phase phase_ = Phase::Extend;
     uint32_t phase_since_ = 0;
     uint32_t cycles_ = 0;
-    bool prev_start_ = false;
+    bool prev_start_ = true;  // a START held at power-up is not a press
     bool armed_ = false;  // JOG was seen released since the last stop; a held JOG never starts the press
     bool stopping_ = false;
     bool reached_front_ = false;
+};
+
+// Relay readback after each write, one bit per relay. A failed read reads as all off in the library, so it counts too.
+class RelayCheck {
+public:
+    // True once the read failed, or a relay commanded off read on, in every call for more than 100 ms.
+    bool stuck(bool read_ok, uint8_t read, uint8_t commanded, uint32_t now_ms);
+
+private:
+    bool bad_ = false;
+    uint32_t bad_since_ = 0;
 };
 
 }  // namespace autolever
