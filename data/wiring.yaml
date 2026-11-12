@@ -96,7 +96,8 @@ steps:
   - id: E
     title: "Connect the valve coils"
     wires:
-      - ["22", "X-V:3", "PLC:1C", red]
+      - ["22", "X-V:3", "PLC:3C", red]
+      - ["28", "PLC:3NO", "PLC:1C", red]
       - ["23", "PLC:1NC", "PLC:2C", red]
       - ["24", "PLC:1NO", "Y1:1", red]
       - ["25", "PLC:2NO", "Y2:1", red]
