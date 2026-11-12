@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.1](https://github.com/OpenReloading/AutoLever/compare/v0.3.0...v0.3.1) (2026-11-12)
+
+
+### Bug Fixes
+
+* **firmware:** bench image switches relays off by itself ([#158](https://github.com/OpenReloading/AutoLever/issues/158)) ([e41a9af](https://github.com/OpenReloading/AutoLever/commit/e41a9af582314004f788cc3516781c50c9135bd5))
+* **firmware:** no start from a held START, watchdog on the control loop ([#159](https://github.com/OpenReloading/AutoLever/issues/159)) ([e39cb02](https://github.com/OpenReloading/AutoLever/commit/e39cb0239d3ec51bc95897a49bd3f492538e1287))
+
 ## [0.3.0](https://github.com/OpenReloading/AutoLever/compare/v0.2.0...v0.3.0) (2026-11-01)
 
 
