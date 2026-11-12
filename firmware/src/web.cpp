@@ -177,13 +177,13 @@ void web_begin(Controller& c, Preferences& p, std::mutex& l) {
     ArduinoOTA.onError([](ota_error_t) { enableLoopWDT(); });
 }
 
-void web_loop(bool idle) {
+void web_loop(bool idle, bool relays_off) {
     if (idle != ota_open) {
         if (idle) ArduinoOTA.begin();
         else ArduinoOTA.end();
         ota_open = idle;
     }
-    if (ota_open) ArduinoOTA.handle();
+    if (ota_open && relays_off) ArduinoOTA.handle();
 }
 
 String web_ap_ssid() { return ap_ssid; }

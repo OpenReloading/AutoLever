@@ -35,7 +35,9 @@ struct Rig {
         now += 10;
     }
     void run(int n) { while (n--) tick(); }
-    void press_start() { in.start = true; tick(); in.start = false; tick(); }
+    // START released for 160 ms, pressed for one step, released again
+    void press_start() { in.start = false; run(16); press(); }
+    void press() { in.start = true; tick(); in.start = false; tick(); }
     // the rod sticks: the end sensors hold still while the controller runs n steps
     void stick(int n, bool at_home) {
         in.home = at_home;
@@ -59,6 +61,8 @@ static void random_run(uint32_t seed, uint32_t jam_ms) {
     uint32_t now = 1000, same_since = 0;
     Outputs prev{};
     bool released = false;   // JOG seen released since the press last left Idle
+    uint32_t start_up_since = 0, start_up_ms = 0;   // last run of released START reads, as in the controller
+    bool prev_start = true;
     State prev_state = State::Idle;
     int stuck = 0;
     for (int i = 0; i < 400000; ++i) {
@@ -72,6 +76,11 @@ static void random_run(uint32_t seed, uint32_t jam_ms) {
         if (rnd(300) == 0) in.home = !in.home;     // sensor glitch
         if (rnd(500) == 0) in.front = !in.front;
         Outputs out = c.step(in, now);
+        if (!in.start) {
+            if (prev_start) start_up_since = now;
+            start_up_ms = now - start_up_since;
+        }
+        prev_start = in.start;
 
         CHECK(!(out.extend && out.retract));
         if (!in.estop_ok || !in.pressure_ok) CHECK(!out.extend && !out.retract && c.state() == State::Fault);
@@ -79,6 +88,7 @@ static void random_run(uint32_t seed, uint32_t jam_ms) {
         if (c.state() == State::Fault) CHECK(c.fault() != Fault::None);
         if (c.state() == State::Jog) CHECK(in.jog);                                   // jog moves only while held
         if (prev_state != State::Jog && c.state() == State::Jog) CHECK(released);      // never starts from a held JOG
+        if (prev_state != State::Auto && c.state() == State::Auto) CHECK(in.start && start_up_ms >= 150);
         // one direction never runs longer than the jam timeout, plus the step
         bool on = out.extend || out.retract;
         if (!on || out.extend != prev.extend || out.retract != prev.retract) same_since = now;
@@ -151,6 +161,29 @@ int main() {
         r.press_start();
         CHECK(r.c.state() == State::Auto && r.out.extend);
     }
+    {  // a held START that reads released for less than 150 ms (a failed button read) is not a press
+        Rig r;
+        r.in.start = true;
+        r.run(10);
+        r.in.start = false;
+        r.run(15);  // released reads at 0 to 140 ms
+        r.in.start = true;
+        r.run(10);
+        CHECK(r.c.state() == State::Idle && !r.out.extend && r.pos == 0);
+        r.in.start = false;
+        r.run(16);  // 0 to 150 ms
+        r.in.start = true;
+        r.tick();
+        CHECK(r.c.state() == State::Auto && r.out.extend);
+    }
+    {  // a short release still stops AUTO after the stroke
+        Rig r;
+        r.tick();
+        r.press_start();
+        r.run(50);
+        r.press();
+        CHECK(r.c.stopping());
+    }
     {  // E-STOP: valves off, idle after the reset until button A
         Rig r;
         r.tick();
@@ -196,10 +229,10 @@ int main() {
     {  // the jam timer holds across the 32-bit millis wrap
         Rig r;
         r.c.jam_ms = 500;
-        r.now = UINT32_MAX - 310;
-        r.tick();
+        r.now = UINT32_MAX - 470;
+        r.run(17);
         const uint32_t start = r.now;
-        r.press_start();  // the stroke starts at `start`
+        r.press();  // the stroke starts at `start`
         while (r.now - start <= r.c.jam_ms) {  // the rod sticks
             r.out = r.c.step(r.in, r.now);
             CHECK(r.c.state() == State::Auto && r.out.extend);
