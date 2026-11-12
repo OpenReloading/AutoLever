@@ -353,6 +353,16 @@ int main() {
         CHECK(!k.stuck(false, 0x0, 0x0, 0));
         CHECK(k.stuck(false, 0x0, 0x0, 101));
     }
+    {  // updates: closed until button C is held, then open for 10 minutes
+        UpdateWindow w;
+        CHECK(!w.is_open(0) && !w.is_open(5000));
+        w.open(4294700000u);   // 267296 ms before the millis() wrap
+        CHECK(w.is_open(4294700000u) && w.is_open(4294967295u) && w.is_open(332703u));
+        CHECK(!w.is_open(332704u));   // 600000 ms after open()
+        CHECK(!w.is_open(4294700000u) && !w.is_open(4294700001u));   // one wrap later, still closed
+        w.open(100);   // held again
+        CHECK(w.is_open(100) && w.is_open(600099) && !w.is_open(600100));
+    }
     std::puts("ok");
     return 0;
 }
