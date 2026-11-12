@@ -110,6 +110,7 @@ int main() {
     }
     {  // a second press stops after the current stroke, back home
         Rig r;
+        r.tick();
         r.press_start();
         r.run(50);
         CHECK(r.pos > 0 && r.pos < 100);
@@ -140,8 +141,19 @@ int main() {
         r.tick();
         CHECK(r.c.state() == State::Jog);
     }
+    {  // a START held at power-up does not start the press; the next press does
+        Rig r;
+        r.in.start = true;
+        r.run(10);
+        CHECK(r.c.state() == State::Idle && !r.out.extend && r.pos == 0);
+        r.in.start = false;
+        r.tick();
+        r.press_start();
+        CHECK(r.c.state() == State::Auto && r.out.extend);
+    }
     {  // E-STOP: valves off, idle after the reset until button A
         Rig r;
+        r.tick();
         r.press_start();
         r.run(50);
         r.in.estop_ok = false;
@@ -160,6 +172,7 @@ int main() {
     {  // jam: one stroke longer than the timeout stops everything until acknowledged
         Rig r;
         r.c.jam_ms = 500;
+        r.tick();
         r.press_start();
         r.run(20);
         r.pos = 40;  // the rod sticks
@@ -175,6 +188,7 @@ int main() {
     {  // a stall at home is a jam too
         Rig r;
         r.c.jam_ms = 500;
+        r.tick();
         r.press_start();
         r.stick(100, true);  // valve on, rod does not leave home
         CHECK(r.c.fault() == Fault::Jam);
@@ -182,7 +196,8 @@ int main() {
     {  // the jam timer holds across the 32-bit millis wrap
         Rig r;
         r.c.jam_ms = 500;
-        r.now = UINT32_MAX - 300;
+        r.now = UINT32_MAX - 310;
+        r.tick();
         const uint32_t start = r.now;
         r.press_start();  // the stroke starts at `start`
         while (r.now - start <= r.c.jam_ms) {  // the rod sticks
@@ -207,6 +222,7 @@ int main() {
     {  // a jam stays latched under an E-STOP and still needs button A after the release
         Rig r;
         r.c.jam_ms = 500;
+        r.tick();
         r.press_start();
         r.stick(100, true);  // valve on, rod does not leave home
         CHECK(r.c.fault() == Fault::Jam);
@@ -239,6 +255,7 @@ int main() {
     {  // A during a supply fault does not acknowledge a latched jam; it survives E-STOP and pressure loss stacked
         Rig r;
         r.c.jam_ms = 500;
+        r.tick();
         r.press_start();
         r.stick(100, false);  // valve on, the rod stops just off home
         CHECK(r.c.fault() == Fault::Jam);
@@ -276,6 +293,7 @@ int main() {
     {  // starting mid-stroke retracts first
         Rig r;
         r.pos = 50;
+        r.tick();
         r.press_start();
         CHECK(r.out.retract && !r.out.extend);
     }
@@ -313,6 +331,27 @@ int main() {
     {  // Wi-Fi form password: empty keeps the stored one, else a WPA2 passphrase length
         CHECK(wifi_pass_ok(nullptr) && wifi_pass_ok("") && wifi_pass_ok("12345678") && wifi_pass_ok(std::string(63, 'a').c_str()));
         CHECK(!wifi_pass_ok("1") && !wifi_pass_ok("1234567") && !wifi_pass_ok(std::string(64, 'a').c_str()));
+    }
+    {  // relay readback: a relay commanded off that reads on restarts after more than 100 ms in a row
+        RelayCheck k;
+        CHECK(!k.stuck(true, 0x1, 0x1, 0));     // extend on, reads on
+        CHECK(!k.stuck(true, 0x0, 0x1, 10));    // commanded on, reads off: the jam timer covers it
+        CHECK(!k.stuck(true, 0x1, 0x0, 20));
+        CHECK(!k.stuck(true, 0x1, 0x0, 120));
+        CHECK(k.stuck(true, 0x1, 0x0, 121));
+    }
+    {  // a clean read in between starts the count again
+        RelayCheck k;
+        CHECK(!k.stuck(true, 0x2, 0x0, 0));
+        CHECK(!k.stuck(true, 0x0, 0x0, 90));
+        CHECK(!k.stuck(true, 0x2, 0x0, 150));
+        CHECK(!k.stuck(true, 0x2, 0x0, 250));
+        CHECK(k.stuck(true, 0x2, 0x0, 251));
+    }
+    {  // a failed expander read counts as stuck: it reads as all off
+        RelayCheck k;
+        CHECK(!k.stuck(false, 0x0, 0x0, 0));
+        CHECK(k.stuck(false, 0x0, 0x0, 101));
     }
     std::puts("ok");
     return 0;
