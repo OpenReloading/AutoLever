@@ -1,6 +1,7 @@
 // Bench image: shows the 8 inputs live and switches the relays, to check the wiring before the press firmware runs.
-//   A, B, C toggle relays 1, 2, 3. Hold A and C together to switch all relays off. Every relay switches off by itself
-//   after 10 s, and while input 3 or 4 is off. Build and flash: pio run -e bench -t upload
+//   A, B, C toggle relays 1, 2, 3. Hold C, then press A, to switch all relays off. All relays switch off by themselves
+//   once one has been on for 10 s (buttons ignored for 1 s after), and while input 3 or 4 is off.
+//   Build and flash: pio run -e bench -t upload
 #include <M5StamPLC.h>
 
 #include "relays.h"
@@ -13,6 +14,8 @@ void setup() {
     M5StamPLC.begin();
     Serial.begin(115200);
     M5StamPLC.writePlcAllRelay(0);
+    // A loop() stalled for 5 s panics and restarts the unit (CONFIG_ESP_TASK_WDT_PANIC); begin() sets every relay off.
+    enableLoopWDT();
 }
 
 void loop() {
@@ -20,7 +23,7 @@ void loop() {
     const bool toggle[4] = {M5StamPLC.BtnA().wasPressed(), M5StamPLC.BtnB().wasPressed(), M5StamPLC.BtnC().wasPressed(),
                             false};
     relays.step(toggle, M5StamPLC.BtnA().isPressed() && M5StamPLC.BtnC().isPressed(),
-                M5StamPLC.readPlcInput(IN_ESTOP_OK) && M5StamPLC.readPlcInput(IN_PRESSURE_OK), millis());
+                M5StamPLC.readPlcInput(IN_ESTOP_OK), M5StamPLC.readPlcInput(IN_PRESSURE_OK), millis());
     for (uint8_t i = 0; i < 4; ++i) {
         if (M5StamPLC.readPlcRelay(i) != relays.on[i]) M5StamPLC.writePlcRelay(i, relays.on[i]);
     }

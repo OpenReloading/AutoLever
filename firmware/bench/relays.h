@@ -6,20 +6,34 @@
 namespace bench {
 
 constexpr uint32_t RELAY_ON_MS = 10000;   // the bench image never holds a valve on longer than this
+constexpr uint32_t LOCKOUT_MS = 1000;     // presses ignored after the automatic off, so a late "off" press stays off
 
 struct Relays {
     bool on[4] = {};
     uint32_t since[4] = {};
+    bool locked = false;
+    uint32_t locked_at = 0;
 
-    // toggle: the relays whose button was pressed in this loop. rails_ok: inputs 3 and 4 are both on (E-STOP
-    // released, pressure fine); while either is off every relay stays off, so none is latched when the rail returns.
-    void step(const bool (&toggle)[4], bool all_off, bool rails_ok, uint32_t now) {
+    // toggle: the relays whose button was pressed in this loop. all_off: A and C held. estop_ok, pressure_ok: inputs 3
+    // and 4; while either is off every relay stays off, so none is latched when the rail returns. The first relay to
+    // reach RELAY_ON_MS switches every relay off: relay 1 NC feeds relay 2 COM, so relay 1 alone going off would put
+    // Y2 on with no button pressed.
+    void step(const bool (&toggle)[4], bool all_off, bool estop_ok, bool pressure_ok, uint32_t now) {
+        if (locked && now - locked_at >= LOCKOUT_MS) locked = false;
+        bool timed_out = false;
         for (int i = 0; i < 4; ++i) {
-            if (toggle[i]) {
+            if (toggle[i] && !locked) {
                 on[i] = !on[i];
                 since[i] = now;
             }
-            if (all_off || !rails_ok || now - since[i] >= RELAY_ON_MS) on[i] = false;
+            if (on[i] && now - since[i] >= RELAY_ON_MS) timed_out = true;
+        }
+        if (timed_out) {
+            locked = true;
+            locked_at = now;
+        }
+        if (timed_out || all_off || !estop_ok || !pressure_ok) {
+            for (bool& o : on) o = false;
         }
     }
 };
