@@ -42,16 +42,19 @@ wiring_notes:
       sensor), add a 4.7 kΩ resistor from that input to C. Position: B0 so input 1 is on with the rod fully home, B1 so
       input 2 is on 2–3 mm before the press bottoms.
   E:
-    do: Connect the two valve coils through their plugs and relays 1 and 2 of the StamPLC.
+    do: Connect the two valve coils through their plugs and relays 3, 1 and 2 of the StamPLC.
     text: >-
       Y1 extends; Y2 retracts. Pin 1 is +24 V (red): mark that core at both ends of each valve cable. Relay terminals are
-      NC, COM and NO: follow the labels on the unit, they are not in the order of this drawing. Relay 1 COM comes from the
-      valve rail X-V, relay 1 NC feeds relay 2 COM, so relay 1 and 2 can never switch the two coils on together. Inside each
+      NC, COM and NO: follow the labels on the unit, they are not in the order of this drawing. Relay 3 COM comes from the
+      valve rail X-V and relay 3 NO feeds relay 1 COM: the press firmware closes relay 3 only while a stroke runs, so a
+      relay 1 or 2 that sticks on still loses its feed at the next fault or stop. Relay 1 NC feeds relay 2 COM, so relay 1
+      and 2 can never switch the two coils on together. Inside each
       plug, fit D7/D8 with the cores: ring on pin 1 (+), plain leg on pin 2; reversed, they short the supply. Leave them out
       only if the plug's datasheet shows built-in suppression (an LED alone is not enough). The plugs fit either coil: with
       air on, press the red manual button next to each coil; the coil that drives the rod out gets plug Y1. Check without
-      air, meter on the plug pins, with the bench program (firmware/bench) toggling the relays: both off, neither plug is
-      live; relay 1 on, only Y1 is live; relay 2 on, only Y2 is live; both on, only Y1 is live.
+      air, meter on the plug pins, with the bench program (firmware/bench) toggling the relays (A, B and C switch relays 1,
+      2 and 3): relay 3 off, neither plug is live, whatever relays 1 and 2 do. Relay 3 on: relays 1 and 2 off, neither
+      plug is live; relay 1 on, only Y1 is live; relay 2 on, only Y2 is live; both on, only Y1 is live.
 relay_notes:
   # the relay edition (deprecated prototype): same layout as wiring_notes, steps in relay.yaml
   A:
@@ -327,7 +330,7 @@ bom:
   group: Wiring
   qty: '2'
   part: Wago 221-413 lever connectors, 3-way
-  spec: 'X-S: after the E-STOP, feeds the pressure switch and StamPLC input 3 · X-V: valve rail after the pressure switch, feeds StamPLC input 4 and relay 1'
+  spec: 'X-S: after the E-STOP, feeds the pressure switch and StamPLC input 3 · X-V: valve rail after the pressure switch, feeds StamPLC input 4 and relay 3'
 - id: controlwire
   group: Wiring
   qty: 5 m est.

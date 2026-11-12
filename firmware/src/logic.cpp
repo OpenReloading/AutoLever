@@ -112,7 +112,7 @@ Outputs Controller::step(const Inputs& in, uint32_t now_ms) {
         enter_fault(Fault::Jam);
         return {};
     }
-    return {phase_ == Phase::Extend, phase_ == Phase::Retract};
+    return {phase_ == Phase::Extend, phase_ == Phase::Retract, true};
 }
 
 bool RelayCheck::stuck(bool read_ok, uint8_t read, uint8_t commanded, uint32_t now_ms) {

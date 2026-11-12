@@ -30,6 +30,7 @@ struct Rig {
         in.front = pos >= 100;
         out = c.step(in, now);
         CHECK(!(out.extend && out.retract));
+        CHECK(out.enable == (out.extend || out.retract));
         if (out.extend && pos < 100) ++pos;
         if (out.retract && pos > 0) --pos;
         now += 10;
@@ -74,6 +75,7 @@ static void random_run(uint32_t seed, uint32_t jam_ms) {
         Outputs out = c.step(in, now);
 
         CHECK(!(out.extend && out.retract));
+        CHECK(out.enable == (out.extend || out.retract));   // the feed relay is on only during a stroke
         if (!in.estop_ok || !in.pressure_ok) CHECK(!out.extend && !out.retract && c.state() == State::Fault);
         if (c.state() == State::Idle || c.state() == State::Fault) CHECK(!out.extend && !out.retract);
         if (c.state() == State::Fault) CHECK(c.fault() != Fault::None);
@@ -289,6 +291,31 @@ int main() {
         r.in.jog = true;
         r.tick();
         CHECK(r.c.state() == State::Jog && r.out.retract);   // mid-stroke: back home first
+    }
+    {  // the feed relay: off at idle, on through the strokes, off at a jam, an E-STOP and a stop at home
+        Rig r;
+        r.c.jam_ms = 1500;   // one stroke takes 1000 ms
+        r.tick();
+        CHECK(!r.out.enable);
+        r.press_start();
+        CHECK(r.out.enable && r.out.extend);
+        r.run(150);   // out to the front and on the way back
+        CHECK(r.out.enable && r.out.retract);
+        r.stick(200, false);
+        CHECK(r.c.fault() == Fault::Jam && !r.out.enable);
+        r.press_start();
+        r.press_start();
+        CHECK(r.c.state() == State::Auto && r.out.enable);
+        r.in.estop_ok = false;
+        r.tick();
+        CHECK(r.c.fault() == Fault::EStop && !r.out.enable);
+        r.in.estop_ok = true;
+        r.tick();
+        r.press_start();
+        r.run(20);
+        r.press_start();   // stop request
+        r.run(400);
+        CHECK(r.c.state() == State::Idle && !r.out.enable);
     }
     {  // starting mid-stroke retracts first
         Rig r;

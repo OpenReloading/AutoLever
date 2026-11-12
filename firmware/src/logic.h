@@ -16,6 +16,7 @@ struct Inputs {
 struct Outputs {
     bool extend;   // valve Y1
     bool retract;  // valve Y2
+    bool enable;   // relay 3, the feed of relays 1 and 2: on only while a stroke is commanded
 };
 
 enum class State { Idle, Auto, Jog, Fault };

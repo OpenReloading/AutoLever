@@ -12,7 +12,7 @@ using namespace autolever;
 // The inputs are opto-isolated with anti-parallel LEDs (EL3H4), so either polarity works, and the expander reads
 // true while an input is driven. All eight share COM (terminal C): connect it to 0 V for PNP sensors.
 constexpr uint8_t IN_HOME = 0, IN_FRONT = 1, IN_ESTOP_OK = 2, IN_PRESSURE_OK = 3;
-constexpr uint8_t RELAY_EXTEND = 0, RELAY_RETRACT = 1;
+constexpr uint8_t RELAY_EXTEND = 0, RELAY_RETRACT = 1, RELAY_ENABLE = 2;
 
 static Controller press;
 static RelayCheck relay_check;
@@ -79,6 +79,9 @@ void loop() {
     std::unique_lock<std::mutex> hold(press_lock);
     Outputs out = press.step(in, millis());
     hold.unlock();
+    // Relay 3 feeds relays 1 and 2 (wiring step E). It opens first and closes last, so a stuck relay 1 or 2 loses its
+    // feed on every fault and at idle.
+    if (!out.enable) set_relay(RELAY_ENABLE, false);
     // The relay that turns off is written first, so extend and retract are never on together.
     if (out.extend) {
         set_relay(RELAY_RETRACT, out.retract);
@@ -87,10 +90,11 @@ void loop() {
         set_relay(RELAY_EXTEND, false);
         set_relay(RELAY_RETRACT, out.retract);
     }
+    if (out.enable) set_relay(RELAY_ENABLE, true);
     // Relays 0 to 3 are pins 0 to 3 of the expander's input port 0 (register 0x00).
     uint8_t read = 0;
     bool read_ok = M5StamPLC.getIOExpanderB().readRegister(0x00, &read, 1);
-    uint8_t commanded = out.extend << RELAY_EXTEND | out.retract << RELAY_RETRACT;
+    uint8_t commanded = out.extend << RELAY_EXTEND | out.retract << RELAY_RETRACT | out.enable << RELAY_ENABLE;
     if (relay_check.stuck(read_ok, read & 0x0F, commanded, millis())) ESP.restart();
 
     hold.lock();
