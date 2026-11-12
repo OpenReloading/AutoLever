@@ -41,8 +41,8 @@ class Controller {
 public:
     // Longest time for one stroke (out or back); longer is a jam.
     uint32_t jam_ms = 15000;
-    // In IDLE a START press starts AUTO only after START read released for this long. A failed button read reads
-    // as released; a bus failure that long already restarts the unit through RelayCheck (100 ms).
+    // In IDLE a START press starts AUTO only after START read released for this long, since a failed button read
+    // reads as released. Failed reads that span this long can still start AUTO: RelayCheck does not catch all of them.
     static constexpr uint32_t start_release_ms = 150;
 
     Outputs step(const Inputs& in, uint32_t now_ms);

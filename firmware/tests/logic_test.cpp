@@ -176,11 +176,10 @@ int main() {
         r.tick();
         CHECK(r.c.state() == State::Auto && r.out.extend);
     }
-    {  // a short release still stops AUTO after the stroke
+    {  // a 10 ms release still stops AUTO after the stroke
         Rig r;
         r.tick();
-        r.press_start();
-        r.run(50);
+        r.press_start();  // ends with one released step
         r.press();
         CHECK(r.c.stopping());
     }
