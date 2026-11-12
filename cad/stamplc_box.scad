@@ -13,7 +13,8 @@
 // Unit frame (StamPLC, from the M5Stack structure file): origin on the DIN rail line in the middle of the width,
 // x across, y up the front face (inputs row up, relay row down), z out of the front plane (0 = front face).
 //
-// Print: PETG or ASA, 4 perimeters, 15-20 % infill, no supports. Base upright, lid face down, ring flat in yellow.
+// Print: PETG or ASA, 4 perimeters, 15-20 % infill, no supports. Base upright, lid face down, ring flat in yellow,
+//        USB plug flange down; every part exports in its print orientation.
 // Hardware: 4 x M3x8 + 4 x M3 heat-set inserts (lid), 2 x M3x6 pan-head + 2 inserts (rail), 35 mm DIN rail cut to
 //           100 mm (slot centres 12.5 and 87.5 from its end), 4 cable ties.
 // Fit order: base -> inserts, rail, jack, rocker -> StamPLC onto the rail -> wire -> lid over the unit.
@@ -24,12 +25,17 @@ wood_screw_holes = false; // true: 4 countersunk holes in the floor for 4 mm woo
 $fn = 48;
 
 // ---- StamPLC K141 ----
+// TO CONFIRM by caliper on the owned unit before the lid is printed: plc_w, plc_y, plc_depth, rail_gap and usb_y come
+// from the M5Stack 3D file; the vendor page gives 72.0 x 80.0 x 33.4 mm (https://docs.m5stack.com/en/core/StamPLC),
+// which overlaps lid and rail here, perhaps because it includes the rail latch and hooks.
 plc_w     = 72;           // width; the front part (10 mm deep) is 72 x 77, the body behind it 72 x 72
 plc_y     = [-39, 38];    // y extent of the front part
 plc_depth = 30.7;         // front face to the back of the DIN clip
 rail_gap  = 1;            // back of the unit to the surface of the rail (side view of the data sheet drawing)
 plc_play  = 0.3;          // window play per side
 usb_y     = 11;           // centre of the USB-C opening on the +x side (read from the 3D file, +-1 mm)
+// TO CONFIRM by a fit check: the notch only opens the lid, the port's depth below the front face is not measured, and
+// right_room is too short for a straight plug plus its cable bend; an angled plug or a side wall slot is still open.
 usb_notch = [26, 16];     // lid notch for the plug: length beyond the window, width
 
 // ---- bought parts ----
@@ -44,8 +50,12 @@ rail_w       = 35;
 rail_h       = 7.5;
 rail_len     = 100;
 rail_slots   = [12.5, 87.5];
-insert_d     = 4.2;       // M3 heat-set insert; 2.6 for self-tapping M3
+// M3 heat-set insert of about 5 mm outer diameter, at most 6 mm long (TO CONFIRM: the type on the shelf); 2.6 for
+// self-tapping M3
+insert_d     = 4.2;
 insert_h     = 6;
+insert_spare = 0.5;       // depth below the insert for displaced plastic
+insert_lead  = 0.5;       // 45 degree lead-in at the hole mouth, centres the insert on the iron
 screw_d      = 3.4;
 wood_d       = 4.5;
 wood_head    = 9;
@@ -62,7 +72,12 @@ x_left   = 70;            // window left edge in the cavity: the E-STOP ring tak
 right_room = 34;          // beside the window on the USB-C side
 exit_d   = [30, 14];      // cable opening, width x height
 exit_z   = 36;
+tie      = [4.2, 1.8];    // cable tie slot, width x height
+tie_dx   = 8;             // tie slot centre beyond each end of the cable opening
+tie_dz   = 2;             // tie slots below the centre of the cable opening
+jack_x   = 15;            // DC jack axis from the right cavity wall
 jack_z   = 33;
+pad      = [12, 30];      // rail pads under the DIN rail, along x and y, centred on each rail slot
 rocker_z = 33;
 rocker_y = 30;            // on the left wall, cavity y
 
@@ -70,7 +85,7 @@ rocker_y = 30;            // on the left wall, cavity y
 // connector by the rim of its lever face; widths and heights as measured on the real parts (see the relay box).
 wagos     = [29.7, 29.7, 29.7, 18.5, 18.5];
 wago_h    = [8.4, 8.4, 8.4, 8.3, 8.3];   // housing height = ledge depth from the wall
-arm_t     = 1.4;
+arm_t     = 1.6;          // four 0.4 mm lines
 arm_h     = 16;
 lip       = 0.8;
 wago_grip = 0.5;
@@ -109,12 +124,14 @@ module oval(w, h, len) {   // hull of two circles along x, extruded along z
 module columns() {
     for (c = corners) hull() {
         translate([c.x, c.y, floor_t - 0.01]) cylinder(r = boss_r, h = H - floor_t + 0.01);
-        translate([c.x < cx / 2 ? 0 : cx - 1, c.y < cy / 2 ? 0 : cy - 1, floor_t - 0.01]) cube([1, 1, H - floor_t + 0.01]);
+        // up to the boss axis and 0.01 into both walls: faces that only touch the walls leave edges shared by four faces
+        translate([c.x < cx / 2 ? -0.01 : cx - boss_r, c.y < cy / 2 ? -0.01 : cy - boss_r, floor_t - 0.01])
+            cube([boss_r + 0.01, boss_r + 0.01, H - floor_t + 0.01]);
     }
 }
 
 module pedestals() {
-    for (s = rail_slots) translate([rail_x0 + s - 6, oy - 15, floor_t - 0.01]) cube([12, 30, rail_z - floor_t + 0.01]);
+    for (s = rail_slots) translate([rail_x0 + s - pad.x / 2, oy - pad.y / 2, floor_t - 0.01]) cube([pad.x, pad.y, rail_z - floor_t + 0.01]);
 }
 
 module wago_rack() {   // wall at cavity y = 0, material grows to +y
@@ -124,17 +141,24 @@ module wago_rack() {   // wall at cavity y = 0, material grows to +y
         da = d0 + lip + 1.2;     // arm depth: slope, then the 1.2 mm lead-in ramp
         x0 = slot_x(i);
         w = wagos[i];
-        // ledge under the connector, 45 degrees underneath so it prints without support
+        // ledge under the connector, 45 degrees underneath so it prints without support; 0.01 inside the outer
+        // faces of the arms, which would otherwise share a plane with it
         hull() {
-            translate([x0, -0.01, rack_z - ds]) cube([2 * arm_t + w, 0.02, ds]);
-            translate([x0, 0, rack_z - 0.01]) cube([2 * arm_t + w, ds, 0.01]);
+            translate([x0 + 0.01, -0.01, rack_z - ds]) cube([2 * arm_t + w - 0.02, 0.02, ds]);
+            translate([x0 + 0.01, 0, rack_z - 0.01]) cube([2 * arm_t + w - 0.02, ds, 0.01]);
         }
+        // arms 0.01 into the wall and the ledge, lips 0.01 into the arm: touching faces leave zero-area faces
         for (side = [0, 1]) translate([x0 + side * (arm_t + w), 0, 0]) {
-            translate([0, 0, rack_z]) cube([arm_t, da, arm_h]);
+            translate([0, -0.01, rack_z - 0.01]) cube([arm_t, da + 0.01, arm_h + 0.01]);
             translate([side == 0 ? arm_t : 0, 0, rack_z + arm_h / 2]) mirror([side, 0, 0])
-                linear_extrude(arm_h / 2) polygon([[0, d0], [lip, d0 + lip], [0, da]]);
+                linear_extrude(arm_h / 2) polygon([[-0.01, d0], [lip, d0 + lip], [-0.01, da - 0.01]]);
         }
     }
+}
+
+module insert_hole() {   // mouth at z = 0, going down
+    translate([0, 0, -insert_h - insert_spare]) cylinder(d = insert_d, h = insert_h + insert_spare + 1);
+    translate([0, 0, -insert_lead]) cylinder(d1 = insert_d, d2 = insert_d + 2 * (insert_lead + 0.01), h = insert_lead + 0.01);
 }
 
 module cs_hole() {
@@ -152,15 +176,15 @@ module base() {
             cav() { columns(); pedestals(); wago_rack(); }
         }
         cav() {
-            for (c = corners) translate([c.x, c.y, H - insert_h - 0.5]) cylinder(d = insert_d, h = insert_h + 1);
-            for (s = rail_slots) translate([rail_x0 + s, oy, rail_z - insert_h - 0.5]) cylinder(d = insert_d, h = insert_h + 1);
+            for (c = corners) translate([c.x, c.y, H]) insert_hole();
+            for (s = rail_slots) translate([rail_x0 + s, oy, rail_z]) insert_hole();
         }
         // cable opening and tie slots, back wall
         translate([t + ox, D - t - 1, exit_z]) rotate([-90, 0, 0]) oval(exit_d.x, exit_d.y, t + 2);
-        for (s = [-1, 1]) translate([t + ox + s * (exit_d.x / 2 + 8), D - t - 1, exit_z - 2]) rotate([-90, 0, 0])
-            translate([-2.1, -0.9, 0]) cube([4.2, 1.8, t + 2]);
+        for (s = [-1, 1]) translate([t + ox + s * (exit_d.x / 2 + tie_dx), D - t - 1, exit_z - tie_dz]) rotate([-90, 0, 0])
+            translate([-tie.x / 2, -tie.y / 2, 0]) cube([tie.x, tie.y, t + 2]);
         // DC jack, back wall, right
-        translate([t + cx - 15, D - t - 1, jack_z]) rotate([-90, 0, 0]) cylinder(d = jack_d, h = t + 2);
+        translate([t + cx - jack_x, D - t - 1, jack_z]) rotate([-90, 0, 0]) cylinder(d = jack_d, h = t + 2);
         // POWER rocker, left wall, thinned from inside
         translate([-1, t + rocker_y, rocker_z]) rotate([0, 90, 0]) cylinder(d = rocker_d, h = t + 2);
         translate([rocker_panel, t + rocker_y, rocker_z]) rotate([0, 90, 0]) cylinder(d = rocker_recess, h = t);
@@ -194,11 +218,11 @@ module lid() {
     }
 }
 
-module usb_plug() {   // fills the notch, held by a flange on the lid; pull it out with a fingernail
+module usb_plug() {   // fills the notch, held by a flange on the lid; pull it out with a fingernail. Flange down, as printed
     play = 0.2; fl = 2; fl_t = 1.2;
     w = usb_notch[1] - 2 * play;
-    cube([usb_notch[0] - play, w, lid_t - 0.2]);
-    translate([0, -fl, lid_t - 0.21]) cube([usb_notch[0] - play + fl, w + 2 * fl, fl_t]);
+    translate([0, -fl, 0]) cube([usb_notch[0] - play + fl, w + 2 * fl, fl_t]);
+    translate([0, 0, fl_t - 0.01]) cube([usb_notch[0] - play, w, lid_t - 0.2]);
 }
 
 module estop_ring() difference() {
@@ -216,7 +240,7 @@ module ghosts() {
     color("red") translate([t + estop_x, t + cy / 2, Hz - estop_depth]) cylinder(d = 30, h = estop_depth + 20);
     color("#3b82f6") translate([0, t + rocker_y, rocker_z]) rotate([0, 90, 0]) cylinder(d = rocker_d, h = 22);
     for (i = [0 : len(wagos) - 1]) color("orange", 0.8) cav() translate([slot_x(i) + arm_t, 0, rack_z]) cube([wagos[i], wago_h[i], 18.6]);
-    color("#333") translate([t + cx - 15, D - 22, jack_z]) rotate([-90, 0, 0]) cylinder(d = 12, h = 22);
+    color("#333") translate([t + cx - jack_x, D - 22, jack_z]) rotate([-90, 0, 0]) cylinder(d = 12, h = 22);
 }
 
 module body_colored() { color("#3a6ea5") render() base(); }

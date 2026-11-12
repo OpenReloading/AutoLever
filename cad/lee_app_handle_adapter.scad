@@ -74,7 +74,7 @@ $fn = 64;
 bolts = [
     ["M4",  4.5,  9,  7],
     ["M5",  5.5, 10,  8],
-    ["M6",  6.4, 12, 10],
+    ["M6",  6.6, 12, 10],   // ISO 273 medium: vertical printed holes come out 0.1 to 0.3 mm small
     ["M8",  8.4, 16, 13],
     ["M10", 10.5, 20, 17],
     ["M12", 13.0, 24, 19]
@@ -129,10 +129,11 @@ module outline() {
         arm_side_strip();
     }
 }
-// Arm footprint: only from the arm-side strip to the eye (never pokes out elsewhere)
+// Arm footprint: only from the arm-side strip to the eye (never pokes out elsewhere); the strip stops 0.02 short
+// of the clamp's end faces, which the arm plate would otherwise share
 module arm2d() {
     hull() {
-        arm_side_strip();
+        translate([0.02, ymin]) square([L - 0.04, wall]);
         translate([arm_x * L, eye_y]) circle(r = eye_r);
     }
 }
@@ -159,11 +160,12 @@ function x_left(y)  = y >= TL[1] ? (y - ymin) / (TL[1] - ymin) * TL[0]
 function x_right(y) = y >= TR[1] ? L + (y - ymin) / (TR[1] - ymin) * (TR[0] - L)
                                  : arm_x * L + sqrt(max(0, eye_r*eye_r - pow(y - eye_y, 2)));
 
-// thin slice across the arm at position y, height h, top corners chamfered
-module slice(y, h) {
-    xl = x_left(y); xr = x_right(y); c = min(chamfer, h / 2);
-    translate([0, y + 0.01, 0]) rotate([90, 0, 0]) linear_extrude(0.01)
-        polygon([[xl, 0], [xr, 0], [xr, h - c], [xr - c, h], [xl + c, h], [xl, h - c]]);
+// thin slice across the arm at position y, height h, top corners chamfered; inset shrinks it at the sides and top
+// and moves it further in +y
+module slice(y, h, inset = 0) {
+    xl = x_left(y) + inset; xr = x_right(y) - inset; hi = h - inset; c = min(chamfer, hi / 2);
+    translate([0, y + inset + 0.01, 0]) rotate([90, 0, 0]) linear_extrude(0.01)
+        polygon([[xl, 0], [xr, 0], [xr, hi - c], [xr - c, hi], [xl + c, hi], [xl, hi - c]]);
 }
 
 module arm_with_gusset(h_full) {
@@ -174,9 +176,10 @@ module arm_with_gusset(h_full) {
                 linear_extrude(arm_t - chamfer) arm2d();
                 translate([0, 0, arm_t - 0.01]) linear_extrude(0.01) offset(delta = -chamfer) arm2d();
             }
-            // gusset: lofted from full clamp height to arm thickness, side edges chamfered
+            // gusset: lofted from full clamp height to arm thickness, side edges chamfered; it starts 0.01 inside
+            // the clamp body, since a start on the body's face leaves an edge shared by four faces
             hull() {
-                slice(ymin, h_full);
+                slice(ymin, h_full, 0.01);
                 slice(y_gusset_end, arm_t);
             }
         }
