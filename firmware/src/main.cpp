@@ -15,6 +15,7 @@ constexpr uint8_t IN_HOME = 0, IN_FRONT = 1, IN_ESTOP_OK = 2, IN_PRESSURE_OK = 3
 constexpr uint8_t RELAY_EXTEND = 0, RELAY_RETRACT = 1;
 
 static Controller press;
+static RelayCheck relay_check;
 static Preferences prefs;
 static std::mutex press_lock;   // press, shared with the web task
 static State shown_state = State::Fault;
@@ -56,6 +57,8 @@ void setup() {
     press.set_cycles(prefs.getUInt("cycles", 0));
     press.jam_ms = jam_ms_from_seconds(prefs.getUInt("jam_ms", press.jam_ms) / 1000);
     web_begin(press, prefs, press_lock);
+    // A loop() stalled for 5 s panics and restarts the unit (CONFIG_ESP_TASK_WDT_PANIC); begin() sets every relay off.
+    enableLoopWDT();
 }
 
 void loop() {
@@ -84,6 +87,11 @@ void loop() {
         set_relay(RELAY_EXTEND, false);
         set_relay(RELAY_RETRACT, out.retract);
     }
+    // Relays 0 to 3 are pins 0 to 3 of the expander's input port 0 (register 0x00).
+    uint8_t read = 0;
+    bool read_ok = M5StamPLC.getIOExpanderB().readRegister(0x00, &read, 1);
+    uint8_t commanded = out.extend << RELAY_EXTEND | out.retract << RELAY_RETRACT;
+    if (relay_check.stuck(read_ok, read & 0x0F, commanded, millis())) ESP.restart();
 
     hold.lock();
     if (press.cycles() != shown_cycles) {
@@ -99,6 +107,9 @@ void loop() {
         redraw = true;
     }
     hold.unlock();
+#ifdef AUTOLEVER_HANG_TEST
+    if (shown_state == State::Auto) for (;;) delay(10);   // bench check: hangs with the extend valve on
+#endif
     web_loop(shown_state == State::Idle);   // after the relays: an OTA upload holds the loop
 
     static uint32_t last_info = 0;   // the home address arrives some seconds after power-up

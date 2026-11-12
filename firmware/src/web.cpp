@@ -172,6 +172,9 @@ void web_begin(Controller& c, Preferences& p, std::mutex& l) {
 
     ArduinoOTA.setHostname("autolever");
     ArduinoOTA.setPassword(ap_pass.c_str());
+    // An upload holds loop() past the watchdog timeout; updates open only at idle, so both valves are off meanwhile.
+    ArduinoOTA.onStart(disableLoopWDT);
+    ArduinoOTA.onError([](ota_error_t) { enableLoopWDT(); });
 }
 
 void web_loop(bool idle) {

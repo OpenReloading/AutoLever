@@ -115,6 +115,18 @@ Outputs Controller::step(const Inputs& in, uint32_t now_ms) {
     return {phase_ == Phase::Extend, phase_ == Phase::Retract};
 }
 
+bool RelayCheck::stuck(bool read_ok, uint8_t read, uint8_t commanded, uint32_t now_ms) {
+    if (read_ok && !(read & ~commanded)) {
+        bad_ = false;
+        return false;
+    }
+    if (!bad_) {
+        bad_ = true;
+        bad_since_ = now_ms;
+    }
+    return now_ms - bad_since_ > 100;
+}
+
 // The String::c_str() these get is nullptr for a String without a buffer, so nullptr counts as empty.
 bool same_origin(const char* source, const char* host) {
     if (!source || !*source) return true;
