@@ -51,7 +51,9 @@ wiring_notes:
       only if the plug's datasheet shows built-in suppression (an LED alone is not enough). The plugs fit either coil: with
       air on, press the red manual button next to each coil; the coil that drives the rod out gets plug Y1. Check without
       air, meter on the plug pins, with the bench program (firmware/bench) toggling the relays: both off, neither plug is
-      live; relay 1 on, only Y1 is live; relay 2 on, only Y2 is live; both on, only Y1 is live.
+      live; relay 1 on, only Y1 is live; relay 2 on, only Y2 is live; both on, only Y1 is live. The bench program switches
+      all relays off once one has been on for 10 s, and keeps them off while E-STOP is pressed: a plug that goes dead under
+      the meter is that, not a wiring fault.
 relay_notes:
   # the relay edition (deprecated prototype): same layout as wiring_notes, steps in relay.yaml
   A:

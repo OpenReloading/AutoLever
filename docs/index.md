@@ -73,7 +73,7 @@ PETG or ASA. Handle adapter: 6 walls and 40% infill. Control box: 15–20% infil
 1. Print the parts and gather the components from the [BOM](bom.md).
 2. Mount the press, cylinder, valve and filter-regulator on a board. Clamp the handle adapter onto the press lever.
 3. Follow the [Wiring](wiring.md) and [Tubing](tubing.md) guides to connect everything.
-4. Flash the bench image (`pio run -e bench -t upload` in `firmware/`): it shows all eight inputs live and toggles the relays. Set the sensors with air disconnected: POWER on, move the rod by hand. Then flash the press firmware (`pio run -e stamplc -t upload`) and test with air at 2 bar using JOG before trying START.
+4. Flash the bench image (`pio run -e bench -t upload` in `firmware/`): it shows BENCH and all eight inputs live, and A, B and C toggle relays 1, 2 and 3. All relays switch off by themselves once one has been on for 10 s, and while input 3 or 4 is off. Set the sensors with air disconnected: POWER on, move the rod by hand. Then flash the press firmware (`pio run -e stamplc -t upload`) and test with air at 2 bar using JOG before trying START.
 
 ## Update it
 
