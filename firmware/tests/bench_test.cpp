@@ -86,6 +86,32 @@ int main() {
         r.step(NONE, true, true, true, 1010);
         CHECK(!any_on(r));
     }
+    // a press on relay 1 as it reaches 10 s still switches every relay off and starts the lockout
+    {
+        bench::Relays r;
+        r.step(a, false, true, true, 1000);
+        r.step(b, false, true, true, 6000);
+        r.step(a, false, true, true, 11000);
+        CHECK(!any_on(r));
+        r.step(a, false, true, true, 11500);
+        CHECK(!any_on(r));
+    }
+    // relays switch off from relay 4 down, then on from relay 1 up: relay 1 never feeds a closed relay 2 COM
+    {
+        bench::Relays r;
+        bool out[4] = {false, true, true, false};
+        r.on[0] = true;
+        r.on[3] = true;
+        int order[4], n = 0;
+        r.sync([&](int i) { return out[i]; },
+               [&](int i, bool v) {
+                   out[i] = v;
+                   order[n++] = v ? i + 1 : -(i + 1);
+               });
+        CHECK(n == 4);
+        CHECK(order[0] == -3 && order[1] == -2 && order[2] == 1 && order[3] == 4);
+        CHECK(out[0] && !out[1] && !out[2] && out[3]);
+    }
     std::printf("ok\n");
     return 0;
 }

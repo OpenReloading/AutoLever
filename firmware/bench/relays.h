@@ -20,20 +20,35 @@ struct Relays {
     // Y2 on with no button pressed.
     void step(const bool (&toggle)[4], bool all_off, bool estop_ok, bool pressure_ok, uint32_t now) {
         if (locked && now - locked_at >= LOCKOUT_MS) locked = false;
+        // Checked before the toggles, so a press on the expiring relay cannot leave the others on.
         bool timed_out = false;
         for (int i = 0; i < 4; ++i) {
-            if (toggle[i] && !locked) {
-                on[i] = !on[i];
-                since[i] = now;
-            }
             if (on[i] && now - since[i] >= RELAY_ON_MS) timed_out = true;
         }
         if (timed_out) {
             locked = true;
             locked_at = now;
         }
+        for (int i = 0; i < 4; ++i) {
+            if (toggle[i] && !locked) {
+                on[i] = !on[i];
+                since[i] = now;
+            }
+        }
         if (timed_out || all_off || !estop_ok || !pressure_ok) {
             for (bool& o : on) o = false;
+        }
+    }
+
+    // read(i), write(i, on): the relay outputs. Off from relay 4 down, then on from relay 1 up (src/main.cpp also writes
+    // the off first): relay 2 opens before relay 1 NC feeds its COM, and relay 1 cuts that feed before relay 2 closes.
+    template <class Read, class Write>
+    void sync(Read read, Write write) const {
+        for (int i = 3; i >= 0; --i) {
+            if (!on[i] && read(i)) write(i, false);
+        }
+        for (int i = 0; i < 4; ++i) {
+            if (on[i] && !read(i)) write(i, true);
         }
     }
 };

@@ -24,9 +24,8 @@ void loop() {
                             false};
     relays.step(toggle, M5StamPLC.BtnA().isPressed() && M5StamPLC.BtnC().isPressed(),
                 M5StamPLC.readPlcInput(IN_ESTOP_OK), M5StamPLC.readPlcInput(IN_PRESSURE_OK), millis());
-    for (uint8_t i = 0; i < 4; ++i) {
-        if (M5StamPLC.readPlcRelay(i) != relays.on[i]) M5StamPLC.writePlcRelay(i, relays.on[i]);
-    }
+    relays.sync([](int i) { return M5StamPLC.readPlcRelay(i); },
+                [](int i, bool on) { M5StamPLC.writePlcRelay(i, on); });
 
     static uint32_t last = 0;
     if (millis() - last < 200) return;
