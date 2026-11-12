@@ -187,175 +187,181 @@ bom:
 - id: press
   group: Mounting
   qty: '1'
-  part: Lee APP
-  spec: Classic APP (preferred) or APP Deluxe
+  part: Lee APP (Classic 90933 or Deluxe 91898)
+  spec: 'Classic APP (preferred) or APP Deluxe · Source: Lee Precision dealers · Est. EUR 77 Classic, EUR 95 Deluxe (Nov 2026, US retail converted, no import costs)'
 - id: rail
   group: Mounting
   qty: '1'
   part: DIN rail
-  spec: TS35 × 7.5 · cut to 100 mm so that a slot centre is 12.5 mm from each end
+  spec: 'TS35 × 7.5, slotted (Phoenix Contact NS 35/7,5 perforated is one) · cut to 100 mm so that a slot centre is 12.5 mm from each end · Source: electrical wholesaler · Est. EUR 8 (Nov 2026)'
 - id: hardware
   group: Mounting
   qty: 1 set
   part: Board and mounting hardware
-  spec: Plywood board ≥ 15 mm · 6 × M3 heat-set inserts (4.2 mm hole, ≤ 6 mm long) · 2 × M3×6 pan-head screws with
-    washers (rail) · 4 × M3×8 (lid) · 4 × 4×16 countersunk
-    wood screws for the box, only if you print the base with the wood-screw holes · wood screws for the press, cylinder pivot,
-    valve and FRL bracket · cable ties
+  spec: 'Plywood board ≥ 15 mm · 6 × M3 heat-set inserts (4.2 mm hole, ≤ 6 mm long) · 2 × M3×6 pan-head screws with ISO 7093 large washers, 9 mm OD, to bridge the rail slot (rail) · 4 × M3×8 (lid) · 4 × 4×16 countersunk wood screws for the box, only if you print the base with the wood-screw holes · wood screws for the press, cylinder pivot, valve and FRL bracket · cable ties · Source: hardware shop · Est. EUR 15 (Nov 2026, unverified)'
 - id: mechanism
   group: Mounting
   qty: 1 set
   part: Cylinder pivot and lever coupling
-  spec: 'Rear pivot mount · M10×1.25 rod clevis · adapter hardware: 2 × M6×45 + 1 × M10 (length to suit the clevis), nuts
-    and washers'
+  spec: 'Rear pivot: Festo LBN-32 clevis foot (195860) or SBN-32 swivel mounting (539924), fit to the DSNU-32 unverified · rod clevis Festo SG-M10x1,25, M10×1.25 internal thread (not the SGS version) · adapter hardware: 2 × M6×45 + 1 × M10 (length to suit the clevis), 2 × M6 and 1 × M10 lock nuts, washers · Source: RS Online, Festo distributors · Est. EUR 45 (Nov 2026, unverified)'
 - id: compressor
   group: Pneumatics
   qty: '1'
   part: Compressed-air source
-  spec: Compressor or shop air · 7–10 bar at the FRL inlet
+  spec: 'Compressor or shop air · 7–10 bar at the FRL inlet · Source: your own or a hardware store · Est. EUR 150 for a small 8 bar compressor, 0 for shop air (Nov 2026, unverified)'
 - id: cylinder
   group: Pneumatics
   qty: '1'
-  part: Festo DSNU-32-250-PPS-A
-  spec: Ø32 mm bore · 250 mm stroke · G1/8 ports · M10×1.25 rod
+  part: Festo DSNU-32-250-PPS-A (559303)
+  spec: 'Ø32 mm bore · 250 mm stroke · G1/8 ports (parallel thread) · M10×1.25 rod · Source: RS Online, Festo distributors · Est. EUR 107 (Nov 2026, RS Ireland listing incl. VAT)'
 - id: valve
   group: Pneumatics
   qty: '1'
-  part: 5/3 exhaust-centre valve
-  spec: AirTAC 4V230E-06 or another 5/3 exhaust-centre (E) valve, not C or P · 1/8 ports · two 24 V DC coils with DIN plugs
+  part: AirTAC 4V230E-06B (DC 24 V)
+  spec: '5/3 exhaust-centre (E) valve, not C or P, or an equivalent with two 24 V DC coils · the last letter is the coil: B = DC 24 V, E = AC 24 V, check it before ordering · Rc 1/8 ports (tapered thread) · two coils with DIN plugs · Source: AirTAC distributors · Est. EUR 75 (Nov 2026, US listing $83.90 converted)'
 - id: frl
   group: Pneumatics
   qty: '1'
   part: Filter-regulator + gauge
-  spec: AirTAC AFC-2000 or AFR-2000 (no lubricator) · 1/4 ports · gauge and bracket included
+  spec: 'AirTAC AFR2000, no lubricator (the AFC2000 includes one: do not order it) · 1/4 ports (tapered thread, takes R1/4 male fittings) · gauge and bracket included · Source: AirTAC distributors · Est. EUR 29 (Nov 2026, US listing $32.57 converted)'
 - id: pressure
   group: Pneumatics
   qty: '1'
   part: QPM11 pressure switch + tee
-  spec: QPM11-NC, 1/8 male · opens above the set pressure · 6 mm push-in tee with 1/8 male branch + 1/8 female–female socket
+  spec: 'QPM11-NC, 1/8 male · opens above the set pressure · 6 mm push-in tee with 1/8 male branch (Festo QST-1/8-6, 153107) + 1/8 female–female socket · Source: AirTAC-type distributors, Festo distributors · Est. EUR 20 (Nov 2026, unverified)'
 - id: flow
   group: Pneumatics
   qty: '2'
-  part: Meter-out flow controls
-  spec: G1/8 cylinder thread × 6 mm tube OD
+  part: Festo GRLA-1/8-QS-6-D (193144) meter-out flow controls
+  spec: 'G1/8 cylinder thread × 6 mm tube OD · Source: Landefeld, ESD Equipment, Festo distributors · Est. EUR 39 for 2 (Nov 2026, Landefeld EUR 19.44 each incl. VAT)'
 - id: valvefittings
   group: Pneumatics
   qty: '3'
-  part: Valve push-in fittings
-  spec: 6 mm tube × 1/8 · P, A and B
+  part: Festo QS-1/8-6 (153002) valve push-in fittings
+  spec: '6 mm tube × R1/8 male (tapered, for the Rc valve ports) · P, A and B · seal with PTFE tape or sealant · Source: Festo distributors, DigiKey, RS · Est. EUR 7 for 3 (Nov 2026)'
 - id: silencers
   group: Pneumatics
   qty: '2'
-  part: Exhaust silencers
-  spec: 1/8 · R and S
+  part: AirTAC SL-01 exhaust silencers
+  spec: 'R1/8 male (tapered) · R and S · not the Festo U-1/8-B, its G thread does not suit the Rc ports · Source: AirTAC distributors · Est. EUR 4 for 2 (Nov 2026, unverified)'
 - id: tube
   group: Pneumatics
   qty: 3 m est.
   part: PU pneumatic tubing
-  spec: 6 mm OD × 4 mm ID · PU, rated ≥ 8 bar
+  spec: '6 mm OD × 4 mm ID · PU, rated ≥ 10 bar (Festo PUN-H-6X1-BL, 197384, is a 50 m roll rated −0.95 to 10 bar) · Source: Festo distributors, pneumatics shops that cut to length · Est. EUR 4 for 3 m (Nov 2026, unverified)'
 - id: supplyair
   group: Pneumatics
   qty: 1 set
   part: Air supply connection
-  spec: Supply hose rated ≥ 10 bar, matching coupler, 1/4 FRL inlet adapter
+  spec: 'Supply hose rated ≥ 10 bar, matching coupler, 1/4 FRL inlet adapter · Source: hardware store · Est. EUR 20 (Nov 2026, unverified)'
 - id: frladapter
   group: Pneumatics
   qty: '1'
   part: FRL outlet tube adapter
-  spec: 6 mm push-in × 1/4
+  spec: '6 mm push-in × R1/4 male (Festo QS-1/4-6, 153003) · Source: Festo distributors · Est. EUR 4 (Nov 2026)'
 - id: isolation
   group: Pneumatics
   qty: '1'
   part: Air shut-off with exhaust
-  spec: 3/2-way hand valve with exhaust, 6 mm tube connections · between the filter-regulator and the tee
+  spec: '3/2-way hand valve with exhaust, 6 mm tube connections (Festo HE-3-QS-6, 153475) · between the filter-regulator and the tee · Source: Festo distributors · Est. EUR 45 (Nov 2026, unverified)'
+- id: sealant
+  group: Pneumatics
+  qty: '1'
+  part: Thread sealant
+  spec: 'PTFE tape or anaerobic pipe sealant rated for compressed air · on every tapered thread (valve, FRL, pressure switch, tee, silencers), not on the parallel G1/8 cylinder ports · Source: hardware store · Est. EUR 4 (Nov 2026, unverified)'
 - id: plc
   group: Electrical
   qty: '1'
   part: M5Stack StamPLC (K141)
-  spec: Controller with 4 relays (NC, COM, NO), 8 optically isolated inputs, display and 3 buttons · DIN rail clip · 24 V DC · programmed with PlatformIO over USB-C
+  spec: 'Controller with 4 relays (NC, COM, NO), 8 optically isolated inputs, display and 3 buttons · DIN rail clip · 24 V DC · programmed with PlatformIO over USB-C · Source: M5Stack, DigiKey, Mouser, RS · Est. EUR 43 (Nov 2026, RS Online NL incl. VAT)'
+- id: usbcable
+  group: Electrical
+  qty: '1'
+  part: USB-C data cable
+  spec: 'Data cable, not charge-only, to program the StamPLC · about 1 m · Source: electronics shop · Est. EUR 5 (Nov 2026, unverified)'
 - id: psu
   group: Electrical
   qty: '1'
   part: Mean Well GST25A24-P1J
-  spec: Closed desktop power supply, CE-marked · 24 V DC · 1.04 A · Class I, IEC C14 inlet · 5.5 × 2.1 mm plug, centre +
+  spec: 'Closed desktop power supply, CE-marked · 24 V DC · 1.04 A · Class I, IEC C14 inlet · 5.5 × 2.1 mm plug, centre + · Source: Bürklin, Reichelt, DigiKey · Est. EUR 21 (Nov 2026)'
 - id: cord
   group: Electrical
   qty: '1'
   part: IEC mains cord
-  spec: Earthed, C13 plug (fits the supply's C14 inlet)
+  spec: 'Earthed, C13 plug (fits the supply''s C14 inlet) · Source: electrical shop · Est. EUR 4 (Nov 2026, unverified)'
 - id: jack
   group: Electrical
   qty: '1'
   part: Panel DC jack J1
-  spec: 5.5 × 2.1 mm, 8 mm thread (DC-099 type) · ≥ 2 A · 8 mm panel hole
+  spec: '5.5 × 2.1 mm, 8 mm thread (DC-099 type) · ≥ 2 A · 8 mm panel hole · Source: electronics distributors · Est. EUR 2 (Nov 2026, unverified)'
 - id: inlinefuse
   group: Electrical
   qty: '1'
   part: Inline fuse holder FU1 + fuse
-  spec: 5 × 20 mm · fuse T 1 A (slow-blow) + spare · in the + lead from J1 to Q1
+  spec: '5 × 20 mm · fuse T 1 A (slow-blow) + spare · in the + lead from J1 to Q1 · Source: electronics distributors · Est. EUR 3 (Nov 2026, unverified)'
 - id: sensors
   group: Electrical
   qty: 2 sets
-  part: Festo SMT-8M-A-PS-24V-E-2,5-OE sensors + clamps
-  spec: PNP, N/O · 2.5 m open cable end · SMBR-8-32 clamps
+  part: Festo SMT-8M-A-PS-24V-E-2,5-OE (574335) sensors + clamps
+  spec: 'PNP, N/O · 2.5 m open cable end · SMBR-8-32 clamps · Source: Festo distributors, Landefeld, RS · Est. EUR 88 (Nov 2026, sensor EUR 36.87 and clamp EUR 7.28 each incl. VAT)'
 - id: diodes
   group: Electrical
   qty: '2'
   part: 1N4007 diodes
-  spec: D7/D8 in the valve plugs
+  spec: 'D7/D8 in the valve plugs · Source: electronics distributors · Est. EUR 1 (Nov 2026, unverified)'
 - id: resistors
   group: Electrical
   qty: '2'
   part: 4.7 kΩ resistors
-  spec: Only if a sensor input reads on with the sensor off, see the sensors step on the wiring page
+  spec: 'Only if a sensor input reads on with the sensor off, see the sensors step on the wiring page · Source: electronics distributors · Est. EUR 1 (Nov 2026, unverified)'
 - id: stop
   group: Controls
   qty: '1'
   part: 22 mm emergency stop E-STOP
-  spec: Red mushroom, latching, twist release · closed contact (marked 11 and 12) · S3 · sits on the printed yellow ring
+  spec: 'Red mushroom button listed to ISO 13850, latching, twist release · closed contact (marked 11 and 12) with positive (direct) opening to IEC 60947-5-1 annex K, not a look-alike without it · example: Schneider XB5AS8445, 82 mm deep overall, while the box allows 58 mm behind the panel: check the depth of the part you buy · S3 · sits on the printed yellow ring · Source: Bürklin, RS, DigiKey · Est. EUR 30 (Nov 2026, Bürklin incl. VAT)'
 - id: switch
   group: Controls
   qty: '1'
   part: Illuminated rocker switch Q1
-  spec: Round Ø20 mm snap-in · ON-OFF with 24 V LED, 3 pins · ≥ 3 A · any LED colour but red · POWER
+  spec: 'Round Ø20 mm snap-in · ON-OFF with 24 V LED, 3 pins · ≥ 3 A · any LED colour but red · POWER · no part number verified, order by these values · Source: electronics distributors · Est. EUR 6 (Nov 2026, unverified)'
 - id: wago5
   group: Wiring
   qty: '3'
   part: Wago 221-415 lever connectors, 5-way
-  spec: 'X-24: +24 V after POWER · X-0V1 and X-0V2: Ground (0 V, minus), joined by one wire'
+  spec: 'X-24: +24 V after POWER · X-0V1 and X-0V2: Ground (0 V, minus), joined by one wire · Source: Wago distributors, DigiKey, RS · Est. EUR 4 for 3 (Nov 2026)'
 - id: wago3
   group: Wiring
   qty: '2'
   part: Wago 221-413 lever connectors, 3-way
-  spec: 'X-S: after the E-STOP, feeds the pressure switch and StamPLC input 3 · X-V: valve rail after the pressure switch, feeds StamPLC input 4 and relay 1'
+  spec: 'X-S: after the E-STOP, feeds the pressure switch and StamPLC input 3 · X-V: valve rail after the pressure switch, feeds StamPLC input 4 and relay 1 · Source: Wago distributors, DigiKey, RS · Est. EUR 2 for 2 (Nov 2026)'
 - id: controlwire
   group: Wiring
   qty: 5 m est.
   part: Hook-up wire, red + black
-  spec: Stranded, H05V-K · 0.5 mm² (AWG 20) · about 3 m red = +24 V, about 2 m black = Ground
+  spec: 'Stranded, H05V-K · 0.5 mm² (AWG 20) · about 3 m red = +24 V, about 2 m black = Ground · Source: electronics distributors · Est. EUR 6 (Nov 2026, unverified)'
 - id: valvecable
   group: Wiring
   qty: 3 m est.
   part: 2-core cable, black sheath
-  spec: 3 runs out of the box (valve plugs Y1, Y2 and QPM11) · 2 × 0.5 mm² (AWG 20) · all cables, sensors included, leave through the one oval exit, 30 × 14 mm · the board shows red and black, on a valve cable mark the +24 V core red, on the QPM11 cable (switch in the +24 V feed, no polarity) mark both cores red
+  spec: '3 runs out of the box (valve plugs Y1, Y2 and QPM11) · 2 × 0.5 mm² (AWG 20) · all cables, sensors included, leave through the one oval exit, 30 × 14 mm · the board shows red and black, on a valve cable mark the +24 V core red, on the QPM11 cable (switch in the +24 V feed, no polarity) mark both cores red · Source: electronics distributors · Est. EUR 6 (Nov 2026, unverified)'
 - id: terminations
   group: Wiring
   qty: 1 set
   part: Ferrules, receptacles and labels
-  spec: 30 ferrules 0.5 mm² · 3 insulated flat receptacles for the Q1 tabs · heat-shrink
-    · wire labels
+  spec: '30 ferrules 0.5 mm² · 3 insulated flat receptacles for the Q1 tabs · heat-shrink · wire labels · Source: electronics distributors · Est. EUR 12 (Nov 2026, unverified)'
 - id: adapter
   group: 3D printed
   qty: '1'
   part: Lee APP handle adapter
-  spec: 3D printed, two halves · clamps on the lever struts, takes the cylinder rod clevis · PETG or ASA, 6 walls, 40 % infill · regulator at most 5.5 bar · not for other presses or loads
+  spec: '3D printed, two halves · clamps on the lever struts, takes the cylinder rod clevis · PETG or ASA, 6 walls, 40 % infill · regulator at most 5.5 bar · not for other presses or loads · Source: print it yourself · Est. EUR 4 filament (Nov 2026, unverified)'
   image: boxes/lee_app_handle_adapter.png
   makerworld:
 - id: controlbox
   group: 3D printed
   qty: '1'
   part: Control box
-  spec: 3D printed in PETG or ASA, 15–20 % infill · base, lid, E-STOP ring (yellow) and USB-C plug · the front of the StamPLC sits flush in the lid, so display, buttons and terminals stay reachable · DIN rail, Wago rack, POWER rocker and DC jack in the box · one oval cable exit at the back · no mains inside
+  spec: '3D printed in PETG or ASA, 15–20 % infill · base, lid, E-STOP ring (yellow) and USB-C plug · the front of the StamPLC sits flush in the lid, so display, buttons and terminals stay reachable · DIN rail, Wago rack, POWER rocker and DC jack in the box · one oval cable exit at the back · no mains inside · Source: print it yourself · Est. EUR 3 filament (Nov 2026, unverified)'
+  image: boxes/stamplc_box.png
   makerworld:
 - id: glands
   group: Relay edition only (deprecated)
