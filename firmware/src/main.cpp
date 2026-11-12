@@ -24,7 +24,6 @@ static bool shown_stopping = false;
 static uint32_t shown_cycles = UINT32_MAX;
 static bool info_screen = false;
 static bool redraw = true;
-static esp_reset_reason_t reset_reason;
 
 // The loop watchdog restarts the unit only with these two values of the prebuilt core config.
 #ifndef CONFIG_ESP_TASK_WDT_PANIC
@@ -34,15 +33,18 @@ static_assert(CONFIG_ESP_TASK_WDT_TIMEOUT_S == 5, "loop watchdog timeout");
 
 // Why the unit last started: after a watchdog or readback restart it comes back in IDLE as after power-up.
 static const char* reset_name(esp_reset_reason_t r) {
-    switch (r) {
-        case ESP_RST_POWERON: return "power-on";
-        case ESP_RST_SW: return "restart";   // ESP.restart(): relay readback, or after an update
-        case ESP_RST_PANIC: return "panic";
-        case ESP_RST_TASK_WDT: return "watchdog";
-        case ESP_RST_INT_WDT: return "int watchdog";
-        case ESP_RST_BROWNOUT: return "brownout";
-        default: return nullptr;
+    static const struct { esp_reset_reason_t reason; const char* name; } names[] = {
+        {ESP_RST_POWERON, "power-on"},
+        {ESP_RST_SW, "restart"},   // ESP.restart(): relay readback, or after an update
+        {ESP_RST_PANIC, "panic"},
+        {ESP_RST_TASK_WDT, "watchdog"},
+        {ESP_RST_INT_WDT, "int watchdog"},
+        {ESP_RST_BROWNOUT, "brownout"},
+    };
+    for (const auto& n : names) {
+        if (n.reason == r) return n.name;
     }
+    return nullptr;
 }
 
 static void draw() {
@@ -57,8 +59,9 @@ static void draw() {
                  "Cycles %lu   Jam %lu s\nReset  ",
                  web_ap_ssid().c_str(), web_ap_password().c_str(), web_ip().c_str(),
                  (unsigned long)press.cycles(), (unsigned long)(press.jam_ms / 1000));
-        if (const char* name = reset_name(reset_reason)) d.print(name);
-        else d.printf("code %d", (int)reset_reason);
+        const esp_reset_reason_t reason = esp_reset_reason();   // fixed for the whole boot
+        if (const char* name = reset_name(reason)) d.print(name);
+        else d.printf("code %d", (int)reason);
     } else {
         d.printf("%s\n%s%s\nCycles %lu", state_name(press.state()), fault_name(press.fault()),
                  press.stopping() ? "STOPPING" : "", (unsigned long)press.cycles());
@@ -73,7 +76,6 @@ static void set_relay(uint8_t relay, bool on) {
 }
 
 void setup() {
-    reset_reason = esp_reset_reason();
     M5StamPLC.begin();
     M5StamPLC.writePlcAllRelay(0);
     prefs.begin("autolever");
