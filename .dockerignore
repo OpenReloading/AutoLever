@@ -1,0 +1,3 @@
+# the dev container build (context: the repository root) reads only requirements.in
+*
+!requirements.in
