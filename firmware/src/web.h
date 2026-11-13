@@ -10,7 +10,8 @@
 // The page is served in its own task, so a slow or stalled client never holds up loop(). The page reads and
 // changes the press only while it holds lock; loop() takes it for the same.
 void web_begin(autolever::Controller& press, Preferences& prefs, std::mutex& lock);
-void web_loop(bool idle);   // OTA, open only while the press is idle
+// OTA, open only while the press is idle; an upload starts only in a loop whose readback read every relay off.
+void web_loop(bool idle, bool relays_off);
 
 String web_ap_ssid();
 String web_ap_password();

@@ -41,6 +41,9 @@ class Controller {
 public:
     // Longest time for one stroke (out or back); longer is a jam.
     uint32_t jam_ms = 15000;
+    // In IDLE a START press starts AUTO only after START read released for this long, since a failed button read
+    // reads as released. Failed reads that span this long can still start AUTO: RelayCheck does not catch all of them.
+    static constexpr uint32_t start_release_ms = 150;
 
     Outputs step(const Inputs& in, uint32_t now_ms);
 
@@ -63,6 +66,8 @@ private:
     uint32_t phase_since_ = 0;
     uint32_t cycles_ = 0;
     bool prev_start_ = true;  // a START held at power-up is not a press
+    uint32_t released_since_ = 0;  // first step of the current or last run of released START reads
+    uint32_t released_ms_ = 0;     // length of that run, up to its last released read
     bool armed_ = false;  // JOG was seen released since the last stop; a held JOG never starts the press
     bool stopping_ = false;
     bool reached_front_ = false;
