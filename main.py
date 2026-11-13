@@ -207,7 +207,7 @@ def build():
     g = load("guide.yaml")
     return {
         "storage": "autolever-guide",
-        "bom": {"note": "Feel free to substitute as required for local availability and cost. Cable and tube lengths are estimates.",
+        "bom": {"note": "Feel free to substitute as required for local availability and cost. Cable and tube lengths are estimates. Each main-edition row carries one price estimate for its full quantity, in EUR including VAT, November 2026, without shipping; US prices are converted at about 0.9 EUR per USD. Prices change, and an estimate marked unverified is not taken from a listing: treat them as a guide, not a quote. The relay edition rows are not priced.",
                 "export": "autolever-bom.csv", "linkLabel": "MakerWorld",
                 "items": bom_items(g)},
         "boards": {
