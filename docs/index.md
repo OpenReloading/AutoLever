@@ -48,7 +48,7 @@ POWER and the three buttons under the display:
 1. **POWER** on.
 2. **A** starts and stops automatic cycling.
 3. **B** jogs while held.
-4. **C** shows the info screen.
+4. **C** shows the info screen. Held for 2 s, it opens updates over Wi-Fi for 10 minutes ([Update it](#update-it)).
 
 E-STOP cuts the power to the valves (the StamPLC stays on and shows the fault); twist to release. A supply fault clears itself when the power is back; after a jam or a sensor fault, press A, also when E-STOP or the pressure switch tripped in between. Release JOG after any stop or trip. A held JOG never starts the press; release it and press it again.
 
@@ -77,7 +77,7 @@ PETG or ASA. Handle adapter: 6 walls and 40% infill. Control box: 15–20% infil
 
 ## Update it
 
-Later updates go over Wi-Fi, once the press firmware is on the StamPLC (the bench image has none). The display must show IDLE: the update is closed while the press runs, jogs or shows a fault. Press C and run in `firmware/`, with the password from the **Pass** line:
+Later updates go over Wi-Fi, once the press firmware is on the StamPLC (the bench image has none). Hold C for 2 s until it beeps: the info screen shows **Update open** for 10 minutes. The press must also be idle: the update is closed while it runs, jogs or shows a fault. Run in `firmware/`, with the password from the **Pass** line:
 
     PLATFORMIO_UPLOAD_FLAGS=--auth=PASSWORD pio run -e stamplc -t upload --upload-port autolever.local
 
