@@ -15,6 +15,7 @@ constexpr uint8_t IN_HOME = 0, IN_FRONT = 1, IN_ESTOP_OK = 2, IN_PRESSURE_OK = 3
 
 static Controller press;
 static RelayCheck relay_check;
+static UpdateWindow update_window;
 static Preferences prefs;
 static std::mutex press_lock;   // press, shared with the web task
 static State shown_state = State::Fault;
@@ -33,9 +34,10 @@ static void draw() {
     d.setCursor(4, 4);
     if (info_screen) {
         d.printf("INFO\nWi-Fi  %s\nPass   %s\nPhone  192.168.4.1\nHome   %s\nName   autolever.local\n"
-                 "Cycles %lu   Jam %lu s",
+                 "Cycles %lu   Jam %lu s\nUpdate %s",
                  web_ap_ssid().c_str(), web_ap_password().c_str(), web_ip().c_str(),
-                 (unsigned long)press.cycles(), (unsigned long)(press.jam_ms / 1000));
+                 (unsigned long)press.cycles(), (unsigned long)(press.jam_ms / 1000),
+                 update_window.is_open(millis()) ? "open" : "closed, hold C");
     } else {
         d.printf("%s\n%s%s\nCycles %lu", state_name(press.state()), fault_name(press.fault()),
                  press.stopping() ? "STOPPING" : "", (unsigned long)press.cycles());
@@ -52,6 +54,7 @@ static void set_relay(uint8_t relay, bool on) {
 void setup() {
     M5StamPLC.begin();
     M5StamPLC.writePlcAllRelay(0);
+    M5StamPLC.BtnC().setHoldThresh(2000);
     prefs.begin("autolever");
     press.set_cycles(prefs.getUInt("cycles", 0));
     press.jam_ms = jam_ms_from_seconds(prefs.getUInt("jam_ms", press.jam_ms) / 1000);
@@ -62,8 +65,14 @@ void setup() {
 
 void loop() {
     M5StamPLC.update();
-    if (M5StamPLC.BtnC().wasPressed()) {
+    if (M5StamPLC.BtnC().wasClicked()) {   // on release, so a hold does not also toggle the screen
         info_screen = !info_screen;
+        redraw = true;
+    }
+    if (M5StamPLC.BtnC().wasHold()) {
+        update_window.open(millis());
+        M5StamPLC.tone(4000, 100);
+        info_screen = true;
         redraw = true;
     }
 
@@ -107,7 +116,8 @@ void loop() {
 #ifdef AUTOLEVER_HANG_TEST
     if (shown_state == State::Auto) for (;;) delay(10);   // bench check: hangs with the extend valve on
 #endif
-    web_loop(shown_state == State::Idle);   // after the relays: an OTA upload holds the loop
+    // after the relays: an OTA upload holds the loop; the window is evaluated every loop so its latch expires
+    web_loop(update_window.is_open(millis()) && shown_state == State::Idle);
 
     static uint32_t last_info = 0;   // the home address arrives some seconds after power-up
     if (info_screen && millis() - last_info > 2000) {
