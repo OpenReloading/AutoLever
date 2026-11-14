@@ -119,8 +119,8 @@ void loop() {
 #ifdef AUTOLEVER_HANG_TEST
     if (shown_state == State::Auto) for (;;) delay(10);   // bench check: hangs with the extend valve on
 #endif
-    // after the relays: an OTA upload holds the loop
-    web_loop(shown_state == State::Idle && update_window.is_open(millis()));
+    // after the relays: an OTA upload holds the loop; the window is evaluated every loop so its latch expires
+    web_loop(update_window.is_open(millis()) && shown_state == State::Idle);
 
     static uint32_t last_info = 0;   // the home address arrives some seconds after power-up
     if (info_screen && millis() - last_info > 2000) {

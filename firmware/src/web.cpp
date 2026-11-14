@@ -46,7 +46,7 @@ static String esc(const String& in) {
     return out;
 }
 
-// Settings posts only from this device's own page: the browser sends saved Basic credentials with a form from any site.
+// Settings posts only from this device's own page: the browser sends the saved login with a form from any site.
 static bool authed() {
     String from = server.hasHeader("Origin") ? server.header("Origin") : server.header("Referer");
     if (!same_origin(from.c_str(), server.hostHeader().c_str())) {
