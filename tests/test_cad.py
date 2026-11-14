@@ -48,6 +48,27 @@ def bodies(stl: Path) -> int:
     return len({find(v) for v in parent})
 
 
+def solid_defects(stl: Path) -> tuple[int, int]:
+    """Edges not shared by exactly two triangles, and zero-area triangles, of an ASCII STL."""
+    edges: dict[frozenset[tuple[str, ...]], int] = {}
+    flat = 0
+    triangle: list[tuple[str, ...]] = []
+    for line in stl.read_text().splitlines():
+        if m := re.match(r"\s*vertex\s+(\S+)\s+(\S+)\s+(\S+)", line):
+            triangle.append(m.groups())
+            if len(triangle) == 3:
+                for i in range(3):
+                    edge = frozenset((triangle[i], triangle[(i + 1) % 3]))
+                    edges[edge] = edges.get(edge, 0) + 1
+                a, b, c = ([float(x) for x in v] for v in triangle)
+                u = [b[i] - a[i] for i in range(3)]
+                w = [c[i] - a[i] for i in range(3)]
+                cross = (u[1] * w[2] - u[2] * w[1], u[2] * w[0] - u[0] * w[2], u[0] * w[1] - u[1] * w[0])
+                flat += math.hypot(*cross) < 1e-9
+                triangle = []
+    return sum(n != 2 for n in edges.values()), flat
+
+
 def x_extent(stl: Path) -> tuple[float, float]:
     xs = [float(m[1]) for line in stl.read_text().splitlines() if (m := re.match(r"\s*vertex\s+(\S+)", line))]
     return min(xs), max(xs)
@@ -64,10 +85,11 @@ def test_pivot_eye_overlapping_a_clamp_corner_is_rejected(tmp_path, params):
     assert "pivot eye overlaps a clamp corner: increase arm_r, move arm_x, or reduce eye_extra" in result.stderr
 
 
-def test_default_print_plate_is_two_bodies(tmp_path):
+def test_default_print_plate_is_two_solid_bodies(tmp_path):
     result = render(tmp_path / "out.stl")
     assert result.returncode == 0, result.stderr
     assert bodies(tmp_path / "out.stl") == 2
+    assert solid_defects(tmp_path / "out.stl") == (0, 0)
 
 
 def test_default_print_plate_keeps_its_spacing(tmp_path):
@@ -81,11 +103,12 @@ def test_default_print_plate_keeps_its_spacing(tmp_path):
 
 
 @pytest.mark.parametrize("arm_x", [1.5, -0.5])
-def test_print_plate_with_arm_beyond_a_long_clamp_is_two_bodies(tmp_path, arm_x):
+def test_print_plate_with_arm_beyond_a_long_clamp_is_two_solid_bodies(tmp_path, arm_x):
     # L = 50 / tan(30 deg) = 86.6 mm, more than 2 * (eye_r + 10) = 46 mm
     result = render(tmp_path / "out.stl", arm_x=arm_x, gap_wide=60)
     assert result.returncode == 0, result.stderr
     assert bodies(tmp_path / "out.stl") == 2
+    assert solid_defects(tmp_path / "out.stl") == (0, 0)
 
 
 def test_control_box_estop_ring_is_one_body(tmp_path):

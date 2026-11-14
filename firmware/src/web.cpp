@@ -13,6 +13,7 @@ static Preferences* prefs = nullptr;
 static std::mutex* lock = nullptr;
 static String ap_ssid, ap_pass;
 static bool ota_open = false;
+static constexpr uint16_t OTA_PORT = 3232;
 
 static const char PAGE[] PROGMEM = R"html(<!doctype html><meta charset=utf-8>
 <meta name=viewport content="width=device-width,initial-scale=1"><title>AutoLever</title>
@@ -45,15 +46,17 @@ static String esc(const String& in) {
     return out;
 }
 
-// Settings posts only from this device's own page: the browser sends saved Basic credentials with a form from any site.
+// Settings posts only from this device's own page: the browser sends the saved login with a form from any site.
 static bool authed() {
     String from = server.hasHeader("Origin") ? server.header("Origin") : server.header("Referer");
     if (!same_origin(from.c_str(), server.hostHeader().c_str())) {
         server.send(403, "text/plain", "Changes only from this device's own page");
         return false;
     }
-    if (server.authenticate("admin", ap_pass.c_str())) return true;
-    server.requestAuthentication();
+    // Digest only: the library also accepts Basic, which a browser that cached it keeps sending in clear text.
+    bool digest = server.header("Authorization").startsWith("Digest ");
+    if (digest && server.authenticate("admin", ap_pass.c_str())) return true;
+    server.requestAuthentication(DIGEST_AUTH);
     return false;
 }
 
@@ -171,17 +174,24 @@ void web_begin(Controller& c, Preferences& p, std::mutex& l) {
     xTaskCreatePinnedToCore(serve, "web", 8192, nullptr, tskIDLE_PRIORITY, nullptr, 0);
 
     ArduinoOTA.setHostname("autolever");
+    ArduinoOTA.setPort(OTA_PORT);
+    ArduinoOTA.setMdnsEnabled(false);   // its end() stops mDNS, and autolever.local with it
     ArduinoOTA.setPassword(ap_pass.c_str());
     // An upload holds loop() past the watchdog timeout; updates open only at idle, so both valves are off meanwhile.
     ArduinoOTA.onStart(disableLoopWDT);
     ArduinoOTA.onError([](ota_error_t) { enableLoopWDT(); });
 }
 
-void web_loop(bool idle, bool relays_off) {
-    if (idle != ota_open) {
-        if (idle) ArduinoOTA.begin();
-        else ArduinoOTA.end();
-        ota_open = idle;
+void web_loop(bool open, bool relays_off) {
+    if (open != ota_open) {
+        if (open) {
+            ArduinoOTA.begin();
+            MDNS.enableArduino(OTA_PORT, true);   // the upload service the Arduino IDE lists
+        } else {
+            ArduinoOTA.end();
+            MDNS.disableArduino();
+        }
+        ota_open = open;
     }
     if (ota_open && relays_off) ArduinoOTA.handle();
 }
