@@ -1,5 +1,5 @@
-// Control box — all electrics in one box, 24 V DC only (rev. 2026-10-07, "safe edition").
-//   Front:  45° console plate, a separate part like the lid (rev. 2026-10-07): E-STOP (S3, on a yellow ring),
+// Control box — all electrics in one box, 24 V DC only.
+//   Front:  45° console plate, a separate part like the lid: E-STOP (S3, on a yellow ring),
 //           STOP (S2), START (S0), JOG (S1) and POWER (Q1, round Ø20 mm snap-in rocker with 24 V LED).
 //           Fit and wire the buttons on the bench, then screw the plate into its frame. It rests on a ledge
 //           all round and on two pillars, one right of the E-STOP, so a hard hit goes into the base, not the screws.
@@ -68,16 +68,16 @@ module at_gland(u) {   // local frame on the outer wall face, +z pointing into t
     else translate([c0 + u, D, entry_z]) rotate([90, 0, 0]) children();
 }
 // power: [x, z, hole Ø, depth behind the panel (preview), label, label z]
-// J1 panel DC jack 5.5 × 2.1 mm, 8 mm thread (DC-099 type, user's part 2026-10-09; centre +, matches the GST …-P1J
+// J1 panel DC jack 5.5 × 2.1 mm, 8 mm thread (DC-099 type, centre +, matches the GST …-P1J
 // plug). F1 panel fuse holder 5 × 20 mm, IP65,
-// pre-wired (user's listing, 2026-10-06): 12 mm hole, 28 mm from the flange to the body end incl. the wall, cap 13 mm
+// pre-wired: 12 mm hole, 28 mm from the flange to the body end incl. the wall, cap 13 mm
 // outside, two 145 mm 0.75 mm² leads. Inside the body ends at y 172.6, 2.6 mm behind the socket row (y 170).
-// Spanner room (user, 2026-10-07): J1 low, `spanner` clear of the corner column (x < 9) and the first gland; F1 above
+// Spanner room: J1 low, `spanner` clear of the corner column (x < 9) and the first gland; F1 above
 // the gland row and offset right, so the spanner on J1 swings up past F1, and F1's head stays clear of the Wago rack.
 power = [[9 + spanner + 1, 22, 8.2, 22, "24V DC", 8], [50, 60, 12.5, 25.4, "T1A", 74]];   // 28 − wall 2.6
 
 // Wago 221 rack, left to right as on the wiring board: X-EN, X-M1, X-M2 (221-415), X-D (221-413), the D6 and D7
-// joints (221-412). Widths measured with calipers (user, 2026-10-05: the data-sheet sizes + 0.2 play were very loose in
+// joints (221-412). Widths measured with calipers (the data-sheet sizes + 0.2 play were very loose in
 // the test print; they match 5.6 · poles + 1.75). Heights:
 // WAGO data sheets 8.4 (221-415), 8.3 (221-412/413); real parts run 0.1–0.3 under nominal, so the lip grips instead
 // of fitting: its retaining face is a 45° slope that starts wago_grip below nominal, and the arm spring presses it onto
@@ -122,7 +122,7 @@ buttons = [
     [176, "JOG",     30, 45, hole_d],
     [216, "POWER",   24, 30, rocker_d],
 ];
-// console plate (user, 2026-10-07: separate like the lid, but solid). It sits flush in a pocket of the 45° frame:
+// console plate (separate like the lid, but solid). It sits flush in a pocket of the 45° frame:
 // side walls, a band at the skirt (fb) and one under the lid (ft). Behind its edges a ledge (lw wide, ledge_t thick)
 // carries it; two pillars from the floor carry it between the buttons, one right of the E-STOP, one left of POWER.
 // Contact blocks (30 wide, preview) pass through the opening, so a wired plate goes in and out in one piece.
@@ -147,7 +147,7 @@ stop_w  = 8;
 pitch   = 30;
 timer_hole = 50;              // timer front passes through, so the lid lifts off over it
 led_slot = [8, 36];
-// Device row (user, 2026-10-06): centred under the lid. The visible group runs from the K1 LED window to the right
+// Device row: centred under the lid. The visible group runs from the K1 LED window to the right
 // edge of the timer cut-out; row_x0 = left end of the K1 end stop. F1 and J1 sit behind the socket row (y > 170).
 row_x0  = cx / 2 - (stop_w + pitch / 2 - led_slot.x / 2 + stop_w + 4 * pitch + 25 + timer_hole / 2) / 2;   // 21.5
 relay_x = [for (i = [0 : 3]) row_x0 + stop_w + pitch / 2 + i * pitch];

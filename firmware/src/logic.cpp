@@ -127,6 +127,16 @@ bool RelayCheck::stuck(bool read_ok, uint8_t read, uint8_t commanded, uint32_t n
     return now_ms - bad_since_ > 100;
 }
 
+void UpdateWindow::open(uint32_t now_ms) {
+    open_ = true;
+    since_ = now_ms;
+}
+
+bool UpdateWindow::is_open(uint32_t now_ms) {
+    if (open_ && now_ms - since_ >= 10u * 60u * 1000u) open_ = false;
+    return open_;
+}
+
 // The String::c_str() these get is nullptr for a String without a buffer, so nullptr counts as empty.
 bool same_origin(const char* source, const char* host) {
     if (!source || !*source) return true;
