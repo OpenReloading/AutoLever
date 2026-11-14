@@ -8,11 +8,10 @@
 
 using namespace autolever;
 
-// Input channels (0 to 7) and relays (0 to 3) as wired in the control box.
+// Input channels (0 to 7) as wired in the control box; the relays are in logic.h.
 // The inputs are opto-isolated with anti-parallel LEDs (EL3H4), so either polarity works, and the expander reads
 // true while an input is driven. All eight share COM (terminal C): connect it to 0 V for PNP sensors.
 constexpr uint8_t IN_HOME = 0, IN_FRONT = 1, IN_ESTOP_OK = 2, IN_PRESSURE_OK = 3;
-constexpr uint8_t RELAY_EXTEND = 0, RELAY_RETRACT = 1;
 
 static Controller press;
 static RelayCheck relay_check;
@@ -113,19 +112,17 @@ void loop() {
     std::unique_lock<std::mutex> hold(press_lock);
     Outputs out = press.step(in, millis());
     hold.unlock();
-    // The relay that turns off is written first, so extend and retract are never on together.
-    if (out.extend) {
-        set_relay(RELAY_RETRACT, out.retract);
-        set_relay(RELAY_EXTEND, true);
-    } else {
-        set_relay(RELAY_EXTEND, false);
-        set_relay(RELAY_RETRACT, out.retract);
-    }
+    write_relays(out, set_relay);
     // Relays 0 to 3 are pins 0 to 3 of the expander's input port 0 (register 0x00).
     uint8_t read = 0;
     bool read_ok = M5StamPLC.getIOExpanderB().readRegister(0x00, &read, 1);
-    uint8_t commanded = out.extend << RELAY_EXTEND | out.retract << RELAY_RETRACT;
-    if (relay_check.stuck(read_ok, read & 0x0F, commanded, millis())) ESP.restart();
+    uint8_t commanded = out.extend << RELAY_EXTEND | out.retract << RELAY_RETRACT | out.enable << RELAY_ENABLE;
+    if (relay_check.stuck(read_ok, read & 0x0F, commanded, millis())) {
+        // The restart does not reset the expander and begin() only clears it after boot, so relay 3 opens first.
+        // Written without set_relay's read, which reads off when the expander read fails.
+        write_relays(Outputs{}, [](uint8_t relay, bool on) { M5StamPLC.writePlcRelay(relay, on); });
+        ESP.restart();
+    }
 
     hold.lock();
     if (press.cycles() != shown_cycles) {
