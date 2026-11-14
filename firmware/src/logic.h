@@ -19,6 +19,24 @@ struct Outputs {
     bool enable;   // relay 3, the feed of relays 1 and 2: on only while a stroke is commanded
 };
 
+constexpr uint8_t RELAY_EXTEND = 0, RELAY_RETRACT = 1, RELAY_ENABLE = 2;   // relays 1, 2 and 3
+
+// Writes out through write(relay, on). Relay 3 feeds relays 1 and 2 (wiring step E): it opens first and closes last,
+// so a stuck relay 1 or 2 loses its feed on every fault and at idle. Of relays 1 and 2 the one that turns off is
+// written first, so extend and retract are never on together.
+template <class Write>
+void write_relays(const Outputs& out, Write write) {
+    if (!out.enable) write(RELAY_ENABLE, false);
+    if (out.extend) {
+        write(RELAY_RETRACT, out.retract);
+        write(RELAY_EXTEND, true);
+    } else {
+        write(RELAY_EXTEND, false);
+        write(RELAY_RETRACT, out.retract);
+    }
+    if (out.enable) write(RELAY_ENABLE, true);
+}
+
 enum class State { Idle, Auto, Jog, Fault };
 enum class Fault { None, EStop, Pressure, Sensor, Jam };
 

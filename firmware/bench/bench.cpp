@@ -1,6 +1,6 @@
 // Bench image: shows the 8 inputs live and switches the relays, to check the wiring before the press firmware runs.
-//   A, B, C toggle relays 1, 2, 3. Hold C, then press A, to switch all relays off. All relays switch off by themselves
-//   once one has been on for 10 s (buttons ignored for 1 s after), and while input 3 or 4 is off.
+//   A, B, C toggle relays 1, 2, 3 (C on release). Hold C, then press A, to switch all relays off. All relays switch
+//   off by themselves once one has been on for 10 s (buttons ignored for 1 s after), and while input 3 or 4 is off.
 //   Build and flash: pio run -e bench -t upload
 #include <M5StamPLC.h>
 
@@ -20,7 +20,7 @@ void setup() {
 
 void loop() {
     M5StamPLC.update();
-    const bool toggle[4] = {M5StamPLC.BtnA().wasPressed(), M5StamPLC.BtnB().wasPressed(), M5StamPLC.BtnC().wasPressed(),
+    const bool toggle[4] = {M5StamPLC.BtnA().wasPressed(), M5StamPLC.BtnB().wasPressed(), M5StamPLC.BtnC().wasReleased(),
                             false};
     relays.step(toggle, M5StamPLC.BtnA().isPressed() && M5StamPLC.BtnC().isPressed(),
                 M5StamPLC.readPlcInput(IN_ESTOP_OK), M5StamPLC.readPlcInput(IN_PRESSURE_OK), millis());

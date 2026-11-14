@@ -380,6 +380,23 @@ int main() {
         CHECK(!k.stuck(false, 0x0, 0x0, 0));
         CHECK(k.stuck(false, 0x0, 0x0, 101));
     }
+    {  // relay write order (relay number, minus for off): relay 3 opens first and closes last, also for the all-off
+       // write before a restart on a stuck readback
+        struct Case { Outputs out; int order[3]; };
+        const Case cases[] = {
+            {{false, false, false}, {-3, -1, -2}},
+            {{true, false, true}, {-2, 1, 3}},
+            {{false, true, true}, {-1, 2, 3}},
+        };
+        for (const Case& c : cases) {
+            int order[3] = {}, n = 0;
+            write_relays(c.out, [&](uint8_t relay, bool on) {
+                CHECK(n < 3);
+                order[n++] = on ? relay + 1 : -(relay + 1);
+            });
+            CHECK(n == 3 && std::memcmp(order, c.order, sizeof order) == 0);
+        }
+    }
     std::puts("ok");
     return 0;
 }
