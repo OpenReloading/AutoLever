@@ -1,7 +1,7 @@
 {
  "storage": "autolever-guide",
  "bom": {
-  "note": "Feel free to substitute as required for local availability and cost. Cable and tube lengths are estimates. Each main-edition row carries one price estimate for its full quantity, in EUR including VAT, November 2026, without shipping; US prices are converted at about 0.9 EUR per USD. Prices change, and an estimate marked unverified is not taken from a listing: treat them as a guide, not a quote. The relay edition rows are not priced.",
+  "note": "Feel free to substitute as required for local availability and cost. Cable and tube lengths are estimates. Each main-edition row carries one price estimate for its full quantity, in EUR including VAT, November 2026, without shipping, except rows converted from US prices (at about 0.9 EUR per USD), which exclude VAT and import costs. Prices change, and an estimate marked unverified is not taken from a listing: treat them as a guide, not a quote. The relay edition rows are not priced.",
   "export": "autolever-bom.csv",
   "linkLabel": "MakerWorld",
   "items": [
@@ -10,7 +10,7 @@
     "group": "Mounting",
     "qty": "1",
     "part": "Lee APP (Classic 90933 or Deluxe 91898)",
-    "spec": "Classic APP (preferred) or APP Deluxe · Source: Lee Precision dealers · Est. EUR 77 Classic, EUR 95 Deluxe (Nov 2026, US retail converted, no import costs)"
+    "spec": "Classic APP (preferred) or APP Deluxe · Source: Lee Precision dealers · Est. EUR 77 Classic, EUR 95 Deluxe (Nov 2026, US retail converted, excl. VAT and import costs)"
    },
    {
     "id": "rail",
@@ -31,7 +31,7 @@
     "group": "Mounting",
     "qty": "1 set",
     "part": "Cylinder pivot and lever coupling",
-    "spec": "Rear pivot: Festo LBN-32 clevis foot (195860) or SBN-32 swivel mounting (539924), fit to the DSNU-32 unverified · rod clevis Festo SG-M10x1,25, M10×1.25 internal thread (not the SGS version) · adapter hardware: 2 × M6×45 + 1 × M10 (length to suit the clevis), 2 × M6 and 1 × M10 lock nuts, washers · Source: RS Online, Festo distributors · Est. EUR 45 (Nov 2026, unverified)"
+    "spec": "Rear pivot: Festo LBN-32 clevis foot (195860) or SBN-32 swivel mounting (539924), fit to the DSNU-32 unverified · rod clevis Festo SG-M10x1,25, M10×1.25 internal thread (not the SGS version): its slot is 10 mm wide and the arm of the printed adapter 16 mm thick, so the arm does not fit it yet: check before printing · adapter hardware: 2 × M6×45 + 1 × M10 (length to suit the clevis), 2 × M6 and 1 × M10 lock nuts, washers · Source: RS Online, Festo distributors · Est. EUR 45 (Nov 2026, unverified)"
    },
    {
     "id": "compressor",
@@ -52,14 +52,14 @@
     "group": "Pneumatics",
     "qty": "1",
     "part": "AirTAC 4V230E-06B (DC 24 V)",
-    "spec": "5/3 exhaust-centre (E) valve, not C or P, or an equivalent with two 24 V DC coils · the last letter is the coil: B = DC 24 V, E = AC 24 V, check it before ordering · Rc 1/8 ports (tapered thread) · two coils with DIN plugs · Source: AirTAC distributors · Est. EUR 75 (Nov 2026, US listing $83.90 converted)"
+    "spec": "5/3 exhaust-centre (E) valve, not C or P, or an equivalent with two 24 V DC coils · the last letter is the coil: B = DC 24 V, E = AC 24 V, check it before ordering · Rc 1/8 ports (tapered thread) · two coils with DIN plugs · Source: AirTAC distributors · Est. EUR 75 (Nov 2026, US listing $83.90 converted, excl. VAT and import costs)"
    },
    {
     "id": "frl",
     "group": "Pneumatics",
     "qty": "1",
     "part": "Filter-regulator + gauge",
-    "spec": "AirTAC AFR2000, no lubricator (the AFC2000 includes one: do not order it) · 1/4 ports (tapered thread, takes R1/4 male fittings) · gauge and bracket included · Source: AirTAC distributors · Est. EUR 29 (Nov 2026, US listing $32.57 converted)"
+    "spec": "AirTAC AFR2000, no lubricator (the AFC2000 includes one: do not order it) · 1/4 ports (tapered thread, takes R1/4 male fittings) · gauge and bracket included · Source: AirTAC distributors · Est. EUR 29 (Nov 2026, US listing $32.57 converted, excl. VAT and import costs)"
    },
    {
     "id": "pressure",
@@ -192,7 +192,7 @@
     "group": "Controls",
     "qty": "1",
     "part": "22 mm emergency stop E-STOP",
-    "spec": "Red mushroom button listed to ISO 13850, latching, twist release · closed contact (marked 11 and 12) with positive (direct) opening to IEC 60947-5-1 annex K, not a look-alike without it · example: Schneider XB5AS8445, 82 mm deep overall, while the box allows 58 mm behind the panel: check the depth of the part you buy · S3 · sits on the printed yellow ring · Source: Bürklin, RS, DigiKey · Est. EUR 30 (Nov 2026, Bürklin incl. VAT)"
+    "spec": "Red mushroom emergency stop button to IEC 60947-5-5 (ISO 13850 sets the design rules), latching, twist release · closed contact (marked 11 and 12) with positive (direct) opening to IEC 60947-5-1 annex K, not a look-alike without it · example: Schneider XB5AS8445, 39.5 mm in front of the panel and 43 mm behind it (data sheet drawing), within the 58 mm the box allows behind the panel: check that depth on the part you buy · S3 · sits on the printed yellow ring · Source: Bürklin, RS, DigiKey · Est. EUR 30 (Nov 2026, Bürklin incl. VAT)"
    },
    {
     "id": "switch",
