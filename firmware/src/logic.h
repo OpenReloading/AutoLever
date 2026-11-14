@@ -79,4 +79,16 @@ private:
     uint32_t bad_since_ = 0;
 };
 
+// Over-the-air updates: closed until button C is held, then open for 10 minutes.
+class UpdateWindow {
+public:
+    void open(uint32_t now_ms);
+    // Called in every loop: once closed it stays closed until the next open(), also across the millis() wrap.
+    bool is_open(uint32_t now_ms);
+
+private:
+    bool open_ = false;
+    uint32_t since_ = 0;
+};
+
 }  // namespace autolever
