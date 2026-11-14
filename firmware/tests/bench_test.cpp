@@ -86,6 +86,19 @@ int main() {
         r.step(NONE, true, true, true, 1010);
         CHECK(!any_on(r));
     }
+    // relay 1 on, relay 3 off: the all-off gesture (hold C, then press A) never closes relay 3, also on the release of
+    // C that ends it; the next release of C toggles again
+    {
+        const bool c[4] = {false, false, true, false};   // C released
+        bench::Relays r;
+        r.step(a, false, true, true, 1000);
+        r.step(a, true, true, true, 1010);
+        CHECK(!any_on(r));
+        r.step(c, false, true, true, 1020);
+        CHECK(!any_on(r));
+        r.step(c, false, true, true, 1030);
+        CHECK(r.on[2] && !r.on[0] && !r.on[1]);
+    }
     // a press on relay 1 as it reaches 10 s still switches every relay off and starts the lockout
     {
         bench::Relays r;
