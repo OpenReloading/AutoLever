@@ -44,6 +44,10 @@ void Controller::begin(State s, const Inputs& in, uint32_t now_ms) {
 
 Outputs Controller::step(const Inputs& in, uint32_t now_ms) {
     bool start_edge = in.start && !prev_start_;
+    if (!in.start) {
+        if (prev_start_) released_since_ = now_ms;
+        released_ms_ = now_ms - released_since_;
+    }
     prev_start_ = in.start;
 
     Fault f = !in.estop_ok       ? Fault::EStop
@@ -76,7 +80,7 @@ Outputs Controller::step(const Inputs& in, uint32_t now_ms) {
 
     if (state_ == State::Idle) {
         if (!in.jog) armed_ = true;
-        if (start_edge) {
+        if (start_edge && released_ms_ >= start_release_ms) {
             begin(State::Auto, in, now_ms);
             start_edge = false;  // the press that started it is not a stop request
         } else if (in.jog && armed_) {

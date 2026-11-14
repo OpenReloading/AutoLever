@@ -25,6 +25,28 @@ static uint32_t shown_cycles = UINT32_MAX;
 static bool info_screen = false;
 static bool redraw = true;
 
+// The loop watchdog restarts the unit only with these two values of the prebuilt core config.
+#ifndef CONFIG_ESP_TASK_WDT_PANIC
+#error "the loop watchdog needs CONFIG_ESP_TASK_WDT_PANIC"
+#endif
+static_assert(CONFIG_ESP_TASK_WDT_TIMEOUT_S == 5, "loop watchdog timeout");
+
+// Why the unit last started: after a watchdog or readback restart it comes back in IDLE as after power-up.
+static const char* reset_name(esp_reset_reason_t r) {
+    static const struct { esp_reset_reason_t reason; const char* name; } names[] = {
+        {ESP_RST_POWERON, "power-on"},
+        {ESP_RST_SW, "restart"},   // ESP.restart(): relay readback, or after an update
+        {ESP_RST_PANIC, "panic"},
+        {ESP_RST_TASK_WDT, "watchdog"},
+        {ESP_RST_INT_WDT, "int watchdog"},
+        {ESP_RST_BROWNOUT, "brownout"},
+    };
+    for (const auto& n : names) {
+        if (n.reason == r) return n.name;
+    }
+    return nullptr;
+}
+
 static void draw() {
     std::lock_guard<std::mutex> hold(press_lock);
     auto& d = M5StamPLC.Display();
@@ -34,10 +56,13 @@ static void draw() {
     d.setCursor(4, 4);
     if (info_screen) {
         d.printf("INFO\nWi-Fi  %s\nPass   %s\nPhone  192.168.4.1\nHome   %s\nName   autolever.local\n"
-                 "Cycles %lu   Jam %lu s\nUpdate %s",
+                 "Cycles %lu   Jam %lu s\nUpdate %s\nReset  ",
                  web_ap_ssid().c_str(), web_ap_password().c_str(), web_ip().c_str(),
                  (unsigned long)press.cycles(), (unsigned long)(press.jam_ms / 1000),
                  update_window.is_open(millis()) ? "open" : "closed, hold C");
+        const esp_reset_reason_t reason = esp_reset_reason();   // fixed for the whole boot
+        if (const char* name = reset_name(reason)) d.print(name);
+        else d.printf("code %d", (int)reason);
     } else {
         d.printf("%s\n%s%s\nCycles %lu", state_name(press.state()), fault_name(press.fault()),
                  press.stopping() ? "STOPPING" : "", (unsigned long)press.cycles());
@@ -117,7 +142,7 @@ void loop() {
     if (shown_state == State::Auto) for (;;) delay(10);   // bench check: hangs with the extend valve on
 #endif
     // after the relays: an OTA upload holds the loop; the window is evaluated every loop so its latch expires
-    web_loop(update_window.is_open(millis()) && shown_state == State::Idle);
+    web_loop(update_window.is_open(millis()) && shown_state == State::Idle, read_ok && !(read & 0x0F));
 
     static uint32_t last_info = 0;   // the home address arrives some seconds after power-up
     if (info_screen && millis() - last_info > 2000) {
