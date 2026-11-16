@@ -29,4 +29,4 @@ Edit `data/*.yaml`, run `.venv/bin/python main.py` and commit `data/buildguide.j
 
 Built by reloaders for reloaders, with AI as a tool.
 
-MIT licence. The [BuildGuide](https://github.com/OpenReloading/BuildGuide) plugin bundles JointJS (MPL 2.0) and libavoid-js (LGPL 2.1+).
+ISC licence. The [BuildGuide](https://github.com/OpenReloading/BuildGuide) plugin bundles JointJS (MPL 2.0) and libavoid-js (LGPL 2.1+).

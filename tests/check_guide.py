@@ -124,9 +124,9 @@ with sync_playwright() as p:
         assert phone.title().endswith('AutoLever'),path
         footer=phone.locator('.md-footer')
         expect(footer.locator('.md-copyright a').first).to_have_attribute('href','https://github.com/OpenReloading/AutoLever')
-        expect(footer.locator('.md-copyright a')).to_have_text(['Repository','Discord','MIT licence','Material for MkDocs'])
+        expect(footer.locator('.md-copyright a')).to_have_text(['Repository','Discord','ISC licence','Material for MkDocs'])
         expect(footer.get_by_role('link',name='Discord')).to_have_attribute('href',re.compile(r'^https://discord\.gg/\w+$'))
-        expect(footer.get_by_role('link',name='MIT licence')).to_have_attribute('href','https://github.com/OpenReloading/AutoLever/blob/main/LICENSE')
+        expect(footer.get_by_role('link',name='ISC licence')).to_have_attribute('href','https://github.com/OpenReloading/AutoLever/blob/main/LICENSE')
         for side,j in [('prev',i-1),('next',i+1)]:
             link=footer.locator(f'.md-footer__link--{side} .md-footer__title')
             if 0<=j<len(names):
