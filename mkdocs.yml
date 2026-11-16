@@ -7,7 +7,7 @@ repo_name: OpenReloading/AutoLever
 copyright: >-
   <a href="https://github.com/OpenReloading/AutoLever">Repository</a>
   <a href="https://discord.gg/hUCSjDYNaa">Discord</a>
-  <a href="https://github.com/OpenReloading/AutoLever/blob/main/LICENSE">MIT licence</a>
+  <a href="https://github.com/OpenReloading/AutoLever/blob/main/LICENSE">ISC licence</a>
 
 theme:
   name: material
