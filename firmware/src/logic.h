@@ -11,6 +11,7 @@ struct Inputs {
     bool pressure_ok;  // valve rail is live after the pressure switch
     bool start;        // button A
     bool jog;          // button B
+    bool buttons_ok;   // start and jog come from a good read; false: both are unknown
 };
 
 struct Outputs {
@@ -60,8 +61,9 @@ class Controller {
 public:
     // Longest time for one stroke (out or back); longer is a jam.
     uint32_t jam_ms = 15000;
-    // In IDLE a START press starts AUTO only after START read released for this long, since a failed button read
-    // reads as released. Failed reads that span this long can still start AUTO: RelayCheck does not catch all of them.
+    // In IDLE a START press starts AUTO only after good reads showed START released for this long in a row.
+    // A failed button read (buttons_ok false) is neither a press nor a release: it ends that run, disarms JOG,
+    // stops a JOG and acknowledges no fault.
     static constexpr uint32_t start_release_ms = 150;
 
     Outputs step(const Inputs& in, uint32_t now_ms);
@@ -90,6 +92,41 @@ private:
     bool armed_ = false;  // JOG was seen released since the last stop; a held JOG never starts the press
     bool stopping_ = false;
     bool reached_front_ = false;
+};
+
+// START and JOG from the input status register of the button expander (PI4IOE5V6408 at 0x43). Each button pulls its
+// pin low against the expander's pull-up, so a pressed button reads 0: A (START) is pin 2, B (JOG) pin 1.
+constexpr uint8_t BUTTON_REGISTER = 0x0F;
+constexpr uint8_t BUTTON_START_BIT = 1u << 2, BUTTON_JOG_BIT = 1u << 1;
+
+// Debounces the register reads: a button's new level counts once good reads have shown it for debounce_ms with
+// no failed read in between. A failed read makes both levels unknown until good reads settle them again.
+class Buttons {
+public:
+    static constexpr uint32_t debounce_ms = 10;
+
+    struct Levels {
+        bool ok;     // both levels are settled and the last read was good
+        bool start;  // pressed
+        bool jog;    // pressed
+    };
+
+    // read_ok: the read of BUTTON_REGISTER was acknowledged; reg is its value, ignored when read_ok is false.
+    Levels step(bool read_ok, uint8_t reg, uint32_t now_ms);
+
+private:
+    struct Contact {
+        bool settled = false;  // pressed holds a debounced level
+        bool pressed = false;
+        bool seen = false;     // run_pressed holds the level of the last good read
+        bool run_pressed = false;
+        uint32_t run_since = 0;  // first good read of the current run of equal reads
+
+        void read(bool now_pressed, uint32_t now_ms);
+        void fail() { settled = seen = false; }
+    };
+
+    Contact start_, jog_;
 };
 
 // Relay readback after each write, one bit per relay. A failed read reads as all off in the library, so it counts too.

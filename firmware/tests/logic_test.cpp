@@ -20,7 +20,7 @@ using namespace autolever;
 // A cylinder that moves 1 mm per 10 ms; home at 0, front at 100.
 struct Rig {
     Controller c;
-    Inputs in{true, false, true, true, false, false};
+    Inputs in{true, false, true, true, false, false, true};
     Outputs out{};
     uint32_t now = 1000;
     int pos = 0;
@@ -39,6 +39,15 @@ struct Rig {
     // START released for 160 ms, pressed for one step, released again
     void press_start() { in.start = false; run(16); press(); }
     void press() { in.start = true; tick(); in.start = false; tick(); }
+    // n failed button reads, carrying the released levels M5Unified reported for a failed read
+    void fail(int n) {
+        const bool start = in.start, jog = in.jog;
+        in.buttons_ok = in.start = in.jog = false;
+        run(n);
+        in.buttons_ok = true;
+        in.start = start;
+        in.jog = jog;
+    }
     // the rod sticks: the end sensors hold still while the controller runs n steps
     void stick(int n, bool at_home) {
         in.home = at_home;
@@ -57,7 +66,7 @@ static void random_run(uint32_t seed, uint32_t jam_ms) {
     };
     Controller c;
     c.jam_ms = jam_ms;
-    Inputs in{true, false, true, true, false, false};
+    Inputs in{true, false, true, true, false, false, true};
     int pos = 0;
     uint32_t now = 1000, same_since = 0;
     Outputs prev{};
@@ -65,10 +74,17 @@ static void random_run(uint32_t seed, uint32_t jam_ms) {
     uint32_t start_up_since = 0, start_up_ms = 0;   // last run of released START reads, as in the controller
     bool prev_start = true;
     State prev_state = State::Idle;
-    int stuck = 0;
+    Fault prev_fault = Fault::None;
+    int stuck = 0, failing = 0;
+    bool jog = false;
     for (int i = 0; i < 400000; ++i) {
-        in.start = rnd(40) == 0;
-        if (rnd(60) == 0) in.jog = !in.jog;
+        const bool start = rnd(40) == 0;
+        if (rnd(60) == 0) jog = !jog;
+        if (failing == 0 && rnd(500) == 0) failing = 1 + (int)rnd(40);   // the button reads fail for a while
+        in.buttons_ok = failing == 0;
+        if (failing > 0) --failing;
+        in.start = in.buttons_ok ? start : rnd(2) == 0;   // a failed read carries any levels
+        in.jog = in.buttons_ok ? jog : rnd(2) == 0;
         if (rnd(400) == 0) in.estop_ok = !in.estop_ok;
         if (rnd(700) == 0) in.pressure_ok = !in.pressure_ok;
         if (stuck == 0 && rnd(2000) == 0) stuck = 1 + (int)rnd(3000);   // rod jams for a while
@@ -77,28 +93,39 @@ static void random_run(uint32_t seed, uint32_t jam_ms) {
         if (rnd(300) == 0) in.home = !in.home;     // sensor glitch
         if (rnd(500) == 0) in.front = !in.front;
         Outputs out = c.step(in, now);
-        if (!in.start) {
-            if (prev_start) start_up_since = now;
-            start_up_ms = now - start_up_since;
+        if (!in.buttons_ok) {
+            prev_start = true;
+        } else {
+            if (!in.start) {
+                if (prev_start) start_up_since = now;
+                start_up_ms = now - start_up_since;
+            }
+            prev_start = in.start;
         }
-        prev_start = in.start;
 
         CHECK(!(out.extend && out.retract));
         CHECK(out.enable == (out.extend || out.retract));   // the feed relay is on only during a stroke
         if (!in.estop_ok || !in.pressure_ok) CHECK(!out.extend && !out.retract && c.state() == State::Fault);
         if (c.state() == State::Idle || c.state() == State::Fault) CHECK(!out.extend && !out.retract);
         if (c.state() == State::Fault) CHECK(c.fault() != Fault::None);
-        if (c.state() == State::Jog) CHECK(in.jog);                                   // jog moves only while held
+        if (c.state() == State::Jog) CHECK(in.buttons_ok && in.jog);                  // jog moves only while held
         if (prev_state != State::Jog && c.state() == State::Jog) CHECK(released);      // never starts from a held JOG
-        if (prev_state != State::Auto && c.state() == State::Auto) CHECK(in.start && start_up_ms >= 150);
+        if (prev_state != State::Auto && c.state() == State::Auto) {
+            CHECK(in.buttons_ok && in.start && start_up_ms >= 150);
+        }
+        if (prev_state == State::Fault && (prev_fault == Fault::Jam || prev_fault == Fault::Sensor)
+            && c.state() != State::Fault) {
+            CHECK(in.buttons_ok && in.start);   // only a press acknowledges a jam or a sensor fault
+        }
         // one direction never runs longer than the jam timeout, plus the step
         bool on = out.extend || out.retract;
         if (!on || out.extend != prev.extend || out.retract != prev.retract) same_since = now;
         CHECK(!on || now - same_since <= jam_ms);
 
-        if (c.state() != State::Idle) released = false;
-        if (!in.jog) released = true;
+        if (c.state() != State::Idle || !in.buttons_ok) released = false;
+        if (in.buttons_ok && !in.jog) released = true;
         prev_state = c.state();
+        prev_fault = c.fault();
         prev = out;
         if (stuck > 0) --stuck;
         else {
@@ -163,7 +190,7 @@ int main() {
         r.press_start();
         CHECK(r.c.state() == State::Auto && r.out.extend);
     }
-    {  // a held START that reads released for less than 150 ms (a failed button read) is not a press
+    {  // a held START that reads released for less than 150 ms is not a press
         Rig r;
         r.in.start = true;
         r.run(10);
@@ -177,6 +204,97 @@ int main() {
         r.in.start = true;
         r.tick();
         CHECK(r.c.state() == State::Auto && r.out.extend);
+    }
+    {  // START held through 150 ms or more of failed button reads (only the button expander fails) is not a press
+        Rig r;
+        r.in.start = true;
+        r.run(10);
+        r.fail(20);  // failed reads at 0 to 190 ms
+        r.run(10);
+        CHECK(r.c.state() == State::Idle && !r.out.extend && r.pos == 0);
+        r.press_start();  // good reads after the failures: as before
+        CHECK(r.c.state() == State::Auto && r.out.extend);
+    }
+    {  // a 0.3 s bus stall that spans two failed button reads with START held is not a press
+        Rig r;
+        r.in.start = true;
+        r.run(10);
+        r.fail(1);
+        r.now += 300;  // the loop stalls on the bus
+        r.fail(1);
+        r.run(10);
+        CHECK(r.c.state() == State::Idle && !r.out.extend && r.pos == 0);
+        r.press_start();
+        CHECK(r.c.state() == State::Auto && r.out.extend);
+    }
+    {  // a failed read between a release and a press ends the release: START needs 150 ms of good reads again
+        Rig r;
+        r.tick();
+        r.in.start = false;
+        r.run(16);  // released 0 to 150 ms
+        r.fail(1);
+        r.in.start = true;
+        r.tick();
+        CHECK(r.c.state() == State::Idle && !r.out.extend && r.pos == 0);
+        r.press_start();
+        CHECK(r.c.state() == State::Auto && r.out.extend);
+    }
+    {  // JOG held through failed reads is not armed by them; released and pressed on good reads, it jogs as before
+        Rig r;
+        r.in.jog = true;
+        r.run(5);  // held at power-up: not armed
+        r.fail(3);
+        r.run(5);
+        CHECK(r.c.state() == State::Idle && !r.out.extend && r.pos == 0);
+        r.in.jog = false;
+        r.tick();
+        r.in.jog = true;
+        r.tick();
+        CHECK(r.c.state() == State::Jog && r.out.extend);
+    }
+    {  // a failed read between a JOG release and a press disarms it
+        Rig r;
+        r.tick();  // JOG released: armed
+        r.fail(1);
+        r.in.jog = true;
+        r.run(5);
+        CHECK(r.c.state() == State::Idle && !r.out.extend && r.pos == 0);
+        r.in.jog = false;
+        r.tick();
+        r.in.jog = true;
+        r.tick();
+        CHECK(r.c.state() == State::Jog && r.out.extend);
+    }
+    {  // a failed read stops a JOG whatever levels it carries; the JOG needs a release and a press after it
+        Rig r;
+        r.tick();
+        r.in.jog = true;
+        r.run(10);
+        CHECK(r.c.state() == State::Jog && r.out.extend);
+        r.in.buttons_ok = false;  // still carries JOG held
+        r.tick();
+        CHECK(r.c.state() == State::Idle && !r.out.extend && !r.out.retract);
+        r.in.buttons_ok = true;
+        r.run(5);
+        CHECK(r.c.state() == State::Idle && !r.out.extend && !r.out.retract);
+        r.in.jog = false;
+        r.tick();
+        r.in.jog = true;
+        r.tick();
+        CHECK(r.c.state() == State::Jog);
+    }
+    {  // failed reads with START held do not acknowledge a sensor fault; a press on good reads does
+        Rig r;
+        r.in.start = true;
+        r.in.home = r.in.front = true;
+        r.out = r.c.step(r.in, r.now);
+        CHECK(r.c.fault() == Fault::Sensor);
+        r.run(3);  // sensors sane again, START still held
+        r.fail(3);
+        r.run(3);
+        CHECK(r.c.state() == State::Fault && r.c.fault() == Fault::Sensor && !r.out.extend && !r.out.retract);
+        r.press_start();
+        CHECK(r.c.state() == State::Idle && r.c.fault() == Fault::None);
     }
     {  // a 10 ms release still stops AUTO after the stroke
         Rig r;
@@ -390,6 +508,51 @@ int main() {
     {  // Wi-Fi form password: empty keeps the stored one, else a WPA2 passphrase length
         CHECK(wifi_pass_ok(nullptr) && wifi_pass_ok("") && wifi_pass_ok("12345678") && wifi_pass_ok(std::string(63, 'a').c_str()));
         CHECK(!wifi_pass_ok("1") && !wifi_pass_ok("1234567") && !wifi_pass_ok(std::string(64, 'a').c_str()));
+    }
+    {  // button register: a pressed button reads 0, START on bit 2, JOG on bit 1; a new level counts after 10 ms
+        Buttons b;
+        Buttons::Levels l = b.step(true, 0xFF, 0);
+        CHECK(!l.ok);  // one read settles nothing
+        l = b.step(true, 0xFF, 10);
+        CHECK(l.ok && !l.start && !l.jog);
+        l = b.step(true, 0xFB, 20);
+        CHECK(l.ok && !l.start && !l.jog);  // START down for 0 ms: still released
+        l = b.step(true, 0xFB, 29);
+        CHECK(l.ok && !l.start);
+        l = b.step(true, 0xFB, 30);
+        CHECK(l.ok && l.start && !l.jog);
+        l = b.step(true, 0xF9, 40);
+        l = b.step(true, 0xF9, 50);
+        CHECK(l.ok && l.start && l.jog);
+        l = b.step(true, 0xFD, 60);
+        l = b.step(true, 0xFD, 70);
+        CHECK(l.ok && !l.start && l.jog);
+        l = b.step(true, 0xFE, 80);   // button C only
+        l = b.step(true, 0xFE, 90);
+        CHECK(l.ok && !l.start && !l.jog);
+    }
+    {  // a bounce shorter than 10 ms does not change the level
+        Buttons b;
+        b.step(true, 0xFF, 0);
+        b.step(true, 0xFF, 10);
+        b.step(true, 0xFB, 20);
+        b.step(true, 0xFF, 25);
+        b.step(true, 0xFB, 28);
+        Buttons::Levels l = b.step(true, 0xFB, 35);
+        CHECK(l.ok && !l.start);  // down again since 28 ms
+        l = b.step(true, 0xFB, 38);
+        CHECK(l.ok && l.start);
+    }
+    {  // a failed read makes both levels unknown at once, until good reads have shown a level for 10 ms
+        Buttons b;
+        b.step(true, 0xFB, 0);
+        CHECK(b.step(true, 0xFB, 10).start);
+        Buttons::Levels l = b.step(false, 0x00, 20);
+        CHECK(!l.ok && !l.start && !l.jog);
+        l = b.step(true, 0xFB, 30);
+        CHECK(!l.ok);
+        l = b.step(true, 0xFB, 40);
+        CHECK(l.ok && l.start && !l.jog);
     }
     {  // relay readback: a relay commanded off that reads on restarts after more than 100 ms in a row
         RelayCheck k;
