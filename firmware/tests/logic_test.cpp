@@ -56,6 +56,27 @@ struct Rig {
     }
 };
 
+// Buttons feeding Controller as loop() does, one loop every 2 ms, on a cylinder that moves 1 mm per loop (home at 0,
+// front at 100). A failed read carries 0x00, the all-pressed pattern.
+struct Loop {
+    Buttons b;
+    Controller c;
+    uint32_t now = 0;
+    int pos = 0;
+    bool moved = false;  // an output was on in some loop
+
+    void step(bool read_ok, bool start, bool jog) {
+        const uint8_t pressed = (start ? BUTTON_START_BIT : 0) | (jog ? BUTTON_JOG_BIT : 0);
+        const Buttons::Levels l = b.step(read_ok, read_ok ? (uint8_t)~pressed : 0x00, now);
+        const Outputs out = c.step({pos <= 0, pos >= 100, true, true, l.start, l.jog, l.ok}, now);
+        moved = moved || out.enable;
+        if (out.extend && pos < 100) ++pos;
+        if (out.retract && pos > 0) --pos;
+        now += 2;
+    }
+    void run(int n, bool start, bool jog = false) { while (n--) step(true, start, jog); }
+};
+
 
 // Random operation: whatever the inputs do, the safety rules of the press hold on every step.
 static void random_run(uint32_t seed, uint32_t jam_ms) {
@@ -295,6 +316,26 @@ int main() {
         CHECK(r.c.state() == State::Fault && r.c.fault() == Fault::Sensor && !r.out.extend && !r.out.retract);
         r.press_start();
         CHECK(r.c.state() == State::Idle && r.c.fault() == Fault::None);
+    }
+    {  // in AUTO a failed read requests the stop; START still held on the good reads after it does not restart
+        Rig r;
+        r.tick();
+        r.press_start();
+        r.run(20);
+        CHECK(r.c.state() == State::Auto && !r.c.stopping());
+        r.in.start = true;
+        r.fail(1);
+        CHECK(r.c.state() == State::Auto && r.c.stopping());
+        r.run(300);  // START held on good reads for 3 s
+        CHECK(r.c.state() == State::Idle && r.pos == 0 && !r.out.enable && r.c.cycles() == 1);
+    }
+    {  // reads failing for good in AUTO: the press finishes the cycle, returns home and stays in IDLE
+        Rig r;
+        r.tick();
+        r.press_start();
+        r.run(20);
+        r.fail(1000);  // 10 s
+        CHECK(r.c.state() == State::Idle && r.pos == 0 && !r.out.enable && r.c.cycles() == 1);
     }
     {  // a 10 ms release still stops AUTO after the stroke
         Rig r;
@@ -553,6 +594,43 @@ int main() {
         CHECK(!l.ok);
         l = b.step(true, 0xFB, 40);
         CHECK(l.ok && l.start && !l.jog);
+    }
+    {  // START or JOG held from power-up, through any pattern of failed reads or none, moves nothing
+        for (int button = 0; button < 2; ++button)
+            for (int burst : {0, 1, 2, 5, 10, 75, 100})      // failed reads in a row
+                for (int gap : {1, 2, 5, 6, 10, 75, 200}) {  // good reads between
+                    Loop p;
+                    for (int i = 0; i < 2500; ++i) p.step(i % (burst + gap) >= burst, button == 0, button == 1);
+                    CHECK(!p.moved && p.c.state() == State::Idle);
+                }
+    }
+    {  // AUTO with one failed read every 8 to 24 ms and a 300 ms START press at any phase of it: IDLE at home
+        for (int period = 4; period <= 12; ++period)  // loops
+            for (int phase = 0; phase < period; ++phase) {
+                Loop p;
+                p.run(100, false);
+                p.run(10, true);
+                p.run(100, false);
+                CHECK(p.c.state() == State::Auto);
+                for (int i = 0; i < 1000; ++i) p.step(i % period != 0, i >= 50 + phase && i < 200 + phase, false);
+                CHECK(p.c.state() == State::Idle && p.pos == 0);
+            }
+    }
+    {  // across the millis() wrap: START settles after 10 ms of good reads, and AUTO needs 150 ms released before it
+        struct Case { uint32_t now; int released, held; State state; };
+        const Case cases[] = {
+            {UINT32_MAX - 199, 95, 5, State::Idle},  // pressed from 9 ms before the wrap, 5 reads (8 ms)
+            {UINT32_MAX - 199, 95, 6, State::Auto},  // 6 reads (10 ms)
+            {UINT32_MAX - 79, 70, 6, State::Idle},   // released 138 ms across the wrap
+            {UINT32_MAX - 79, 80, 6, State::Auto},   // released 158 ms across the wrap
+        };
+        for (const Case& k : cases) {
+            Loop p;
+            p.now = k.now;
+            p.run(k.released, false);
+            p.run(k.held, true);
+            CHECK(p.c.state() == k.state);
+        }
     }
     {  // relay readback: a relay commanded off that reads on restarts after more than 100 ms in a row
         RelayCheck k;

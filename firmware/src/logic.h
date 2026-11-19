@@ -63,7 +63,8 @@ public:
     uint32_t jam_ms = 15000;
     // In IDLE a START press starts AUTO only after good reads showed START released for this long in a row.
     // A failed button read (buttons_ok false) is neither a press nor a release: it ends that run, disarms JOG,
-    // stops a JOG and acknowledges no fault.
+    // stops a JOG and acknowledges no fault. In AUTO it requests the stop: the press finishes the cycle, returns
+    // home and goes to IDLE.
     static constexpr uint32_t start_release_ms = 150;
 
     Outputs step(const Inputs& in, uint32_t now_ms);
@@ -94,8 +95,8 @@ private:
     bool reached_front_ = false;
 };
 
-// START and JOG from the input status register of the button expander (PI4IOE5V6408 at 0x43). Each button pulls its
-// pin low against the expander's pull-up, so a pressed button reads 0: A (START) is pin 2, B (JOG) pin 1.
+// START and JOG from the input status register of the button expander (PI4IOE5V6408 at 0x43). A pressed button
+// reads 0, as M5Unified decodes it: A (START) is pin 2, B (JOG) pin 1.
 constexpr uint8_t BUTTON_REGISTER = 0x0F;
 constexpr uint8_t BUTTON_START_BIT = 1u << 2, BUTTON_JOG_BIT = 1u << 1;
 

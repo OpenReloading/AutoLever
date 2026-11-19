@@ -103,7 +103,7 @@ void loop() {
     }
 
     // A and B from the expander register itself: BtnA() and BtnB() read a failed read as released.
-    uint8_t button_reg = 0;
+    uint8_t button_reg = 0xFF;  // all released, as M5Unified starts its own read
     const bool button_read_ok = M5StamPLC.getIOExpanderA().readRegister(BUTTON_REGISTER, &button_reg, 1);
     const Buttons::Levels button = buttons.step(button_read_ok, button_reg, millis());
     Inputs in{

@@ -101,7 +101,8 @@ Outputs Controller::step(const Inputs& in, uint32_t now_ms) {
         state_ = State::Idle;
         return {};
     }
-    if (state_ == State::Auto && start_edge) stopping_ = true;
+    // A failed read hides a stop press, so it requests the stop itself.
+    if (state_ == State::Auto && (start_edge || !in.buttons_ok)) stopping_ = true;
 
     if (phase_ == Phase::Extend && in.front) {
         reached_front_ = true;
