@@ -14,6 +14,7 @@ using namespace autolever;
 constexpr uint8_t IN_HOME = 0, IN_FRONT = 1, IN_ESTOP_OK = 2, IN_PRESSURE_OK = 3;
 
 static Controller press;
+static Buttons buttons;
 static RelayCheck relay_check;
 static UpdateWindow update_window;
 static Preferences prefs;
@@ -101,13 +102,18 @@ void loop() {
         redraw = true;
     }
 
+    // A and B from the expander register itself: BtnA() and BtnB() read a failed read as released.
+    uint8_t button_reg = 0xFF;  // all released, as M5Unified starts its own read
+    const bool button_read_ok = M5StamPLC.getIOExpanderA().readRegister(BUTTON_REGISTER, &button_reg, 1);
+    const Buttons::Levels button = buttons.step(button_read_ok, button_reg, millis());
     Inputs in{
         M5StamPLC.readPlcInput(IN_HOME),
         M5StamPLC.readPlcInput(IN_FRONT),
         M5StamPLC.readPlcInput(IN_ESTOP_OK),
         M5StamPLC.readPlcInput(IN_PRESSURE_OK),
-        M5StamPLC.BtnA().isPressed(),
-        M5StamPLC.BtnB().isPressed(),
+        button.start,
+        button.jog,
+        button.ok,
     };
     std::unique_lock<std::mutex> hold(press_lock);
     Outputs out = press.step(in, millis());

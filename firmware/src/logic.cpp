@@ -43,12 +43,19 @@ void Controller::begin(State s, const Inputs& in, uint32_t now_ms) {
 }
 
 Outputs Controller::step(const Inputs& in, uint32_t now_ms) {
-    bool start_edge = in.start && !prev_start_;
-    if (!in.start) {
-        if (prev_start_) released_since_ = now_ms;
-        released_ms_ = now_ms - released_since_;
+    bool start_edge = false;
+    if (in.buttons_ok) {
+        start_edge = in.start && !prev_start_;
+        if (!in.start) {
+            if (prev_start_) released_since_ = now_ms;
+            released_ms_ = now_ms - released_since_;
+        }
+        prev_start_ = in.start;
+    } else {
+        prev_start_ = true;  // the next held read is not a press, the next released read starts a new run
+        armed_ = false;
     }
-    prev_start_ = in.start;
+    const bool jog = in.buttons_ok && in.jog;  // JOG moves only while a good read shows it held
 
     Fault f = !in.estop_ok       ? Fault::EStop
               : !in.pressure_ok  ? Fault::Pressure
@@ -79,22 +86,23 @@ Outputs Controller::step(const Inputs& in, uint32_t now_ms) {
     }
 
     if (state_ == State::Idle) {
-        if (!in.jog) armed_ = true;
+        if (in.buttons_ok && !in.jog) armed_ = true;
         if (start_edge && released_ms_ >= start_release_ms) {
             begin(State::Auto, in, now_ms);
             start_edge = false;  // the press that started it is not a stop request
-        } else if (in.jog && armed_) {
+        } else if (jog && armed_) {
             begin(State::Jog, in, now_ms);
         } else {
             return {};
         }
     }
 
-    if (state_ == State::Jog && !in.jog) {
+    if (state_ == State::Jog && !jog) {
         state_ = State::Idle;
         return {};
     }
-    if (state_ == State::Auto && start_edge) stopping_ = true;
+    // A failed read hides a stop press, so it requests the stop itself.
+    if (state_ == State::Auto && (start_edge || !in.buttons_ok)) stopping_ = true;
 
     if (phase_ == Phase::Extend && in.front) {
         reached_front_ = true;
@@ -117,6 +125,30 @@ Outputs Controller::step(const Inputs& in, uint32_t now_ms) {
         return {};
     }
     return {phase_ == Phase::Extend, phase_ == Phase::Retract, true};
+}
+
+void Buttons::Contact::read(bool now_pressed, uint32_t now_ms) {
+    if (!seen || now_pressed != run_pressed) {
+        seen = true;
+        run_pressed = now_pressed;
+        run_since = now_ms;
+    }
+    if (now_ms - run_since >= debounce_ms) {
+        settled = true;
+        pressed = now_pressed;
+    }
+}
+
+Buttons::Levels Buttons::step(bool read_ok, uint8_t reg, uint32_t now_ms) {
+    if (!read_ok) {
+        start_.fail();
+        jog_.fail();
+        return {false, false, false};
+    }
+    start_.read(!(reg & BUTTON_START_BIT), now_ms);
+    jog_.read(!(reg & BUTTON_JOG_BIT), now_ms);
+    const bool ok = start_.settled && jog_.settled;
+    return {ok, ok && start_.pressed, ok && jog_.pressed};
 }
 
 bool RelayCheck::stuck(bool read_ok, uint8_t read, uint8_t commanded, uint32_t now_ms) {
