@@ -3,3 +3,5 @@ mkdocs-material==9.8.1
 mkdocs-buildguide @ https://github.com/OpenReloading/BuildGuide/releases/download/mkdocs-v0.1.4/mkdocs_buildguide-0.1.4-py3-none-any.whl#sha256=9e278ddf470f08d6f24befdc2122fa8fc29da48158fd4bb25b3702143c72e20f
 pyyaml==6.0.3
 playwright==1.65.2
+# referencing needs it below Python 3.13: the CI runner installs on 3.12, the lock is compiled on 3.13
+typing-extensions==4.16.0
