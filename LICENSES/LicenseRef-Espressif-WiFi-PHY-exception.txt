@@ -1,0 +1,17 @@
+Additional permission under GNU AGPL version 3 section 7
+
+If you modify the AutoLever firmware (the files in the firmware/ directory of
+this repository), or any covered work based on it, by linking or combining it
+with the Espressif Wi-Fi and PHY libraries, containing parts covered by the
+terms of their licenses, the licensors of the AutoLever firmware grant you
+additional permission to convey the resulting work. Corresponding Source for a
+non-source form of such a combination need not include the source code of the
+Espressif Wi-Fi and PHY libraries; it shall include the source code of every
+other part of the covered work.
+
+"The Espressif Wi-Fi and PHY libraries" are the libraries that Espressif
+Systems distributes in binary form only, as part of ESP-IDF and of the Arduino
+core for ESP32, to drive the Wi-Fi and the PHY (radio) of its ESP32 series
+chips, such as libcore, libnet80211, libpp and libphy, in any version that
+Espressif Systems releases. This permission covers no other library and no
+other part of this repository.

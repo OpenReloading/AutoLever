@@ -30,6 +30,7 @@ Edit `data/*.yaml`, run `.venv/bin/python main.py` and commit `data/buildguide.j
 Built by reloaders for reloaders, with AI as a tool.
 
 - Code (firmware, scripts, tests, site templates): AGPL-3.0-only, see [LICENSE](LICENSE).
+- The firmware (`firmware/`) adds a section 7 permission to link it with the binary-only Espressif Wi-Fi and PHY libraries and convey the result, see [LICENSES/LicenseRef-Espressif-WiFi-PHY-exception.txt](LICENSES/LicenseRef-Espressif-WiFi-PHY-exception.txt).
 - CAD sources and their renders (`cad/`, `docs/assets/boxes/`) and the parts printed from them: CERN-OHL-S-2.0, see [LICENSES/CERN-OHL-S-2.0.txt](LICENSES/CERN-OHL-S-2.0.txt).
 - Guide, BOM and wiring data (`data/`): CC-BY-SA-4.0, see [LICENSES/CC-BY-SA-4.0.txt](LICENSES/CC-BY-SA-4.0.txt).
 - Documentation and site text: MIT, see [LICENSES/MIT.txt](LICENSES/MIT.txt).

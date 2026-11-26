@@ -6,6 +6,12 @@ path = "**"
 SPDX-FileCopyrightText = "2026 the RangeFoundry contributors"
 SPDX-License-Identifier = "AGPL-3.0-only"
 
+# Firmware: linking with the binary-only Espressif Wi-Fi and PHY libraries is permitted.
+[[annotations]]
+path = "firmware/**"
+SPDX-FileCopyrightText = "2026 the RangeFoundry contributors"
+SPDX-License-Identifier = "AGPL-3.0-only WITH LicenseRef-Espressif-WiFi-PHY-exception"
+
 # Documentation and site text.
 [[annotations]]
 path = ["**/*.md", "docs/**"]
