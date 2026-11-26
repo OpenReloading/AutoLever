@@ -1,0 +1,25 @@
+version = 1
+
+# Everything else: the code, firmware, tests, site templates and scripts (LICENSE).
+[[annotations]]
+path = "**"
+SPDX-FileCopyrightText = "2026 the RangeFoundry contributors"
+SPDX-License-Identifier = "AGPL-3.0-only"
+
+# Documentation, site text and the logos.
+[[annotations]]
+path = ["**/*.md", "docs/**"]
+SPDX-FileCopyrightText = "2026 the RangeFoundry contributors"
+SPDX-License-Identifier = "MIT"
+
+# Site styles.
+[[annotations]]
+path = "docs/stylesheets/**"
+SPDX-FileCopyrightText = "2026 the RangeFoundry contributors"
+SPDX-License-Identifier = "AGPL-3.0-only"
+
+# Hardware: CAD sources, their renders, and the BOM and wiring data with the guide file built from them.
+[[annotations]]
+path = ["cad/**", "docs/assets/boxes/**", "data/**"]
+SPDX-FileCopyrightText = "2026 the RangeFoundry contributors"
+SPDX-License-Identifier = "AGPL-3.0-only"

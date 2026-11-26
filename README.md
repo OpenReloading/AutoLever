@@ -25,8 +25,11 @@ python -m venv .venv && .venv/bin/pip install -r requirements.txt
 
 Edit `data/*.yaml`, run `.venv/bin/python main.py` and commit `data/buildguide.json`. Printable parts are in `cad/`.
 
-## Community and licence
+## Community and license
 
 Built by reloaders for reloaders, with AI as a tool.
 
-ISC licence. The [BuildGuide](https://github.com/OpenReloading/BuildGuide) plugin bundles JointJS (MPL 2.0) and libavoid-js (LGPL 2.1+).
+- Code (firmware, scripts, tests, site templates), CAD sources and renders (`cad/`, `docs/assets/boxes/`) and the BOM and wiring data (`data/`): AGPL-3.0-only, see [LICENSE](LICENSE).
+- Documentation, site text and the logos: MIT, see [LICENSES/MIT.txt](LICENSES/MIT.txt).
+
+A changed firmware links its own source: the "Source code" link of the device's web page is in `firmware/src/web.cpp`. The [BuildGuide](https://github.com/OpenReloading/BuildGuide) plugin bundles JointJS (MPL 2.0) and libavoid-js (LGPL 2.1+).
