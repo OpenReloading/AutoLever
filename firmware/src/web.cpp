@@ -28,7 +28,7 @@ input{font:inherit;padding:.3rem;width:100%;box-sizing:border-box}button{font:in
 <form method=post action=/wifi><label>Home network<input name=ssid value="%SSID%"></label>
 <label>Password<input name=pass type=password></label><button>Save and connect</button></form>
 <small>Changes ask for the user admin and the device password shown on the box (info screen).</small>
-<p><a href=https://github.com/OpenReloading/AutoLever>Source code</a></p>
+<p><a href=https://github.com/OpenReloading/AutoLever/tree/)html" AUTOLEVER_COMMIT R"html(>Source code</a> of firmware )html" AUTOLEVER_VERSION R"html(</p>
 <script>async function u(){try{const r=await(await fetch('/status')).json();
 s.textContent=r.state;f.textContent=r.fault;c.textContent=r.cycles}catch(e){s.textContent='no connection'}}
 u();setInterval(u,1000)</script>)html";
