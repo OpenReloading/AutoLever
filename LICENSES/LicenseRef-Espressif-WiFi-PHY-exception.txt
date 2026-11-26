@@ -9,9 +9,13 @@ non-source form of such a combination need not include the source code of the
 Espressif Wi-Fi and PHY libraries; it shall include the source code of every
 other part of the covered work.
 
-"The Espressif Wi-Fi and PHY libraries" are the libraries that Espressif
-Systems distributes in binary form only, as part of ESP-IDF and of the Arduino
-core for ESP32, to drive the Wi-Fi and the PHY (radio) of its ESP32 series
-chips, such as libcore, libnet80211, libpp and libphy, in any version that
-Espressif Systems releases. This permission covers no other library and no
-other part of this repository.
+"The Espressif Wi-Fi and PHY libraries" are exactly these libraries, which
+Espressif Systems distributes in binary form only, as part of ESP-IDF and of
+the Arduino core for ESP32, in any version that Espressif Systems releases:
+
+- libcoexist, libcore, libnet80211, libpp and libsmartconfig (the ESP-IDF
+  esp_wifi component),
+- libphy (the ESP-IDF esp_phy component),
+- libxt_hal (the ESP-IDF xtensa component).
+
+This permission covers no other library and no other part of this repository.
