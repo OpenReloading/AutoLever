@@ -1,0 +1,43 @@
+version = 1
+
+# Everything else: the code, firmware, tests, site templates and scripts (LICENSE).
+[[annotations]]
+path = "**"
+SPDX-FileCopyrightText = "2026 the RangeFoundry contributors"
+SPDX-License-Identifier = "AGPL-3.0-only"
+
+# Firmware: linking with the binary-only Espressif Wi-Fi and PHY libraries is permitted.
+[[annotations]]
+path = "firmware/**"
+SPDX-FileCopyrightText = "2026 the RangeFoundry contributors"
+SPDX-License-Identifier = "AGPL-3.0-only WITH LicenseRef-Espressif-WiFi-PHY-exception"
+
+# Documentation and site text.
+[[annotations]]
+path = ["**/*.md", "docs/**"]
+SPDX-FileCopyrightText = "2026 the RangeFoundry contributors"
+SPDX-License-Identifier = "MIT"
+
+# Names and logos: no open license (LICENSES/LicenseRef-Brand.txt).
+[[annotations]]
+path = ["docs/assets/autolever*.svg", "docs/assets/favicon.svg", "docs/assets/social-card.png"]
+SPDX-FileCopyrightText = "2026 the RangeFoundry contributors"
+SPDX-License-Identifier = "LicenseRef-Brand"
+
+# Site styles.
+[[annotations]]
+path = "docs/stylesheets/**"
+SPDX-FileCopyrightText = "2026 the RangeFoundry contributors"
+SPDX-License-Identifier = "AGPL-3.0-only"
+
+# Hardware: the CAD sources and their renders.
+[[annotations]]
+path = ["cad/**", "docs/assets/boxes/**"]
+SPDX-FileCopyrightText = "2026 the RangeFoundry contributors"
+SPDX-License-Identifier = "CERN-OHL-S-2.0"
+
+# Data: the guide, BOM and wiring data and the guide file built from them.
+[[annotations]]
+path = "data/**"
+SPDX-FileCopyrightText = "2026 the RangeFoundry contributors"
+SPDX-License-Identifier = "CC-BY-SA-4.0"
