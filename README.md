@@ -26,8 +26,15 @@ python -m venv .venv && .venv/bin/pip install -r requirements.txt
 
 Edit `data/*.yaml`, run `.venv/bin/python main.py` and commit `data/buildguide.json`. Printable parts are in `cad/`.
 
-## Community and licence
+## Community and license
 
 Built by reloaders for reloaders, with AI as a tool.
 
-ISC licence. The [BuildGuide](https://github.com/OpenReloading/BuildGuide) plugin bundles JointJS (MPL 2.0) and libavoid-js (LGPL 2.1+).
+- Code (firmware, scripts, tests, site templates): AGPL-3.0-only, see [LICENSE](LICENSE).
+- The firmware (`firmware/`) adds a section 7 permission to link it with the binary-only Espressif Wi-Fi and PHY libraries and convey the result, see [LICENSES/LicenseRef-Espressif-WiFi-PHY-exception.txt](LICENSES/LicenseRef-Espressif-WiFi-PHY-exception.txt).
+- CAD sources and their renders (`cad/`, `docs/assets/boxes/`) and the parts printed from them: CERN-OHL-S-2.0, see [LICENSES/CERN-OHL-S-2.0.txt](LICENSES/CERN-OHL-S-2.0.txt).
+- Guide, BOM and wiring data (`data/`): CC-BY-SA-4.0, see [LICENSES/CC-BY-SA-4.0.txt](LICENSES/CC-BY-SA-4.0.txt).
+- Documentation and site text: MIT, see [LICENSES/MIT.txt](LICENSES/MIT.txt).
+- The AutoLever name and logos: no open license, see [LICENSES/LicenseRef-Brand.txt](LICENSES/LicenseRef-Brand.txt).
+
+The device's web page shows the firmware version and links the source of that commit; `firmware/version.py` stamps both from git at build time. A changed firmware links its own source: the repository address is in `firmware/src/web.cpp`. The [BuildGuide](https://github.com/OpenReloading/BuildGuide) plugin bundles JointJS (MPL 2.0) and libavoid-js (LGPL 2.1+).
