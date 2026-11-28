@@ -1,5 +1,27 @@
 # Changelog
 
+## [1.0.0](https://github.com/OpenReloading/AutoLever/compare/v0.3.0...v1.0.0) (2026-11-27)
+
+
+### ⚠ BREAKING CHANGES
+
+* license the code under AGPL-3.0-only ([#175](https://github.com/OpenReloading/AutoLever/issues/175))
+
+### Bug Fixes
+
+* **cad:** valid box solids, plug export, insert lead-ins, named sizes ([#164](https://github.com/OpenReloading/AutoLever/issues/164)) ([8e7f3dc](https://github.com/OpenReloading/AutoLever/commit/8e7f3dce002ea8020278beb90030f5f12f79f476))
+* **firmware:** bench image switches relays off by itself ([#158](https://github.com/OpenReloading/AutoLever/issues/158)) ([e41a9af](https://github.com/OpenReloading/AutoLever/commit/e41a9af582314004f788cc3516781c50c9135bd5))
+* **firmware:** keep the device name while the press runs, digest login, update only after a button hold ([#162](https://github.com/OpenReloading/AutoLever/issues/162)) ([80a6de4](https://github.com/OpenReloading/AutoLever/commit/80a6de4ccc5c48c00e063b94e26aa2e20ed5dd9d))
+* **firmware:** no start from a held START, watchdog on the control loop ([#159](https://github.com/OpenReloading/AutoLever/issues/159)) ([e39cb02](https://github.com/OpenReloading/AutoLever/commit/e39cb0239d3ec51bc95897a49bd3f492538e1287))
+* **firmware:** read START and JOG with a checked I2C read ([#170](https://github.com/OpenReloading/AutoLever/issues/170)) ([c7afcc4](https://github.com/OpenReloading/AutoLever/commit/c7afcc4742b8202ad9fde1ae433668a4976eceaa))
+* **firmware:** relay 3 as enable contact in series with the valve relays ([#163](https://github.com/OpenReloading/AutoLever/issues/163)) ([926b37f](https://github.com/OpenReloading/AutoLever/commit/926b37f8be6303a33ced97f6113bef1100b7892a))
+* **firmware:** START needs 150 ms released before AUTO, upload only with relays read off, reset reason on info screen ([#160](https://github.com/OpenReloading/AutoLever/issues/160)) ([88553d8](https://github.com/OpenReloading/AutoLever/commit/88553d8cf30a144a8395c97d58ca14c4903fd882))
+
+
+### Miscellaneous Chores
+
+* license the code under AGPL-3.0-only ([#175](https://github.com/OpenReloading/AutoLever/issues/175)) ([ec2d2f2](https://github.com/OpenReloading/AutoLever/commit/ec2d2f2e2598ef960981b788836f5e4f0cc98e89))
+
 ## [0.3.0](https://github.com/OpenReloading/AutoLever/compare/v0.2.0...v0.3.0) (2026-11-01)
 
 
